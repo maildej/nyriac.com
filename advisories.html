@@ -40,20 +40,59 @@
 <section class="section">
   <div class="wrap">
 
-    <div class="notice">
-      <strong>Placeholder:</strong> upload advisory PDFs to the <code>advisories/</code> folder, then replace the example entries below with real titles and links. Delete this yellow box when done.
+    <div class="search-bar">
+      <input type="search" id="advisory-search" placeholder="Search advisories by title&hellip;" aria-label="Search advisories by title">
     </div>
 
-    <ul class="advisory-list">
+    <ul class="advisory-list" id="advisory-list">
       <li>
-        <a href="advisories/example-advisory.pdf">Immigration Consequences of Common New York Pleas (example)</a>
-        <span class="date">Example &mdash; replace me</span>
+        <h3>Court Interpreters Cannot Be Used Outside of Court</h3>
+        <p class="summary">Explains why attorneys may never use a court interpreter for attorney-client discussions &mdash; even a quick one &mdash; and what to do instead to protect privilege and confidentiality.</p>
+        <a class="btn btn-download" href="advisories/court-interpreters-cannot-be-used-outside-court.pdf" download>Download PDF</a>
       </li>
       <li>
-        <a href="advisories/example-advisory-2.pdf">Advising Noncitizen Clients After <em>Padilla</em> (example)</a>
-        <span class="date">Example &mdash; replace me</span>
+        <h3>Expansion of Mandatory Immigration Detention for Undocumented Clients</h3>
+        <p class="summary">Explains the Laken Riley Act's new category of mandatory immigration detention for certain undocumented clients, and the tension between a quick plea and a better disposition when advising them.</p>
+        <a class="btn btn-download" href="advisories/mandatory-detention-undocumented-clients-open-cases.pdf" download>Download PDF</a>
+      </li>
+      <li>
+        <h3>What To Do If A Judge Asks for Your Client's Immigration Status</h3>
+        <p class="summary">Outlines the steps to take if a judge asks about a client's immigration status &mdash; asking to go off the record, objecting on Fifth Amendment grounds, and contacting RIAC immediately.</p>
+        <a class="btn btn-download" href="advisories/judge-asks-immigration-status.pdf" download>Download PDF</a>
+      </li>
+      <li>
+        <h3>NY Requirements for the Factual Basis of Criminal Pleas</h3>
+        <p class="summary">Explains that New York does not require a factual basis for a bargained-for plea to a lesser offense, so a client can lawfully plead to an immigration-safe or even fictitious crime.</p>
+        <a class="btn btn-download" href="advisories/ny-factual-basis-of-criminal-pleas.pdf" download>Download PDF</a>
+      </li>
+      <li>
+        <h3>Info for Attorneys and Clients Regarding ACDs</h3>
+        <p class="summary">Explains why an ACD is usually the best immigration-safe disposition, which client situations must be flagged to RIAC right away, and the steps to take after a client receives one.</p>
+        <a class="btn btn-download" href="advisories/info-for-attorneys-and-clients-regarding-acds.pdf" download>Download PDF</a>
+      </li>
+      <li>
+        <h3>Domestic Orders of Protection</h3>
+        <p class="summary">Covers how to protect foreign-born clients from the deportation risk tied to orders of protection, including negotiating alternatives and avoiding on-record admissions of a domestic relationship.</p>
+        <a class="btn btn-download" href="advisories/domestic-orders-of-protection.pdf" download>Download PDF</a>
+      </li>
+      <li>
+        <h3>Steps You Must Take If Your Client Was Not Born In The U.S.</h3>
+        <p class="summary">A checklist of immediate dos and don'ts for any client born outside the U.S. &mdash; from pleas and ACDs to interpreters and ICE warrants &mdash; before RIAC has given case-specific advice.</p>
+        <a class="btn btn-download" href="advisories/client-not-born-in-the-us.pdf" download>Download PDF</a>
+      </li>
+      <li>
+        <h3>No Diversion or Up-Front Pleas Without RIAC Advice</h3>
+        <p class="summary">Warns that diversion programs and up-front pleas can count as a conviction for immigration purposes even if later vacated or sealed, so counsel must get RIAC advice first.</p>
+        <a class="btn btn-download" href="advisories/no-diversion-or-up-front-pleas-without-riac-advice.pdf" download>Download PDF</a>
+      </li>
+      <li>
+        <h3>How to Check for U.S. Citizenship And Why You Need To</h3>
+        <p class="summary">Explains why every client's place of birth must be verified, not just their stated citizenship, and which documents do or don't resolve the question without a RIAC consultation.</p>
+        <a class="btn btn-download" href="advisories/how-to-check-for-us-citizenship.pdf" download>Download PDF</a>
       </li>
     </ul>
+
+    <p class="no-results" id="advisory-no-results" hidden>No advisories match your search.</p>
   </div>
 </section>
 
@@ -63,6 +102,8 @@
     <p class="fineprint">This website provides general information for legal service providers and does not constitute legal advice.</p>
   </div>
 </footer>
+
+<script src="js/advisory-search.js"></script>
 
 </body>
 </html>

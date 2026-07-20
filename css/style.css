@@ -15,7 +15,7 @@
 
   --r1: #55b7e8;  /* Western New York   */
   --r2: #2e8540;  /* Central New York   */
-  --r3: #c22b30;  /* Northern New York  */
+  --r3: #c22b30;  /* Capital Region / Northern New York */
   --r4: #f2d43d;  /* Hudson Valley      */
   --r5: #ef7c28;  /* New York City      */
   --r6: #8347ad;  /* Long Island        */
@@ -61,11 +61,11 @@ a { color: var(--navy); }
 .brand-text .brand-acronym { font-size: 1.35rem; letter-spacing: .04em; display: block; line-height: 1.1; }
 .brand-text .brand-full { font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; opacity: .85; display: block; }
 
-.site-nav { display: flex; gap: 1.6rem; }
+.site-nav { display: flex; align-items: center; gap: 1.6rem; }
 .site-nav a {
   color: rgba(247,242,224,.8); text-decoration: none;
   font-size: .92rem; letter-spacing: .02em; padding: .35rem 0;
-  border-bottom: 2px solid transparent;
+  border-bottom: 2px solid transparent; text-align: center;
 }
 .site-nav a:hover { color: var(--cream); }
 .site-nav a[aria-current="page"] { color: var(--cream); border-bottom-color: var(--r4); }
@@ -91,7 +91,7 @@ a { color: var(--navy); }
 .btn {
   display: inline-block; text-decoration: none; font-size: .95rem;
   padding: .7rem 1.5rem; border-radius: 6px; letter-spacing: .02em;
-  margin: 0 .6rem .6rem 0;
+  margin: 0 .6rem .6rem 0; white-space: nowrap;
 }
 .btn-solid { background: var(--cream); color: var(--navy); font-weight: 600; }
 .btn-solid:hover { background: #fff; }
@@ -170,15 +170,33 @@ a { color: var(--navy); }
 
 /* ---------- Advisories ---------- */
 
+.search-bar { margin-top: .5rem; }
+.search-bar input {
+  width: 100%; max-width: 26rem; font: inherit; font-size: .95rem;
+  padding: .65rem 1rem; border: 1px solid var(--line); border-radius: 8px;
+  background: #fff; color: var(--ink);
+}
+.search-bar input:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+
+.no-results { color: var(--muted); margin-top: 1.5rem; }
+
 .advisory-list { list-style: none; margin-top: 1.5rem; }
 .advisory-list li {
   background: #fff; border: 1px solid var(--line); border-radius: 10px;
-  padding: 1.1rem 1.4rem; margin-bottom: .8rem;
-  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  padding: 1.4rem 1.6rem; margin-bottom: .8rem;
 }
-.advisory-list a { font-family: var(--serif); font-size: 1.05rem; text-decoration: none; }
-.advisory-list a:hover { text-decoration: underline; }
-.advisory-list .date { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+.advisory-list h3 {
+  font-family: var(--serif); font-size: 1.15rem; color: #fff;
+  background: var(--navy); border-radius: 10px 10px 0 0;
+  margin: -1.4rem -1.6rem 1rem; padding: 1rem 1.6rem;
+}
+.advisory-list .summary { color: var(--muted); font-size: .95rem; margin-bottom: 1rem; max-width: 46rem; }
+
+.btn-download {
+  background: var(--navy); color: var(--cream); font-weight: 600;
+  padding: .55rem 1.2rem; font-size: .88rem; margin: 0;
+}
+.btn-download:hover { background: var(--navy-deep); }
 
 /* ---------- Notices (placeholder boxes) ---------- */
 
@@ -192,6 +210,7 @@ a { color: var(--navy); }
 .page-head { background: var(--navy); color: var(--cream); padding: 2.6rem 0; }
 .page-head h1 { font-size: 2rem; margin-bottom: .4rem; }
 .page-head p { color: rgba(247,242,224,.75); max-width: 44rem; }
+.page-head .map-panel { max-width: 32rem; margin: 2.2rem auto 0; }
 
 /* ---------- Footer ---------- */
 

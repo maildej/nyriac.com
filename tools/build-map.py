@@ -18,7 +18,7 @@ REGIONS = {
     2: ("Central New York", "#2e8540",
         ["Broome","Chemung","Chenango","Cortland","Delaware","Herkimer","Jefferson","Lewis",
          "Madison","Oneida","Onondaga","Oswego","Otsego","Schuyler","Tioga","Tompkins"]),
-    3: ("Northern New York", "#c22b30",
+    3: ("Capital Region / Northern New York", "#c22b30",
         ["Albany","Clinton","Essex","Franklin","Fulton","Hamilton","Montgomery","Rensselaer",
          "St. Lawrence","Saratoga","Schenectady","Schoharie","Warren","Washington"]),
     4: ("Hudson Valley", "#f2d43d",
