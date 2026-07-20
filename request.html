@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download This Advisory — RIAC</title>
+  <meta name="description" content="Request a downloadable practice advisory from the Regional Immigration Assistance Centers.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img src="images/riac-mark.svg" alt="" aria-hidden="true">
+      <span class="brand-text">
+        <span class="brand-acronym">RIAC</span>
+        <span class="brand-full">Regional Immigration Assistance Centers</span>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="advisories.html" aria-current="page">Practice Advisories</a>
+      <a href="intake.html">RIAC Intake Forms</a>
+      <a href="contact.html">Find Your Center</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-head">
+  <div class="wrap">
+    <h1>Download this advisory</h1>
+    <p>Please tell us a little about yourself before downloading. This helps RIAC understand who&rsquo;s using our advisories.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="wrap">
+    <div class="request-card">
+
+      <div class="request-doc">
+        You are requesting:
+        <strong id="doc-title">this document</strong>
+      </div>
+
+      <form class="request-form" action="https://formspree.io/f/mjgnrzpp" method="POST">
+        <input type="hidden" name="document" id="doc-field" value="">
+        <input type="hidden" name="_next" id="next-field" value="thanks.html">
+        <input type="hidden" name="_subject" value="New RIAC advisory download request">
+        <input type="text" name="_gotcha" class="hp-field" tabindex="-1" autocomplete="off">
+
+        <div class="field">
+          <label for="county">County</label>
+          <select name="county" id="county" required>
+            <option value="" disabled selected>Select your county&hellip;</option>
+            <option>Albany</option>
+            <option>Allegany</option>
+            <option>Bronx</option>
+            <option>Broome</option>
+            <option>Cattaraugus</option>
+            <option>Cayuga</option>
+            <option>Chautauqua</option>
+            <option>Chemung</option>
+            <option>Chenango</option>
+            <option>Clinton</option>
+            <option>Columbia</option>
+            <option>Cortland</option>
+            <option>Delaware</option>
+            <option>Dutchess</option>
+            <option>Erie</option>
+            <option>Essex</option>
+            <option>Franklin</option>
+            <option>Fulton</option>
+            <option>Genesee</option>
+            <option>Greene</option>
+            <option>Hamilton</option>
+            <option>Herkimer</option>
+            <option>Jefferson</option>
+            <option>Kings (Brooklyn)</option>
+            <option>Lewis</option>
+            <option>Livingston</option>
+            <option>Madison</option>
+            <option>Monroe</option>
+            <option>Montgomery</option>
+            <option>Nassau</option>
+            <option>New York (Manhattan)</option>
+            <option>Niagara</option>
+            <option>Oneida</option>
+            <option>Onondaga</option>
+            <option>Ontario</option>
+            <option>Orange</option>
+            <option>Orleans</option>
+            <option>Oswego</option>
+            <option>Otsego</option>
+            <option>Putnam</option>
+            <option>Queens</option>
+            <option>Rensselaer</option>
+            <option>Richmond (Staten Island)</option>
+            <option>Rockland</option>
+            <option>St. Lawrence</option>
+            <option>Saratoga</option>
+            <option>Schenectady</option>
+            <option>Schoharie</option>
+            <option>Schuyler</option>
+            <option>Seneca</option>
+            <option>Steuben</option>
+            <option>Suffolk</option>
+            <option>Sullivan</option>
+            <option>Tioga</option>
+            <option>Tompkins</option>
+            <option>Ulster</option>
+            <option>Warren</option>
+            <option>Washington</option>
+            <option>Wayne</option>
+            <option>Westchester</option>
+            <option>Wyoming</option>
+            <option>Yates</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="email">Email address</label>
+          <input type="email" name="email" id="email" required>
+        </div>
+
+        <div class="field">
+          <label>You are&hellip;</label>
+          <div class="radio-group">
+            <label><input type="radio" name="attorney_type" value="Public Defender" required> A public defender</label>
+            <label><input type="radio" name="attorney_type" value="Assigned Counsel"> Assigned counsel</label>
+            <label><input type="radio" name="attorney_type" value="Privately Retained"> Privately retained</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-download">Continue to download</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Regional Immigration Assistance Centers</strong> &middot; <a href="contact.html">Find your center</a> &middot; <a href="advisories.html">Practice advisories</a> &middot; <a href="intake.html">RIAC intake forms</a></p>
+    <p class="fineprint">This website provides general information for legal service providers and does not constitute legal advice.</p>
+  </div>
+</footer>
+
+<script src="js/document-request.js"></script>
+
+</body>
+</html>

@@ -170,6 +170,10 @@ a { color: var(--navy); }
 
 /* ---------- Advisories ---------- */
 
+.advisories-section { padding-top: 1.5rem; }
+
+.advisory-divider { max-width: 46rem; border: none; border-top: 3px solid var(--navy); margin: 1.8rem 0 2.4rem; }
+
 .search-bar { margin-top: .5rem; }
 .search-bar input {
   width: 100%; max-width: 26rem; font: inherit; font-size: .95rem;
@@ -183,7 +187,7 @@ a { color: var(--navy); }
 .advisory-list { list-style: none; margin-top: 1.5rem; }
 .advisory-list li {
   background: #fff; border: 1px solid var(--line); border-radius: 10px;
-  padding: 1.4rem 1.6rem; margin-bottom: .8rem;
+  padding: 1.4rem 1.6rem; margin-bottom: .8rem; max-width: 46rem;
 }
 .advisory-list h3 {
   font-family: var(--serif); font-size: 1.15rem; color: #fff;
@@ -192,11 +196,53 @@ a { color: var(--navy); }
 }
 .advisory-list .summary { color: var(--muted); font-size: .95rem; margin-bottom: 1rem; max-width: 46rem; }
 
+.advisory-list li.featured { background: color-mix(in srgb, var(--navy) 20%, white); border-color: var(--navy); }
+
 .btn-download {
   background: var(--navy); color: var(--cream); font-weight: 600;
   padding: .55rem 1.2rem; font-size: .88rem; margin: 0;
 }
 .btn-download:hover { background: var(--navy-deep); }
+
+/* ---------- Document request form ---------- */
+
+.request-card {
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+  padding: 2rem; max-width: 30rem; margin: 1.5rem auto 0;
+}
+.request-doc {
+  background: color-mix(in srgb, var(--navy) 6%, white); border-radius: 8px;
+  padding: .8rem 1rem; font-size: .9rem; color: var(--navy); margin-bottom: 1.6rem;
+}
+.request-doc strong { display: block; font-family: var(--serif); font-size: 1.05rem; margin-top: .15rem; }
+
+.field { margin-bottom: 1.2rem; }
+.field label { display: block; font-weight: 600; font-size: .88rem; color: var(--navy); margin-bottom: .4rem; }
+.field input[type="email"],
+.field select {
+  width: 100%; font: inherit; font-size: .95rem;
+  padding: .6rem .8rem; border: 1px solid var(--line); border-radius: 8px;
+  background: #fff; color: var(--ink);
+}
+.field input:focus, .field select:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+
+.radio-group { display: flex; flex-direction: column; gap: .5rem; }
+.radio-group label {
+  display: flex; align-items: center; gap: .55rem;
+  font-weight: 400; font-size: .95rem; color: var(--ink);
+}
+.radio-group input { width: auto; }
+
+.hp-field { position: absolute; left: -9999px; top: -9999px; }
+
+.request-form .btn-download { width: 100%; text-align: center; padding: .75rem 1.2rem; font-size: .95rem; }
+
+.thanks-card {
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+  padding: 2.4rem; max-width: 30rem; margin: 1.5rem auto 0; text-align: center;
+}
+.thanks-card h2 { color: var(--navy); font-size: 1.3rem; margin-bottom: .6rem; }
+.thanks-card p { color: var(--muted); margin-bottom: 1.6rem; }
 
 /* ---------- Intake forms ---------- */
 
