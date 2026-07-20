@@ -48,11 +48,13 @@
         <strong id="doc-title">this document</strong>
       </div>
 
-      <form class="request-form" action="https://formspree.io/f/mjgnrzpp" method="POST">
+      <form class="request-form" id="request-form" action="https://formspree.io/f/mjgnrzpp" method="POST">
         <input type="hidden" name="document" id="doc-field" value="">
         <input type="hidden" name="_next" id="next-field" value="thanks.html">
         <input type="hidden" name="_subject" value="New RIAC advisory download request">
         <input type="text" name="_gotcha" class="hp-field" tabindex="-1" autocomplete="off">
+
+        <p class="form-error" id="form-error" hidden>Something went wrong submitting the form. Please try again, or email your regional center directly.</p>
 
         <div class="field">
           <label for="county">County</label>

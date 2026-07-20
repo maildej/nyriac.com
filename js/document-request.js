@@ -22,6 +22,38 @@
     }
   }
 
+  // request.html: submit via fetch so we control the post-submission
+  // redirect ourselves, rather than relying on Formspree's server-side
+  // "_next" redirect (which requires a paid Formspree plan).
+  var form = document.getElementById('request-form');
+  if (form) {
+    var errorEl = document.getElementById('form-error');
+    var submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (errorEl) errorEl.hidden = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' }
+      }).then(function (response) {
+        if (response.ok) {
+          window.location.href = document.getElementById('next-field').value;
+        } else {
+          throw new Error('Form submission failed');
+        }
+      }).catch(function () {
+        if (errorEl) errorEl.hidden = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Continue to download';
+      });
+    });
+  }
+
   // thanks.html: reveal the real download link for the requested document.
   var thanksTitleEl = document.getElementById('thanks-title');
   if (thanksTitleEl) {
