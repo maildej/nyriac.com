@@ -198,6 +198,20 @@ a { color: var(--navy); }
 }
 .btn-download:hover { background: var(--navy-deep); }
 
+/* ---------- Intake forms ---------- */
+
+.intake-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin-top: 1.5rem; }
+.intake-card {
+  background: #fff; border: 1px solid var(--line); border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+}
+.intake-card h3 {
+  font-family: var(--serif); font-size: 1.15rem; color: #fff;
+  background: var(--navy); border-radius: 10px 10px 0 0;
+  margin: -1.4rem -1.6rem 1rem; padding: 1rem 1.6rem;
+}
+.intake-card .summary { color: var(--muted); font-size: .95rem; margin-bottom: 1rem; }
+
 /* ---------- Notices (placeholder boxes) ---------- */
 
 .notice {
@@ -227,6 +241,7 @@ a { color: var(--navy); }
 @media (max-width: 820px) {
   .hero .wrap { grid-template-columns: 1fr; gap: 2.2rem; padding-top: 2.8rem; padding-bottom: 2.8rem; }
   .region-grid { grid-template-columns: 1fr; }
+  .intake-grid { grid-template-columns: 1fr; }
   .legend { grid-template-columns: repeat(2, 1fr); }
   .site-nav { gap: 1.1rem; }
 }
