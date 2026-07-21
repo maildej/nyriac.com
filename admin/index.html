@@ -20,9 +20,23 @@
     body, input, select, textarea, button {
       font-family: "Inter", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif !important;
     }
+
+    /* Floating "back to website" button — sits on top of Decap's own UI
+       (not part of it), so it stays visible on every screen inside the CMS. */
+    #back-to-site {
+      position: fixed; bottom: 18px; left: 18px; z-index: 9999;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #12263f; color: #f7f2e0; text-decoration: none;
+      font-weight: 600; font-size: 14px; letter-spacing: .02em;
+      padding: 10px 16px; border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.25);
+    }
+    #back-to-site:hover { background: #0c1a2e; }
   </style>
 </head>
 <body>
+  <a id="back-to-site" href="https://nyriac.com">&larr; Back to website</a>
+
   <!-- Decap CMS: gives RIAC staff a login-protected page (via GitHub) to
        upload/manage practice advisory PDFs and Word source files, with
        built-in search and one-click "copy URL" on any uploaded file. -->
