@@ -1,26 +1,45 @@
 // Practice advisories page:
 //  1. Filters the advisory list by title as the user types.
-//  2. Equalizes every card's title bar to the tallest, so they all match
-//     regardless of title length or screen width.
+//  2. Sizes the cards so full rows fill the width edge-to-edge (flush),
+//     while an incomplete last row (e.g. the final 2 of 8) centers.
+//  3. Equalizes every card's title bar to the tallest so they all match.
+// Everything recalculates on load, on resize, and after each search so
+// it stays correct at any width and never interferes with filtering.
 (function () {
   var input = document.getElementById('advisory-search');
+  var list = document.getElementById('advisory-list');
   var items = document.querySelectorAll('#advisory-list > li');
   var noResults = document.getElementById('advisory-no-results');
+  if (!list) return;
 
-  // --- Title-bar height equalizer ---
-  // Measures the tallest visible title bar and sets them all to it.
-  // Recalculated on load, on resize, and whenever the search filters
-  // the list (so the height tracks only the currently visible cards).
+  var MIN_CARD = 300; // px: minimum card width before the grid adds a column
+
+  function visibleItems() {
+    var v = [];
+    items.forEach(function (it) { if (!it.hidden) v.push(it); });
+    return v;
+  }
+
+  // Size every card so a full row exactly fills the container (flush
+  // edges). The container's justify-content:center then only affects a
+  // short last row, centering it under the full rows above.
+  function layoutCards() {
+    var width = list.clientWidth;
+    if (!width) return;
+    var gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+    var cols = Math.max(1, Math.floor((width + gap) / (MIN_CARD + gap)));
+    var cardW = Math.floor((width - (cols - 1) * gap) / cols);
+    items.forEach(function (it) { it.style.flex = '0 0 ' + cardW + 'px'; });
+  }
+
+  // Measure the tallest visible title bar and set them all to it.
   function equalizeTitles() {
     var titles = [];
-    items.forEach(function (item) {
-      if (item.hidden) return;
-      var h3 = item.querySelector('h3');
+    visibleItems().forEach(function (it) {
+      var h3 = it.querySelector('h3');
       if (h3) titles.push(h3);
     });
     if (!titles.length) return;
-
-    // Reset so each bar reports its natural height, then find the max.
     titles.forEach(function (h3) { h3.style.height = 'auto'; });
     var max = 0;
     titles.forEach(function (h3) {
@@ -29,18 +48,20 @@
     titles.forEach(function (h3) { h3.style.height = max + 'px'; });
   }
 
-  // Run once now, and again once web fonts finish loading (font metrics
-  // change the wrapping and therefore the heights).
-  equalizeTitles();
+  // Card width must be set before measuring title heights (width drives
+  // how the titles wrap).
+  function refresh() { layoutCards(); equalizeTitles(); }
+
+  refresh();
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(equalizeTitles);
+    document.fonts.ready.then(refresh);
   }
-  window.addEventListener('load', equalizeTitles);
+  window.addEventListener('load', refresh);
 
   var resizeTimer;
   window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(equalizeTitles, 150);
+    resizeTimer = setTimeout(refresh, 150);
   });
 
   // --- Search filter ---

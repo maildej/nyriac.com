@@ -182,11 +182,11 @@ a { color: var(--navy); }
 
 .advisories-section { padding-top: 1.5rem; }
 
-.advisory-divider { max-width: 46rem; border: none; border-top: 3px solid var(--navy); margin: 1.8rem 0 2.4rem; }
+.advisory-divider { border: none; border-top: 3px solid var(--navy); margin: 1.8rem 0 2.4rem; }
 
 .search-bar { margin-top: .5rem; }
 .search-bar input {
-  width: 100%; max-width: 26rem; font: inherit; font-size: .95rem;
+  width: 100%; font: inherit; font-size: .95rem;
   padding: .65rem 1rem; border: 1px solid var(--line); border-radius: 8px;
   background: #fff; color: var(--ink);
 }
@@ -205,6 +205,14 @@ a { color: var(--navy); }
   text-align: center;
 }
 .advisory-list .btn-download { margin-top: auto; align-self: center; }
+
+/* Searchable list: centered flex so an incomplete last row (e.g. the
+   final 2 of 8 cards) centers on the page instead of sitting in the
+   left slots. Search-hidden cards drop out and the rest re-center,
+   so this doesn't interfere with filtering. Scoped to #advisory-list
+   so the full-width featured card (plain .advisory-list) is unaffected. */
+#advisory-list { display: flex; flex-wrap: wrap; justify-content: center; }
+#advisory-list > li { flex: 0 1 320px; }
 .advisory-list h3 {
   font-family: var(--serif); font-size: 1.15rem; color: #fff;
   background: var(--navy); border-radius: 10px 10px 0 0;
