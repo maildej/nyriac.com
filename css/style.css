@@ -40,7 +40,11 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.2; }
 
 a { color: var(--navy); }
 
-.wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+/* 1128px so that after this element's own 1.5rem side padding is
+   subtracted, its content area is exactly 1080px — matching the
+   header/hero/page-head boxes below, whose own 1080px cap has no
+   padding baked in at that same outer level. */
+.wrap { max-width: 1128px; margin: 0 auto; padding: 0 1.5rem; }
 
 /* ---------- Header ---------- */
 
@@ -88,11 +92,14 @@ a { color: var(--navy); }
 
 /* ---------- Hero (home) ---------- */
 
-.hero { background: linear-gradient(170deg, var(--navy) 55%, var(--navy-deep)); color: var(--cream); }
+.hero { padding: 0 1.5rem; margin-bottom: 1.5rem; }
 
 .hero .wrap {
+  max-width: 1080px;
   display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: 3rem; align-items: center; padding-top: 4rem; padding-bottom: 4rem;
+  gap: 3rem; align-items: center; padding: 4rem 1.5rem;
+  background: linear-gradient(170deg, var(--navy) 55%, var(--navy-deep)); color: var(--cream);
+  border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.2);
 }
 
 .eyebrow {
@@ -151,6 +158,8 @@ a { color: var(--navy); }
 /* ---------- Sections ---------- */
 
 .section { padding: 4rem 0; }
+.section-top-tight { padding-top: 1.5rem; }
+.section-top-tighter { padding-top: 0; }
 .section-title { font-size: 1.8rem; color: var(--navy); margin-bottom: .6rem; }
 .section-title.center { text-align: center; }
 .section-intro { color: var(--muted); margin-bottom: 2rem; }
@@ -204,9 +213,11 @@ a.card:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,.08)
 
 /* ---------- Advisories ---------- */
 
-.advisories-section { padding-top: 1.5rem; }
+.advisories-section { padding-top: 0; }
 
-.advisory-divider { border: none; border-top: 3px solid var(--navy); margin: 1.8rem 0 2.4rem; }
+.advisory-list-featured { margin-top: .5rem; }
+
+.advisory-divider { border: none; border-top: 3px solid var(--navy); margin: 1.8rem 0; }
 
 .search-bar { margin-top: .5rem; }
 .search-bar input {
@@ -263,7 +274,14 @@ a.card:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,.08)
 }
 .advisory-list .summary { color: var(--muted); font-size: .95rem; margin-bottom: 1rem; max-width: 46rem; align-self: center; }
 
-.advisory-list li.featured { background: color-mix(in srgb, var(--navy) 20%, white); border-color: var(--navy); }
+/* Warm accent (complementary to the site's navy) sets this card apart
+   from the plain navy-on-white styling used by every other advisory. */
+.advisory-list li.featured { background: color-mix(in srgb, var(--r5) 12%, white); border-color: var(--r5); }
+.advisory-list li.featured h3 { background: var(--r5); }
+.advisory-list li.featured .btn-download { background: var(--r5); }
+.advisory-list li.featured:hover { border-color: var(--r5); box-shadow: 0 4px 14px rgba(239,124,40,.3); }
+.advisory-list li.featured:hover .btn-download { background: color-mix(in srgb, var(--r5) 75%, black); }
+.advisory-list li.featured .summary { font-size: 1.1rem; }
 
 .btn-download {
   background: var(--navy); color: var(--cream); font-weight: 600;
@@ -355,6 +373,20 @@ a.card:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,.08)
 }
 .intake-card .summary { color: var(--muted); font-size: .95rem; margin-bottom: 1rem; }
 
+.intake-followup {
+  margin-top: 1.4rem; text-align: center;
+  background: color-mix(in srgb, var(--r5) 12%, white);
+  border: 1px solid var(--r5); border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+}
+.intake-followup h3 {
+  font-family: var(--serif); font-size: 1.05rem; color: #fff;
+  background: var(--r5); border-radius: 10px 10px 0 0;
+  margin: -1.4rem -1.6rem 1.2rem; padding: 1rem 1.6rem;
+}
+.intake-followup .btn-download { background: var(--r5); }
+.intake-followup .btn-download:hover { background: color-mix(in srgb, var(--r5) 75%, black); }
+
 /* ---------- Notices (placeholder boxes) ---------- */
 
 .notice {
@@ -364,11 +396,21 @@ a.card:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,.08)
 
 /* ---------- Page headers (inner pages) ---------- */
 
-.page-head { background: var(--navy); color: var(--cream); padding: 2.6rem 0; }
+.page-head { padding: 0 1.5rem; margin-bottom: 1.5rem; }
+.page-head .wrap {
+  max-width: 1080px;
+  background: var(--navy); color: var(--cream);
+  border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.2);
+  padding-top: 2.6rem; padding-bottom: 2.6rem;
+}
 .page-head h1 { font-size: 2rem; margin-bottom: .4rem; text-align: center; text-transform: capitalize; }
-.page-head p { color: rgba(247,242,224,.75); max-width: 44rem; }
+.page-head p { color: rgba(247,242,224,.75); max-width: 44rem; text-align: center; margin: 0 auto; }
 .page-head p.full { max-width: none; }
 .page-head .map-panel { max-width: 32rem; margin: 2.2rem auto 0; }
+
+.page-head-alt .wrap { background: var(--cream); color: var(--ink); border: 2px solid var(--navy); }
+.page-head-alt h1 { color: var(--navy); }
+.page-head-alt p { color: var(--muted); }
 
 /* ---------- Footer ---------- */
 
