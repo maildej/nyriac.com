@@ -15,7 +15,7 @@
 
   --r1: #55b7e8;  /* Western New York   */
   --r2: #2e8540;  /* Central New York   */
-  --r3: #c22b30;  /* Capital Region / Northern New York */
+  --r3: #c22b30;  /* Northern New York */
   --r4: #f2d43d;  /* Hudson Valley      */
   --r5: #ef7c28;  /* New York City      */
   --r6: #8347ad;  /* Long Island        */
@@ -136,15 +136,14 @@ a { color: var(--navy); }
 
 .section { padding: 4rem 0; }
 .section-title { font-size: 1.8rem; color: var(--navy); margin-bottom: .6rem; }
-.section-intro { color: var(--muted); max-width: 46rem; margin-bottom: 2rem; }
+.section-title.center { text-align: center; }
+.section-intro { color: var(--muted); margin-bottom: 2rem; }
 
-.cards { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 1.4rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.4rem; }
 
 .card {
   background: #fff; border: 1px solid var(--line); border-radius: 10px;
   padding: 1.6rem;
-  flex: 0 1 280px;
-  display: flex; flex-direction: column; justify-content: center; text-align: center;
 }
 .card h3 { color: var(--navy); font-size: 1.15rem; margin-bottom: .55rem; }
 .card p { color: var(--muted); font-size: .95rem; }
@@ -195,17 +194,32 @@ a { color: var(--navy); }
 
 .no-results { color: var(--muted); margin-top: 1.5rem; }
 
-.advisory-list { list-style: none; margin-top: 1.5rem; }
+.advisory-list {
+  list-style: none; margin-top: 1.5rem;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.4rem;
+}
 .advisory-list li {
   background: #fff; border: 1px solid var(--line); border-radius: 10px;
-  padding: 1.4rem 1.6rem; margin-bottom: .8rem; max-width: 46rem;
+  padding: 1.4rem 1.6rem;
+  display: flex; flex-direction: column;
+  text-align: center;
 }
+.advisory-list .btn-download { margin-top: auto; align-self: center; }
 .advisory-list h3 {
   font-family: var(--serif); font-size: 1.15rem; color: #fff;
   background: var(--navy); border-radius: 10px 10px 0 0;
   margin: -1.4rem -1.6rem 1rem; padding: 1rem 1.6rem;
+  text-align: center; line-height: 1.3;
 }
-.advisory-list .summary { color: var(--muted); font-size: .95rem; margin-bottom: 1rem; max-width: 46rem; }
+/* Uniform title-bar height across the searchable advisory grid.
+   The exact height is measured and applied by js/advisory-search.js
+   (equalized to the tallest title); flex centres shorter titles.
+   The min-height is only a no-JS fallback. */
+#advisory-list h3 {
+  min-height: 3.9em;
+  display: flex; align-items: center; justify-content: center;
+}
+.advisory-list .summary { color: var(--muted); font-size: .95rem; margin-bottom: 1rem; max-width: 46rem; align-self: center; }
 
 .advisory-list li.featured { background: color-mix(in srgb, var(--navy) 20%, white); border-color: var(--navy); }
 
