@@ -73,6 +73,46 @@ Verification isn't required for the site to work, but it stops anyone else from 
 
 Recommended: in GitHub **Settings → Pages**, also click **Verify domain** if offered — it prevents others from claiming nyriac.com on GitHub Pages if the repo is ever deleted.
 
+## Step 6 — Set up admin login for the secret advisories page (`/admin/`)
+
+This page lets you upload/manage practice advisory PDFs (and their Word source files) from a login-protected page, instead of through github.com. Because the site itself has no server, the login step ("sign in with GitHub") is handled by a free Netlify account that does nothing except pass that login through — the site keeps living on GitHub Pages exactly as before.
+
+### 6a — Register a GitHub OAuth App
+
+1. Go to [github.com/settings/developers](https://github.com/settings/developers) (signed in as the GitHub account that owns the `nyriac.com` repo).
+2. Click **OAuth Apps** → **New OAuth App**.
+3. Fill in:
+   - **Application name:** `RIAC Site Admin` (anything you like)
+   - **Homepage URL:** `https://nyriac.com`
+   - **Authorization callback URL:** `https://api.netlify.com/auth/done`
+4. Click **Register application**.
+5. Copy the **Client ID** shown on the next page.
+6. Click **Generate a new client secret**, and copy that too — it's only shown once.
+
+### 6b — Create a free Netlify site (used only for login, not hosting)
+
+1. Go to [app.netlify.com/signup](https://app.netlify.com/signup) and sign up (signing in with your GitHub account is easiest).
+2. Click **Add new site** → **Import an existing project** → choose GitHub → select the `nyriac.com` repository.
+3. Accept the defaults and click **Deploy**. (Netlify will build its own unused copy of the site — that's fine, ignore it. `nyriac.com` itself keeps being served by GitHub Pages, not Netlify.)
+4. Once the site exists, note its Netlify address shown at the top of the dashboard — something like `https://random-name-123abc.netlify.app`.
+5. In that site, go to **Project configuration → Access & security → OAuth**.
+6. Under **Authentication Providers**, click **Install provider** → **GitHub**.
+7. Paste in the **Client ID** and **Client Secret** from step 6a. Save.
+
+### 6c — Connect the two together
+
+Open `admin/config.yml` in this folder and replace:
+
+```
+base_url: https://YOUR-NETLIFY-SITE-NAME.netlify.app
+```
+
+with the actual Netlify address from step 6b (e.g. `https://random-name-123abc.netlify.app`). Save, commit, and push (or ask Claude to do this last part).
+
+### 6d — Try it
+
+Visit `https://nyriac.com/admin/` and click **Login with GitHub**. Only GitHub accounts with push access to the `nyriac.com` repo (or ones you explicitly invite as collaborators) will be able to log in and make changes.
+
 ## Updating the site later
 
 1. Edit the file(s) locally, or open the file on github.com and click the pencil icon.

@@ -40,7 +40,8 @@ Audience: attorneys (public defenders, assigned counsel, mandated providers) —
 | `css/style.css` | All styling, shared by every page (brand + region colors at top in `:root`) |
 | `images/riac-mark.svg` | Colored map mark used as the header logo on every page |
 | `images/favicon.svg` | Browser tab icon (navy square + map) |
-| `advisories/` | Drop advisory PDFs here; link them from `advisories.html` |
+| `advisories/` | Drop advisory PDFs here; link them from `advisories.html`. `advisories/source/` holds internal Word (.docx) copies for editing — not linked publicly, kept out of search engines via `robots.txt` |
+| `admin/` | **Secret admin page** (see "Admin CMS" below) — login-protected via GitHub, for uploading/managing advisory PDFs and Word source files |
 | `tools/` | Map generator (`build-map.py` + county boundary data). **Dan can ignore this folder**; it's only needed if region/county assignments ever change. It regenerates `tools/map-inline.svg`, which is pasted into `index.html` and mirrored in `images/`. |
 | `404.html` | Shown for broken links (uses absolute `/` paths) |
 | `CNAME` | Custom domain for GitHub Pages — **do not delete or edit** |
@@ -60,6 +61,15 @@ Notes:
 - The subject line and honeypot spam trap are set with hidden fields (`_subject`, `_gotcha`) in the form's HTML.
 - Each Formspree form's **first** submission must be confirmed via a link Formspree emails to the recipient before later submissions are delivered.
 - Free Formspree plans cap submissions at 50/month per form.
+
+### Admin CMS (`admin/`)
+
+An unlisted, `noindex` admin page at `admin/index.html` running **Decap CMS** (loaded from a CDN — the one exception to "no JavaScript/frameworks" in this project, isolated entirely to `/admin/`). It gives RIAC staff a real login (via GitHub — not just an unlisted-URL "secret") to upload and manage practice advisory PDFs and their internal Word source files, with built-in search across entries and a "copy URL" option on any uploaded file (for pasting into emails).
+
+- Configuration: `admin/config.yml`. Backend is `github`, repo `maildej/nyriac.com`, branch `main`.
+- Because GitHub Pages can't run server-side code, GitHub OAuth login is proxied through a **free Netlify site created only for this purpose** (Netlify doesn't host the actual site — nyriac.com stays on GitHub Pages). See `SETUP.md` for the one-time setup Dan needs to complete (registering a GitHub OAuth App + connecting Netlify), which fills in `base_url` in `admin/config.yml`.
+- Uploads land in `advisories/` (PDF) and `advisories/source/` (Word doc) and create a small metadata entry under `cms/advisories/` that Decap uses for its list/search — this metadata isn't read by the public site. **Uploading a file here does not automatically add it as a card on `advisories.html`** — that step (title, summary, card styling) is still a manual edit, same as any other advisories.html change.
+- Only people with push access to the GitHub repo (or added as OAuth-approved users) can log in — that's the real access boundary, not the page's URL being unlisted.
 
 ### Chief Defender survey
 

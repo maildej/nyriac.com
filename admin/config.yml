@@ -1,0 +1,24 @@
+backend:
+  name: github
+  repo: maildej/nyriac.com
+  branch: main
+  base_url: https://incandescent-nasturtium-490a59.netlify.app
+  auth_endpoint: auth
+
+media_folder: "advisories"
+public_folder: "/advisories"
+
+collections:
+  - name: "advisories"
+    label: "Practice Advisories"
+    folder: "cms/advisories"
+    create: true
+    identifier_field: title
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Summary (shown on the public advisories page)", name: "summary", widget: "text" }
+      - { label: "PDF (public download)", name: "pdf", widget: "file", media_folder: "/advisories", public_folder: "/advisories" }
+      - { label: "Word Doc (internal editing copy — not linked publicly)", name: "docx", widget: "file", media_folder: "/advisories/source", public_folder: "/advisories/source", required: false }
+      - { label: "Date Added", name: "date", widget: "datetime", format: "YYYY-MM-DD", default: "" }

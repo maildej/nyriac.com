@@ -1,2 +1,5 @@
 User-agent: *
 Disallow: /advisories/*.pdf
+Disallow: /advisories/source/
+Disallow: /admin/
+Disallow: /cms/
