@@ -138,7 +138,8 @@ a { color: var(--navy); }
 .section-title { font-size: 1.8rem; color: var(--navy); margin-bottom: .6rem; }
 .section-title.center { text-align: center; }
 .section-intro { color: var(--muted); margin-bottom: 2rem; }
-.section-intro.justify { text-align: justify; }
+/* "What we do" intro: justified with a first-line indent. */
+.section-intro.justify { text-align: justify; text-indent: 3em; }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.4rem; }
 
@@ -151,7 +152,7 @@ a { color: var(--navy); }
 .card p { color: var(--muted); font-size: .95rem; }
 
 .band { background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.band .section-intro { text-align: justify; }
+.band .section-intro { text-align: justify; text-indent: 3em; }
 
 /* ---------- Region contact cards (contact.html) ---------- */
 
@@ -206,8 +207,18 @@ a { color: var(--navy); }
   padding: 1.4rem 1.6rem;
   display: flex; flex-direction: column;
   text-align: center;
+  position: relative;
+  transition: border-color .15s, box-shadow .15s;
 }
 .advisory-list .btn-download { margin-top: auto; align-self: center; }
+
+/* Whole card clickable: the Download link's ::after overlay covers the
+   card, so a click anywhere follows the same link. No markup change, so
+   the search filter, title-height equalizer and card sizing are all
+   unaffected. (Each card has only this one link, so nothing is blocked.) */
+.advisory-list .btn-download::after { content: ""; position: absolute; inset: 0; }
+.advisory-list li:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+.advisory-list li:hover .btn-download { background: var(--navy-deep); }
 
 /* Searchable list: centered flex so an incomplete last row (e.g. the
    final 2 of 8 cards) centers on the page instead of sitting in the
@@ -310,7 +321,13 @@ a { color: var(--navy); }
   background: #fff; border: 1px solid var(--line); border-radius: 10px;
   padding: 1.4rem 1.6rem;
   text-align: center;
+  display: flex; flex-direction: column;
+  text-decoration: none; color: inherit;
+  transition: border-color .15s, box-shadow .15s;
 }
+.intake-card:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+.intake-card .btn-download { margin-top: auto; align-self: center; }
+.intake-card:hover .btn-download { background: var(--navy-deep); }
 .intake-card h3 {
   font-family: var(--serif); font-size: 1.15rem; color: #fff;
   background: var(--navy); border-radius: 10px 10px 0 0;
@@ -339,7 +356,7 @@ a { color: var(--navy); }
   background: var(--navy-deep); color: rgba(247,242,224,.65);
   padding: 2.6rem 0; font-size: .85rem; margin-top: 4rem;
 }
-.site-footer .wrap { display: grid; gap: .5rem; }
+.site-footer .wrap { display: grid; gap: .5rem; text-align: center; }
 .site-footer a { color: rgba(247,242,224,.85); }
 .site-footer .fineprint { opacity: .75; }
 
