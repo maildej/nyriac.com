@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chief Defender RIAC Referral Survey — RIAC</title>
+  <meta name="description" content="A short survey for New York chief defenders about how their office identifies and refers non-U.S.-born clients to their Regional Immigration Assistance Center.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img src="images/riac-mark.svg" alt="" aria-hidden="true">
+      <span class="brand-text">
+        <span class="brand-acronym">RIAC</span>
+        <span class="brand-full">Regional Immigration Assistance Centers</span>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="advisories.html">Practice Advisories</a>
+      <a href="intake.html">Intake Forms</a>
+      <a href="contact.html">Find Your RIAC</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-head">
+  <div class="wrap">
+    <h1>Chief Defender RIAC Referral Survey</h1>
+    <p>This short survey helps your Regional Immigration Assistance Center (RIAC) understand how your office currently identifies clients who may face immigration consequences, and how referrals reach us. Your answers help us support your office more effectively.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="wrap">
+    <div class="request-card survey-card">
+
+      <form class="request-form" id="survey-form" action="https://formspree.io/f/REPLACE_WITH_YOUR_FORM_ID" method="POST">
+        <!-- Emailed to the RIAC with this subject line (configure the recipient in Formspree). -->
+        <input type="hidden" name="_subject" value="Chief Defender Referral Survey">
+        <!-- Spam honeypot: bots fill this in, humans never see it. -->
+        <input type="text" name="_gotcha" class="hp-field" tabindex="-1" autocomplete="off">
+
+        <p class="form-error" id="form-error" hidden>Something went wrong submitting the survey. Please try again, or email your regional center directly.</p>
+
+        <!-- Q1 -->
+        <div class="field">
+          <label class="survey-q" for="office"><span class="qnum">1.</span>Which office are you answering on behalf of?</label>
+          <p class="field-hint">Start typing your county or office name, then choose from the list.</p>
+          <input type="text" name="Office affiliation" id="office" list="offices" placeholder="Search offices&hellip;" autocomplete="off" required>
+          <datalist id="offices">
+            <option value="Albany County — Public Defender"></option>
+            <option value="Albany County — Alternate Public Defender"></option>
+            <option value="Albany County — Assigned Counsel Plan"></option>
+            <option value="Allegany County — Public Defender"></option>
+            <option value="Allegany County — Conflict Defender"></option>
+            <option value="Allegany County — Assigned Counsel Plan for Indigent Persons"></option>
+            <option value="Broome County — Public Defender"></option>
+            <option value="Broome County — Assigned Counsel Program"></option>
+            <option value="Cattaraugus County — Public Defender"></option>
+            <option value="Cattaraugus County — Assigned Counsel Plan"></option>
+            <option value="Cayuga County — Assigned Counsel for the Indigent Program"></option>
+            <option value="Chautauqua County — Public Defender"></option>
+            <option value="Chautauqua County — Assigned Counsel Plan"></option>
+            <option value="Chemung County — Public Defender"></option>
+            <option value="Chemung County — Public Advocate"></option>
+            <option value="Chenango County — Public Defender"></option>
+            <option value="Chenango County — Assigned Counsel Program"></option>
+            <option value="Clinton County — Public Defender"></option>
+            <option value="Clinton County — Assigned Counsel Program"></option>
+            <option value="Columbia County — Public Defender"></option>
+            <option value="Columbia County — Alternate Conflict Defender"></option>
+            <option value="Columbia County — Assigned Counsel Office"></option>
+            <option value="Cortland County — Public Defender"></option>
+            <option value="Cortland County — Assigned Counsel Plan"></option>
+            <option value="Delaware County — Public Defender"></option>
+            <option value="Dutchess County — Public Defender"></option>
+            <option value="Dutchess County — Assigned Counsel Plan"></option>
+            <option value="Erie County — Legal Aid Bureau of Buffalo, Inc."></option>
+            <option value="Erie County — Bar Association Aid to Indigent Prisoners Society, Inc."></option>
+            <option value="Essex County — Public Defender"></option>
+            <option value="Essex County — Conflict Defender"></option>
+            <option value="Essex County — Assigned Counsel Office"></option>
+            <option value="Franklin County — Public Defender"></option>
+            <option value="Franklin County — Conflict Defender"></option>
+            <option value="Franklin County — Assigned Counsel Plan"></option>
+            <option value="Fulton County — Public Defender"></option>
+            <option value="Fulton County — Assigned Counsel Division"></option>
+            <option value="Genesee County — Public Defender"></option>
+            <option value="Genesee County — Assigned Counsel Program"></option>
+            <option value="Greene County — Public Defender"></option>
+            <option value="Hamilton County — Public Defender"></option>
+            <option value="Herkimer County — Assigned Counsel Program"></option>
+            <option value="Jefferson County — Public Defender"></option>
+            <option value="Lewis County — Public Defender (Lewis Defenders, PLLC)"></option>
+            <option value="Lewis County — Conflict Defender"></option>
+            <option value="Livingston County — Public Defender"></option>
+            <option value="Livingston County — Conflict Defender"></option>
+            <option value="Madison County — Assigned Counsel Plan"></option>
+            <option value="Monroe County — Public Defender"></option>
+            <option value="Monroe County — Conflict Defender"></option>
+            <option value="Monroe County — Assigned Counsel Plan"></option>
+            <option value="Montgomery County — Public Defender"></option>
+            <option value="Montgomery County — Assigned Counsel Program"></option>
+            <option value="Nassau County — Legal Aid Society of Nassau County"></option>
+            <option value="Nassau County — Assigned Counsel Defender Plan"></option>
+            <option value="New York City — Appellate Advocates"></option>
+            <option value="New York City — Assigned Counsel Plan, Appellate Division 1st Dept. (Bronx & New York)"></option>
+            <option value="New York City — Assigned Counsel Plan, Appellate Division 2nd Dept. (Kings, Queens & Richmond)"></option>
+            <option value="New York City — The Bronx Defenders"></option>
+            <option value="New York City — Brooklyn Defender Services"></option>
+            <option value="New York City — Center for Appellate Litigation"></option>
+            <option value="New York City — Center for Family Representation, Inc."></option>
+            <option value="New York City — The Legal Aid Society"></option>
+            <option value="New York City — Neighborhood Defender Service of Harlem"></option>
+            <option value="New York City — New York County Defender Services"></option>
+            <option value="New York City — Office of the Appellate Defender"></option>
+            <option value="New York City — Queens Defenders"></option>
+            <option value="Niagara County — Public Defender"></option>
+            <option value="Niagara County — Conflict Defender"></option>
+            <option value="Oneida County — Public Defender"></option>
+            <option value="Oneida County — Supplemental Assigned Counsel Plan"></option>
+            <option value="Onondaga County — Hiscock Legal Aid Society"></option>
+            <option value="Onondaga County — Bar Association Assigned Counsel Program, Inc."></option>
+            <option value="Ontario County — Public Defender"></option>
+            <option value="Ontario County — Conflict Defender & Assigned Counsel Plan"></option>
+            <option value="Orange County — Legal Aid Society of Orange County, Inc."></option>
+            <option value="Orange County — Office of Assigned Counsel"></option>
+            <option value="Orleans County — Public Defender"></option>
+            <option value="Orleans County — Assigned Counsel Plan"></option>
+            <option value="Oswego County — Public Defender"></option>
+            <option value="Oswego County — Assigned Counsel Program"></option>
+            <option value="Otsego County — Public Defender"></option>
+            <option value="Putnam County — Legal Aid Society, Inc."></option>
+            <option value="Rensselaer County — Public Defender"></option>
+            <option value="Rensselaer County — Conflict Defender"></option>
+            <option value="Rockland County — Public Defender"></option>
+            <option value="Rockland County — Assigned Counsel Plan"></option>
+            <option value="St. Lawrence County — Public Defender"></option>
+            <option value="St. Lawrence County — Assigned Counsel Plan"></option>
+            <option value="Saratoga County — Public Defender"></option>
+            <option value="Saratoga County — Conflict Defender"></option>
+            <option value="Saratoga County — 18-b Assigned Counsel Program"></option>
+            <option value="Schenectady County — Public Defender"></option>
+            <option value="Schenectady County — Conflict Defender"></option>
+            <option value="Schenectady County — Assigned Counsel Plan"></option>
+            <option value="Schoharie County — Assigned Counsel Plan"></option>
+            <option value="Schuyler County — Public Defender"></option>
+            <option value="Schuyler County — Assigned Counsel Panel"></option>
+            <option value="Seneca County — Public Defender"></option>
+            <option value="Steuben County — Public Defender"></option>
+            <option value="Steuben County — Assigned Counsel Plan"></option>
+            <option value="Suffolk County — Legal Aid Society of Suffolk County, Inc."></option>
+            <option value="Suffolk County — Assigned Counsel Defender Plan of Suffolk County"></option>
+            <option value="Sullivan County — Legal Aid Panel, Inc."></option>
+            <option value="Sullivan County — Conflict Legal Aid, Inc."></option>
+            <option value="Sullivan County — Assigned Counsel Plan"></option>
+            <option value="Tioga County — Public Defender"></option>
+            <option value="Tioga County — Assigned Counsel Plan"></option>
+            <option value="Tompkins County — Assigned Counsel Program"></option>
+            <option value="Ulster County — Public Defender"></option>
+            <option value="Ulster County — Assigned Counsel Plan"></option>
+            <option value="Warren County — Public Defender"></option>
+            <option value="Warren County — Assigned Counsel Plan"></option>
+            <option value="Washington County — Public Defender"></option>
+            <option value="Washington County — Assigned Counsel Office"></option>
+            <option value="Wayne County — Public Defender"></option>
+            <option value="Wayne County — Assigned Counsel Program"></option>
+            <option value="Westchester County — Legal Aid Society of Westchester County"></option>
+            <option value="Westchester County — Independent Office of Assigned Counsel"></option>
+            <option value="Wyoming County — Public Defender"></option>
+            <option value="Wyoming County — Attica Legal Aid Bureau, Inc."></option>
+            <option value="Wyoming County — Assigned Counsel Plan"></option>
+            <option value="Yates County — Public Defender"></option>
+            <option value="Yates County — Assigned Counsel Program"></option>
+            <option value="New York State Defenders Association"></option>
+            <option value="Prisoners' Legal Services of New York"></option>
+            <option value="Other/Not Listed - Please State Your Office Below"></option>
+          </datalist>
+          <div class="field-sub">
+            <label for="office-other">If your office is not listed, enter its name here</label>
+            <input type="text" name="Office (if not listed)" id="office-other">
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="field">
+          <label class="survey-q"><span class="qnum">2.</span>Do you currently ask all defendants whom your office may represent whether they were born in the United States?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="Q2 — Ask if born in the US" value="Yes" required> Yes</label>
+            <label><input type="radio" name="Q2 — Ask if born in the US" value="No"> No</label>
+            <label><input type="radio" name="Q2 — Ask if born in the US" value="Other"> Other &mdash; please explain</label>
+          </div>
+          <div class="field-sub">
+            <label for="q2-note">Additional information (optional)</label>
+            <textarea name="Q2 — Additional information" id="q2-note"></textarea>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="field">
+          <label class="survey-q"><span class="qnum">3.</span>Do you automatically send your RIAC a notification if the client says they were born overseas?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="Q3 — Auto-notify RIAC if born overseas" value="Yes" required> Yes</label>
+            <label><input type="radio" name="Q3 — Auto-notify RIAC if born overseas" value="No"> No</label>
+            <label><input type="radio" name="Q3 — Auto-notify RIAC if born overseas" value="Other"> Other &mdash; please explain</label>
+          </div>
+          <div class="field-sub">
+            <label for="q3-note">Additional information (optional)</label>
+            <textarea name="Q3 — Additional information" id="q3-note"></textarea>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="field">
+          <label class="survey-q"><span class="qnum">4.</span>If you are able to send automatic referrals to RIAC, are you generally able to include a copy of the charges and the fingerprint RAP sheet?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="Q4 — Can include charges and RAP sheet" value="Yes" required> Yes</label>
+            <label><input type="radio" name="Q4 — Can include charges and RAP sheet" value="No"> No</label>
+            <label><input type="radio" name="Q4 — Can include charges and RAP sheet" value="Other"> Other &mdash; please explain</label>
+          </div>
+          <div class="field-sub">
+            <label for="q4-note">Additional information (optional)</label>
+            <textarea name="Q4 — Additional information" id="q4-note"></textarea>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="field">
+          <label class="survey-q" for="q5"><span class="qnum">5.</span>Please provide the name(s) and contact details of the person/people in your office who are authorized to respond to any RIAC questions about specific cases.</label>
+          <textarea name="Q5 — Authorized contacts" id="q5" required></textarea>
+        </div>
+
+        <!-- Q6 -->
+        <div class="field">
+          <label class="survey-q" for="q6"><span class="qnum">6.</span>Please provide any other information which may be relevant for us to know about your office or your county (for example, delays in learning about assignments at arraignment, courts do not provide fingerprint RAP sheets, etc.).</label>
+          <textarea name="Q6 — Other relevant information" id="q6"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-download">Submit Survey to RIAC</button>
+      </form>
+
+      <div id="survey-thanks" hidden>
+        <h2 style="color:var(--navy);font-family:var(--serif);font-size:1.3rem;margin-bottom:.6rem;">Thank you</h2>
+        <p style="color:var(--muted);">Your responses have been sent to your Regional Immigration Assistance Center. We appreciate your help.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Regional Immigration Assistance Centers</strong> &middot; <a href="contact.html">Find your RIAC</a> &middot; <a href="advisories.html">Practice advisories</a> &middot; <a href="intake.html">Intake forms</a></p>
+    <p class="fineprint">This website provides general information for legal service providers and does not constitute legal advice.</p>
+  </div>
+</footer>
+
+<script src="js/chief-defender-survey.js"></script>
+
+</body>
+</html>

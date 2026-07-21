@@ -138,11 +138,13 @@ a { color: var(--navy); }
 .section-title { font-size: 1.8rem; color: var(--navy); margin-bottom: .6rem; }
 .section-intro { color: var(--muted); max-width: 46rem; margin-bottom: 2rem; }
 
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.4rem; }
+.cards { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 1.4rem; }
 
 .card {
   background: #fff; border: 1px solid var(--line); border-radius: 10px;
   padding: 1.6rem;
+  flex: 0 1 280px;
+  display: flex; flex-direction: column; justify-content: center; text-align: center;
 }
 .card h3 { color: var(--navy); font-size: 1.15rem; margin-bottom: .55rem; }
 .card p { color: var(--muted); font-size: .95rem; }
@@ -257,6 +259,24 @@ a { color: var(--navy); }
 }
 .thanks-card h2 { color: var(--navy); font-size: 1.3rem; margin-bottom: .6rem; }
 .thanks-card p { color: var(--muted); margin-bottom: 1.6rem; }
+
+/* ---------- Chief Defender survey ---------- */
+
+.survey-card { max-width: 44rem; text-align: left; }
+.survey-card .field { margin-bottom: 1.9rem; }
+.survey-q { display: block; font-weight: 600; font-size: .98rem; color: var(--navy); margin-bottom: .55rem; }
+.survey-q .qnum { color: var(--muted); margin-right: .35rem; }
+.field input[type="text"],
+.field textarea {
+  width: 100%; font: inherit; font-size: .95rem;
+  padding: .6rem .8rem; border: 1px solid var(--line); border-radius: 8px;
+  background: #fff; color: var(--ink);
+}
+.field input[type="text"]:focus, .field textarea:focus { outline: 2px solid var(--navy); outline-offset: 1px; }
+.field textarea { min-height: 4.5rem; resize: vertical; }
+.field-hint { font-weight: 400; font-size: .8rem; color: var(--muted); margin: .3rem 0 .5rem; }
+.field-sub { margin-top: .7rem; }
+.field-sub label { font-weight: 400; font-size: .82rem; color: var(--muted); margin-bottom: .3rem; }
 
 /* ---------- Intake forms ---------- */
 
