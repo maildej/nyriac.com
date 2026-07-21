@@ -4,6 +4,12 @@ backend:
   branch: main
   site_domain: incandescent-nasturtium-490a59.netlify.app
 
+logo:
+  src: https://nyriac.com/images/riac-mark.svg
+  show_in_header: true
+display_url: https://nyriac.com
+site_url: https://nyriac.com
+
 media_folder: "advisories"
 public_folder: "/advisories"
 

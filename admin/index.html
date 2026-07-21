@@ -6,6 +6,21 @@
   <title>RIAC Admin</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <style>
+    /* Match the site's navy brand color. Decap CMS only exposes these two
+       theme variables for override — deeper restyling of its internal
+       components isn't reliably supported and risks breaking on updates. */
+    :root {
+      --accent: #12263f !important;
+      --accent-light: #12263f19 !important;
+    }
+    body, input, select, textarea, button {
+      font-family: "Inter", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif !important;
+    }
+  </style>
 </head>
 <body>
   <!-- Decap CMS: gives RIAC staff a login-protected page (via GitHub) to
