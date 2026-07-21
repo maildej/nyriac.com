@@ -2,8 +2,7 @@ backend:
   name: github
   repo: maildej/nyriac.com
   branch: main
-  base_url: https://incandescent-nasturtium-490a59.netlify.app
-  auth_endpoint: auth
+  site_domain: incandescent-nasturtium-490a59.netlify.app
 
 media_folder: "advisories"
 public_folder: "/advisories"

@@ -98,16 +98,11 @@ This page lets you upload/manage practice advisory PDFs (and their Word source f
 5. In that site, go to **Project configuration → Access & security → OAuth**.
 6. Under **Authentication Providers**, click **Install provider** → **GitHub**.
 7. Paste in the **Client ID** and **Client Secret** from step 6a. Save.
+8. Still in that site's dashboard, go to **Domain management** and click **Add a domain**. Type `nyriac.com` and add it. When Netlify asks whether you're the owner / want to add it anyway, choose **Yes**. (This does **not** change where the site is actually hosted or touch any DNS records — GitHub Pages keeps serving `nyriac.com` exactly as before. This step only lets Netlify's login system recognize `nyriac.com` as allowed to use this site's OAuth settings. Ignore any "DNS not configured" warning Netlify shows afterward.)
 
 ### 6c — Connect the two together
 
-Open `admin/config.yml` in this folder and replace:
-
-```
-base_url: https://YOUR-NETLIFY-SITE-NAME.netlify.app
-```
-
-with the actual Netlify address from step 6b (e.g. `https://random-name-123abc.netlify.app`). Save, commit, and push (or ask Claude to do this last part).
+`admin/config.yml` needs a `site_domain` line set to your Netlify site's address (e.g. `site_domain: random-name-123abc.netlify.app`), telling the login page which Netlify site's OAuth settings to use. Ask Claude to set this once you have your Netlify address.
 
 ### 6d — Try it
 
