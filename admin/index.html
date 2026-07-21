@@ -27,5 +27,56 @@
        upload/manage practice advisory PDFs and Word source files, with
        built-in search and one-click "copy URL" on any uploaded file. -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    // Shows a "Copy link" button for the PDF/Word doc the moment you open
+    // an advisory entry, so you don't have to click into each file field's
+    // own sub-page to get its public URL.
+    var SITE = 'https://nyriac.com';
+
+    function copyLink(url, event) {
+      navigator.clipboard.writeText(url);
+      var btn = event.target;
+      var original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(function () { btn.textContent = original; }, 1500);
+    }
+
+    function linkRow(label, path) {
+      if (!path) return null;
+      var url = SITE + path;
+      return h('div', { style: { marginBottom: '14px' } },
+        h('div', { style: { fontWeight: 600, marginBottom: '4px' } }, label),
+        h('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } },
+          h('input', {
+            readOnly: true,
+            value: url,
+            style: { flex: 1, padding: '6px 8px', fontFamily: 'monospace', fontSize: '13px' },
+            onClick: function (e) { e.target.select(); }
+          }),
+          h('button', {
+            onClick: function (e) { copyLink(url, e); },
+            style: {
+              padding: '6px 14px', background: '#12263f', color: '#f7f2e0',
+              border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600
+            }
+          }, 'Copy link')
+        )
+      );
+    }
+
+    var AdvisoryPreview = createClass({
+      render: function () {
+        var entry = this.props.entry;
+        return h('div', { style: { padding: '20px', fontFamily: 'Inter, sans-serif' } },
+          h('h1', {}, entry.getIn(['data', 'title'])),
+          h('p', { style: { color: '#5b6878', marginBottom: '20px' } }, entry.getIn(['data', 'summary'])),
+          linkRow('PDF link (public — safe to email)', entry.getIn(['data', 'pdf'])),
+          linkRow('Word doc link (internal editing copy only)', entry.getIn(['data', 'docx']))
+        );
+      }
+    });
+
+    CMS.registerPreviewTemplate('advisories', AdvisoryPreview);
+  </script>
 </body>
 </html>
