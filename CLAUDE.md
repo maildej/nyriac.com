@@ -35,6 +35,8 @@ Audience: attorneys (public defenders, assigned counsel, mandated providers) —
 | `index.html` | Landing page: hero with the **clickable region map** (inline SVG), what we do, who we serve |
 | `advisories.html` | List of downloadable practice advisory PDFs |
 | `contact.html` | Six region cards (`#region-1` … `#region-6`) with counties served and each center's contacts — the map links here |
+| `chief-defender-survey.html` | **Unlisted** survey for NY chief defenders (see "Chief Defender survey" below). `noindex`; not linked from any nav or footer — reachable only by direct URL |
+| `js/chief-defender-survey.js` | Submits the survey to Formspree via `fetch` and shows an inline thank-you |
 | `css/style.css` | All styling, shared by every page (brand + region colors at top in `:root`) |
 | `images/riac-mark.svg` | Colored map mark used as the header logo on every page |
 | `images/favicon.svg` | Browser tab icon (navy square + map) |
@@ -44,6 +46,24 @@ Audience: attorneys (public defenders, assigned counsel, mandated providers) —
 | `CNAME` | Custom domain for GitHub Pages — **do not delete or edit** |
 | `.nojekyll` | Tells GitHub Pages to serve files as-is — **do not delete** |
 | `SETUP.md` | One-time GitHub + Wix DNS setup instructions for Dan |
+
+## Forms (Formspree)
+
+Two forms email their submissions through **Formspree** (formspree.io) — a free service that turns a plain HTML form into an email, so the static site needs no backend. Each form posts to a Formspree endpoint; the recipient email and reply settings live in the Formspree account, not in the site code. Submissions are sent in the background with a small `fetch` script so the visitor stays on the page and sees an inline confirmation.
+
+| Form | Endpoint | Emails to | Subject | Handler |
+|---|---|---|---|---|
+| Advisory download request (`request.html`) | `formspree.io/f/mjgnrzpp` | (set in Formspree) | New RIAC advisory download request | `js/document-request.js` |
+| Chief Defender survey (`chief-defender-survey.html`) | `formspree.io/f/mdaqzrpq` | RIAC2@ocbaacp.org | Chief Defender Referral Survey | `js/chief-defender-survey.js` |
+
+Notes:
+- The subject line and honeypot spam trap are set with hidden fields (`_subject`, `_gotcha`) in the form's HTML.
+- Each Formspree form's **first** submission must be confirmed via a link Formspree emails to the recipient before later submissions are delivered.
+- Free Formspree plans cap submissions at 50/month per form.
+
+### Chief Defender survey
+
+An **unlisted** page (`chief-defender-survey.html`) sent to NY chief defenders, asking how their office identifies and refers non-U.S.-born clients to their RIAC. It is deliberately not linked anywhere on the site and carries `noindex, nofollow` — it's shared by direct link only. Question 1 is a searchable office picker whose ~130 options were generated from the NYSDA "Public Defense Services" Chief Defender list; if that list changes, update the `<datalist id="offices">` options in the page.
 
 ## Conventions
 
