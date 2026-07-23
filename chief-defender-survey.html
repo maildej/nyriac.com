@@ -56,7 +56,8 @@
 
         <!-- Q1 -->
         <div class="field">
-          <label class="survey-q" for="office"><span class="qnum">1.</span>Which office are you answering on behalf of?</label>
+          <h2 class="survey-title">1. Your Office</h2>
+          <label class="survey-q" for="office">On behalf of which office are you answering?</label>
           <p class="field-hint">Start typing your county or office name, then choose from the list.</p>
           <input type="text" name="Office affiliation" id="office" list="offices" placeholder="Search offices&hellip;" autocomplete="off" required>
           <datalist id="offices">
@@ -204,11 +205,12 @@
 
         <!-- Q2 -->
         <div class="field">
-          <label class="survey-q"><span class="qnum">2.</span>When a defendant needs an attorney, who assesses eligibility and where is that information kept? <em>(Please click the closest option below and provide any further notes on your process. If most cases are handled one way, with a minority the other, please answer for the majority and provide details in the box below for the minority.)</em></label>
+          <h2 class="survey-title">2. Your Intake Process</h2>
+          <label class="survey-q">When a defendant needs an attorney, who assesses eligibility and where is that information kept? <em>(We are trying to understand what happens in the majority of your cases. If there are variations depending on specific courts &mdash; for example, cases originating in Town and Village Courts <strong style="font-style:italic;">with an appearance ticket as opposed to CAP court</strong> &mdash; please separately explain those in the box below.)</em></label>
           <div class="radio-group">
-            <label><input type="radio" name="Q2 — Who assesses eligibility" value="An attorney (or paralegal/clerk acting on their behalf) asks the questions, our office makes the eligibility determination and all of the defendant's answers are maintained within an attorney-client privileged file" required> <span><strong>Everything is attorney client privileged.</strong> An attorney (or paralegal/clerk acting on their behalf) asks the questions, our office makes the eligibility determination and all of the defendant&rsquo;s answers are maintained within an attorney-client privileged file</span></label>
-            <label><input type="radio" name="Q2 — Who assesses eligibility" value="An attorney (or paralegal/clerk acting on their behalf) asks the questions, but the answers are reviewed outside of privilege, for example by the presiding Judge or court staff"> <span><strong>An attorney asks, but the answers are reviewed outside of privilege.</strong> An attorney (or paralegal/clerk acting on their behalf) asks the questions, but the answers are reviewed outside of privilege, for example by the presiding Judge or court staff</span></label>
-            <label><input type="radio" name="Q2 — Who assesses eligibility" value="Defendants are provided an eligibility form by the Court and answers are reviewed by the Court to approve eligibility"> <span><strong>Eligibility is assessed outside of privilege.</strong> Defendants are provided an eligibility form by the Court and answers are reviewed by the Court to approve eligibility</span></label>
+            <label><input type="radio" name="Q2 — Who assesses eligibility" value="An attorney (or paralegal/clerk acting on their behalf) asks the questions, our office makes the eligibility determination and all of the defendant's answers are maintained within an attorney-client privileged file" required> <span><strong>Everything is attorney client privileged.</strong><span class="opt-desc">An attorney (or paralegal/clerk acting on their behalf) asks the questions, our office makes the eligibility determination and all of the defendant&rsquo;s answers are maintained within an attorney-client privileged file</span></span></label>
+            <label><input type="radio" name="Q2 — Who assesses eligibility" value="An attorney (or paralegal/clerk acting on their behalf) asks the questions, but the answers are reviewed outside of privilege, for example by the presiding Judge or court staff"> <span><strong>An attorney asks, but the answers are reviewed outside of privilege.</strong><span class="opt-desc">An attorney (or paralegal/clerk acting on their behalf) asks the questions, but the answers are reviewed outside of privilege, for example by the presiding Judge or court staff</span></span></label>
+            <label><input type="radio" name="Q2 — Who assesses eligibility" value="Defendants are provided an eligibility form by the Court and answers are reviewed by the Court to approve eligibility"> <span><strong>Eligibility is assessed outside of privilege.</strong><span class="opt-desc">Defendants are provided an eligibility form by the Court and answers are reviewed by the Court to approve eligibility</span></span></label>
             <label><input type="radio" name="Q2 — Who assesses eligibility" value="Other"> <span><strong>Other</strong></span></label>
           </div>
           <div class="field-sub">
@@ -219,7 +221,8 @@
 
         <!-- Q3 -->
         <div class="field">
-          <label class="survey-q"><span class="qnum">3.</span>Do you currently ask all defendants whom your office may represent immigration screening question(s)?</label>
+          <h2 class="survey-title">3. Immigration Screening</h2>
+          <label class="survey-q">Do you currently ask all defendants whom your office may represent immigration screening question(s)?</label>
           <div class="radio-group">
             <label><input type="radio" name="Q3 — Immigration screening question" value="Yes — we ask &quot;Were you born in the United States?&quot;" required> Yes &mdash; we ask &ldquo;Were you born in the United States?&rdquo;</label>
             <label><input type="radio" name="Q3 — Immigration screening question" value="Yes — we ask &quot;Where were you born?&quot;"> Yes &mdash; we ask &ldquo;Where were you born?&rdquo;</label>
@@ -234,7 +237,8 @@
 
         <!-- Q4 -->
         <div class="field">
-          <label class="survey-q"><span class="qnum">4.</span>If you are aware that your client was not born in the United States, do you automatically send anything to RIAC? Please check any and all options which apply. <em>(We are trying to understand what happens in the majority of your cases. If there are variations depending on specific courts &mdash; for example, cases originating in Town and Village Courts with an appearance ticket &mdash; please separately explain those in the box below.)</em></label>
+          <h2 class="survey-title">4. RIAC Referrals</h2>
+          <label class="survey-q">If you are aware that your client was not born in the United States, do you automatically send anything to RIAC? Please check any and all options which apply. <em>(We are trying to understand what happens in the majority of your cases. If there are variations depending on specific courts &mdash; for example, cases originating in Town and Village Courts <strong style="font-style:italic;">with an appearance ticket as opposed to CAP court</strong> &mdash; please separately explain those in the box below.)</em></label>
           <div class="radio-group">
             <label><input type="checkbox" name="Q4 — Sent to RIAC" value="Assigned attorney name"> Assigned attorney name</label>
             <label><input type="checkbox" name="Q4 — Sent to RIAC" value="Client name"> Client name</label>
@@ -250,19 +254,22 @@
 
         <!-- Q5 -->
         <div class="field">
-          <label class="survey-q" for="q5"><span class="qnum">5.</span>If RIAC has a specific administrative question about a case or referral &mdash; e.g. &ldquo;do you have a case for this defendant that we are aware of?&rdquo;, or &ldquo;did you receive a copy of the fingerprint RAP sheet in this case?&rdquo; &mdash; please provide the name(s) and contact details of the best person for us to contact initially.</label>
+          <h2 class="survey-title">5. Administrative Contact Person</h2>
+          <label class="survey-q" for="q5">If RIAC has a specific administrative question about a case or referral, who is the best person for us to contact initially? <em>(For example, <i>&ldquo;does your office have a case for this defendant that RIAC has become aware of?&rdquo;</i>, or <i>&ldquo;did you receive a copy of the fingerprint RAP sheet in this case?&rdquo;</i>)</em></label>
           <textarea name="Q5 — Initial contact for administrative questions" id="q5" required></textarea>
         </div>
 
         <!-- Q6 -->
         <div class="field">
-          <label class="survey-q" for="q6"><span class="qnum">6.</span>Please provide any other information which may be relevant for us to know about your office or your county (for example, delays in learning about assignments at arraignment, courts do not provide fingerprint RAP sheets, etc.).</label>
+          <h2 class="survey-title">6. Other Info</h2>
+          <label class="survey-q" for="q6">Please provide any other information which may be relevant for us to know about your office or your county (for example, delays in learning about assignments at arraignment, courts do not provide fingerprint RAP sheets, etc.).</label>
           <textarea name="Q6 — Other relevant information" id="q6"></textarea>
         </div>
 
         <!-- Q7 -->
         <div class="field">
-          <label class="survey-q" for="q7"><span class="qnum">7.</span>Are there any ways RIAC could improve in our support of your office?</label>
+          <h2 class="survey-title">7. How Can RIAC Improve?</h2>
+          <label class="survey-q" for="q7">Are there any ways RIAC could improve our support of your office / your defenders?</label>
           <textarea name="Q7 — Ways RIAC could improve" id="q7"></textarea>
         </div>
 
