@@ -35,14 +35,14 @@
   </div>
 </header>
 
-<div class="page-head">
+<div class="page-head page-head-justify">
   <div class="wrap">
     <h1>Chief Defender RIAC Referral Survey</h1>
     <p>This short survey helps your Regional Immigration Assistance Center (RIAC) understand how your office currently identifies clients who may face immigration consequences, and how referrals reach us. Your answers help us support your office more effectively.</p>
   </div>
 </div>
 
-<section class="section">
+<section class="section section-top-tighter">
   <div class="wrap">
     <div class="request-card survey-card">
 
@@ -192,15 +192,24 @@
             <label for="office-other">If your office is not listed, enter its name here</label>
             <input type="text" name="Office (if not listed)" id="office-other">
           </div>
+          <div class="field-sub">
+            <label for="chief-defender">Name of Chief Defender / Office Head <span style="font-weight:400;">(This information is auto-filled from the NYSDA Chief Defender List - please correct it if it is out of date)</span></label>
+            <input type="text" name="Chief Defender / office head" id="chief-defender" autocomplete="off">
+          </div>
+          <div class="field-sub">
+            <label for="respondent-name">Your name, if you are not the Chief Defender</label>
+            <input type="text" name="Respondent name (if not Chief Defender)" id="respondent-name" autocomplete="off">
+          </div>
         </div>
 
         <!-- Q2 -->
         <div class="field">
-          <label class="survey-q"><span class="qnum">2.</span>Do you currently ask all defendants whom your office may represent whether they were born in the United States?</label>
+          <label class="survey-q"><span class="qnum">2.</span>When a defendant needs an attorney, who assesses eligibility and where is that information kept? <em>(Please click the closest option below and provide any further notes on your process. If most cases are handled one way, with a minority the other, please answer for the majority and provide details in the box below for the minority.)</em></label>
           <div class="radio-group">
-            <label><input type="radio" name="Q2 — Ask if born in the US" value="Yes" required> Yes</label>
-            <label><input type="radio" name="Q2 — Ask if born in the US" value="No"> No</label>
-            <label><input type="radio" name="Q2 — Ask if born in the US" value="Other"> Other &mdash; please explain</label>
+            <label><input type="radio" name="Q2 — Who assesses eligibility" value="An attorney (or paralegal/clerk acting on their behalf) asks the questions, our office makes the eligibility determination and all of the defendant's answers are maintained within an attorney-client privileged file" required> <span><strong>Everything is attorney client privileged.</strong> An attorney (or paralegal/clerk acting on their behalf) asks the questions, our office makes the eligibility determination and all of the defendant&rsquo;s answers are maintained within an attorney-client privileged file</span></label>
+            <label><input type="radio" name="Q2 — Who assesses eligibility" value="An attorney (or paralegal/clerk acting on their behalf) asks the questions, but the answers are reviewed outside of privilege, for example by the presiding Judge or court staff"> <span><strong>An attorney asks, but the answers are reviewed outside of privilege.</strong> An attorney (or paralegal/clerk acting on their behalf) asks the questions, but the answers are reviewed outside of privilege, for example by the presiding Judge or court staff</span></label>
+            <label><input type="radio" name="Q2 — Who assesses eligibility" value="Defendants are provided an eligibility form by the Court and answers are reviewed by the Court to approve eligibility"> <span><strong>Eligibility is assessed outside of privilege.</strong> Defendants are provided an eligibility form by the Court and answers are reviewed by the Court to approve eligibility</span></label>
+            <label><input type="radio" name="Q2 — Who assesses eligibility" value="Other"> <span><strong>Other</strong></span></label>
           </div>
           <div class="field-sub">
             <label for="q2-note">Additional information (optional)</label>
@@ -210,11 +219,12 @@
 
         <!-- Q3 -->
         <div class="field">
-          <label class="survey-q"><span class="qnum">3.</span>Do you automatically send your RIAC a notification if the client says they were born overseas?</label>
+          <label class="survey-q"><span class="qnum">3.</span>Do you currently ask all defendants whom your office may represent immigration screening question(s)?</label>
           <div class="radio-group">
-            <label><input type="radio" name="Q3 — Auto-notify RIAC if born overseas" value="Yes" required> Yes</label>
-            <label><input type="radio" name="Q3 — Auto-notify RIAC if born overseas" value="No"> No</label>
-            <label><input type="radio" name="Q3 — Auto-notify RIAC if born overseas" value="Other"> Other &mdash; please explain</label>
+            <label><input type="radio" name="Q3 — Immigration screening question" value="Yes — we ask &quot;Were you born in the United States?&quot;" required> Yes &mdash; we ask &ldquo;Were you born in the United States?&rdquo;</label>
+            <label><input type="radio" name="Q3 — Immigration screening question" value="Yes — we ask &quot;Where were you born?&quot;"> Yes &mdash; we ask &ldquo;Where were you born?&rdquo;</label>
+            <label><input type="radio" name="Q3 — Immigration screening question" value="Yes — we ask some other question(s)"> Yes &mdash; we ask some other question(s) (please provide details below)</label>
+            <label><input type="radio" name="Q3 — Immigration screening question" value="No — we do not"> No &mdash; we do not</label>
           </div>
           <div class="field-sub">
             <label for="q3-note">Additional information (optional)</label>
@@ -224,11 +234,13 @@
 
         <!-- Q4 -->
         <div class="field">
-          <label class="survey-q"><span class="qnum">4.</span>If you are able to send automatic referrals to RIAC, are you generally able to include a copy of the charges and the fingerprint RAP sheet?</label>
+          <label class="survey-q"><span class="qnum">4.</span>If you are aware that your client was not born in the United States, do you automatically send anything to RIAC? Please check any and all options which apply. <em>(If your process for most cases is different than a known majority, please answer for the majority and provide further details about the minority in the box below.)</em></label>
           <div class="radio-group">
-            <label><input type="radio" name="Q4 — Can include charges and RAP sheet" value="Yes" required> Yes</label>
-            <label><input type="radio" name="Q4 — Can include charges and RAP sheet" value="No"> No</label>
-            <label><input type="radio" name="Q4 — Can include charges and RAP sheet" value="Other"> Other &mdash; please explain</label>
+            <label><input type="checkbox" name="Q4 — Sent to RIAC" value="Assigned attorney name"> Assigned attorney name</label>
+            <label><input type="checkbox" name="Q4 — Sent to RIAC" value="Client name"> Client name</label>
+            <label><input type="checkbox" name="Q4 — Sent to RIAC" value="Case identifying information (e.g. docket number)"> Case identifying information (e.g. docket number)</label>
+            <label><input type="checkbox" name="Q4 — Sent to RIAC" value="Charges &amp; supporting depositions"> Charges &amp; supporting depositions</label>
+            <label><input type="checkbox" name="Q4 — Sent to RIAC" value="Further additional information"> Further additional information (please specify)</label>
           </div>
           <div class="field-sub">
             <label for="q4-note">Additional information (optional)</label>
@@ -238,8 +250,8 @@
 
         <!-- Q5 -->
         <div class="field">
-          <label class="survey-q" for="q5"><span class="qnum">5.</span>Please provide the name(s) and contact details of the person/people in your office who are authorized to respond to any RIAC questions about specific cases.</label>
-          <textarea name="Q5 — Authorized contacts" id="q5" required></textarea>
+          <label class="survey-q" for="q5"><span class="qnum">5.</span>If RIAC has a specific administrative question about a case or referral &mdash; e.g. &ldquo;do you have a case for this defendant that we are aware of?&rdquo;, or &ldquo;did you receive a copy of the fingerprint RAP sheet in this case?&rdquo; &mdash; please provide the name(s) and contact details of the best person for us to contact initially.</label>
+          <textarea name="Q5 — Initial contact for administrative questions" id="q5" required></textarea>
         </div>
 
         <!-- Q6 -->

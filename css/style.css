@@ -336,10 +336,16 @@ a.card:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,.08)
 
 /* ---------- Chief Defender survey ---------- */
 
-.survey-card { max-width: 44rem; text-align: left; }
+.survey-card { max-width: 44rem; text-align: justify; }
+.survey-card .radio-group label { gap: 1rem; }
+.survey-card .radio-group { margin-top: 1.1rem; }
+
+.survey-card .field { padding: 1rem 1.1rem; border-radius: 8px; }
+.survey-card .field:nth-of-type(even) { background: color-mix(in srgb, var(--navy) 5%, white); }
 .survey-card .field { margin-bottom: 1.9rem; }
-.survey-q { display: block; font-weight: 600; font-size: .98rem; color: var(--navy); margin-bottom: .55rem; }
+.survey-q { display: block; font-weight: 600; font-size: .98rem; color: var(--navy); margin-bottom: 1rem; }
 .survey-q .qnum { color: var(--muted); margin-right: .35rem; }
+.survey-q em { color: var(--muted); font-weight: 400; }
 .field input[type="text"],
 .field textarea {
   width: 100%; font: inherit; font-size: .95rem;
@@ -411,6 +417,8 @@ a.card:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,.08)
 .page-head-alt .wrap { background: var(--cream); color: var(--ink); border: 2px solid var(--navy); }
 .page-head-alt h1 { color: var(--navy); }
 .page-head-alt p { color: var(--muted); }
+
+.page-head-justify p { text-align: justify; }
 
 /* ---------- Footer ---------- */
 
