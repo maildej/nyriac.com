@@ -345,7 +345,7 @@ a.card:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,.08)
 .survey-card .field { margin-bottom: 1.9rem; }
 .survey-q { display: block; font-weight: 600; font-size: .98rem; color: var(--navy); margin-bottom: 1rem; }
 .survey-q .qnum { color: var(--muted); margin-right: .35rem; }
-.survey-q em { color: var(--muted); font-weight: 400; }
+.survey-q em { display: block; margin-top: .4rem; color: var(--muted); font-weight: 400; }
 .field input[type="text"],
 .field textarea {
   width: 100%; font: inherit; font-size: .95rem;
