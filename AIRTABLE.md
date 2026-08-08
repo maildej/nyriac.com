@@ -116,30 +116,25 @@ This was a deliberate design goal. Each of these is a single edit in one place:
 
 ## Known gaps and unfinished work
 
-**1. `Status` on the case table is an artefact — delete it.**
-It is documented as *"Set automatically from RIAC Next Steps by the 'Advisal readiness'
-automations."* No such automation exists, and never did. The data looks right only because
-all 44 cases were seeded on 6 August with `Status` already matching `Readiness (calc)`.
-Nothing keeps them matching, so the first edit to `RIAC Next Steps` would have broken it
-silently.
+**1. ~~`Status` on the case table~~ — RESOLVED, deleted 8 August 2026.**
+It was documented as *"Set automatically from RIAC Next Steps by the 'Advisal readiness'
+automations."* No such automation ever existed. The data looked right only because all 44
+cases were seeded on 6 August with `Status` already matching `Readiness (calc)`; nothing
+kept them matching, so the first edit to `RIAC Next Steps` would have broken it silently.
 
-It is safe to delete. There are exactly two calculations on this table, and neither uses
-it — verified by reading their formulas:
+Deleting it was safe because there are exactly two calculations on this table and neither
+used it:
 
 - **`Readiness (calc)`** groups `RIAC Next Steps` into ready / not ready. Reads only
   `RIAC Next Steps`.
 - **`Reminder Due`** decides who goes on the monthly chase list. Reads `RIAC Next Steps`,
   `Closing Code`, `Date Closed`, `Days Since Attorney Contact` and `Attorney Email`.
 
-No other formula, rollup or lookup in the base references `Status`. **One thing the API
-cannot see is whether an interface filter points at it.** Check the filter settings on the
-case pages in the interface designer before deleting.
-
-Note that renaming the field first proves nothing: Airtable references fields by internal
-ID, not by name, so a filter would carry on working under any new name. Renaming only
-makes the field conspicuous wherever it is displayed. If a filter does turn out to depend
-on it, the fix is to re-point that filter at `Readiness (calc)`, which holds the same two
-values.
+Confirmed after deletion: `Readiness (calc)` still computes, so no interface filter was
+depending on it. **If you ever need this check again**, note that renaming a field first
+proves nothing — Airtable references fields by internal ID, so a filter carries on working
+under any new name. The only real check is the filter settings in the interface designer,
+and the fix if one does depend on a deleted field is to re-point it at `Readiness (calc)`.
 
 **2. The Case Viewer is still editable.**
 A session on 7 August was titled *"Make Airtable case interfaces read-only with record
@@ -208,9 +203,10 @@ dead `Status` field. A formula cannot drift.
 
 ### Manual steps — Airtable's API cannot do these
 
-The API can create fields and edit names, descriptions and formulas. It **cannot** change
-a field's type, delete a field, reassign which field is primary, or edit a form's field
-list. So these four are by hand.
+**All four were completed on 8 August 2026.** They are recorded because the API can create
+fields and edit names, descriptions and formulas, but **cannot** change a field's type,
+delete a field, reassign which field is primary, or edit a form's field list — so if any
+of this is ever redone, or repeated in another region's base, it is hand work.
 
 **1. Convert `Charge` on Case Charges from text to a formula.**
 Safe: all 47 existing rows were checked. 45 carry text identical to the linked catalogue
@@ -258,6 +254,31 @@ and `Attempted?`. Remove `Charge` from the form once it is a formula.
 - **A form cannot display information back about what you picked.** Statutory text and
   the Senate/CJI links therefore cannot appear inside the add popup. They are instead on
   the charge row on the case page, via the lookups above.
+- **Interface layouts have no version history.** Record *data* has revision history;
+  page layouts do not. An unwanted layout change that has been published cannot be rolled
+  back — it has to be undone by hand. Nor can the API revert it: the revert tool only
+  undoes changes the API itself made.
+- **The API cannot see interface tabs at all.** It exposes pages, their fields and
+  dashboard elements, but not the tab structure inside a record page, nor whether a linked
+  field is displayed as chips or as a view. Anything at that level has to be checked by
+  eye in the designer.
+
+### The Add a Charge popup, as published
+
+Labels differ from the underlying field names, deliberately — they read as instructions:
+
+| Box on the popup | Field behind it |
+|---|---|
+| Search NY Penal Law Offenses | `Penal Law Offense` |
+| Search NY VTL Offenses | `VTL Offense` |
+| Write In Charges, If They Are Not Listed in Catalogues (Use the format: State + Statutory Provision + Title + Weight) | `Other Charge (not in catalogues)` |
+| Number of Counts Of This Charge | `Counts` |
+| Select if This Is The Top Charge | `Top Charge?` |
+| Select If This Is An Attempt | `Attempted?` |
+| Charge Notes | `Charge Notes` |
+
+`Charge` is deliberately **not** on the form — it names itself from whichever catalogue
+entry is picked.
 
 ## Status: this is still a pilot
 
