@@ -169,6 +169,13 @@ the PDF on its own does not help either; it carries no date stamp and fires no a
 **The only action that records anything is picking a value in `EOIR Result`.** Everything
 else in the workflow is navigation and evidence.
 
+Because that is so easy to get wrong, `EOIR Result` carries the interface label
+**"(MAKE SURE TO UPDATE THIS WHEN CHECKING)"** in the client popup. Note what that is: an
+interface label sitting on top of the field, not a rename — the field is still `EOIR Result`
+in the base, which is why grids, pickers and column headers stay clean. The trade-off is that
+the warning appears **only in that popup**. The EOIR Checks page shows the same field, also
+editable, without it.
+
 The fields all live on **Parties**, on the person — never on the case. The same human can
 appear on several cases, and their EOIR position is a fact about them, not about any one
 matter. The case only ever *displays* it, through lookups.
@@ -229,6 +236,14 @@ is what makes the button grey itself out for anyone with no A-Number.
 Checks page still displays it. Button fields cannot be created through the API; this one was
 made by hand on 8 August 2026.
 
+**The button pre-fills nothing.** The A-Number appears in that formula only as a test — "does
+this person have one?" — and never in the address, which is a fixed string. Clicking opens the
+ACIS front page and stops there. ACIS does not accept the A-Number as part of a web address,
+which is why `A-Number for EOIR` exists: it holds the padded 9-digit form ready to copy into
+the ACIS box by hand. Country is not a search key on ACIS at all, so there is nothing to pass
+there either. If ACIS ever gains a deep link, this button's formula is the one place to
+change.
+
 ### Known limits, accepted
 
 - **A re-check that finds the same answer does not move the date.** The automation fires
@@ -243,13 +258,13 @@ made by hand on 8 August 2026.
 - **The EOIR Checks page has no `Fake Entry?` filter.** Deliberate — it is what makes the
   page testable while the base holds only test data. Add the filter before real client data
   goes in, or the page will list test people forever.
-- **EOIR checks cannot be done at intake.** The intake form does capture `A Number` and
-  `Country of Birth`, but they sit on the **Pending Intakes** row as loose text and a pending
-  intake has no Parties record attached — so there is nowhere to record a result until the
-  intake is accepted and the client record created. The Pending Intakes page does not
-  currently display either field. If intake-time checking is ever wanted, that is the gap to
-  close: show the fields, and decide where an answer would live before a client record
-  exists.
+- **EOIR checks are not done at intake, deliberately.** They belong later, once the case is
+  set up, and **always after the conflict check has been completed** — there is no point
+  researching someone we may be about to conflict out of. This suits how the data sits
+  anyway: the intake form captures `A Number` and `Country of Birth`, but they live on the
+  **Pending Intakes** row as loose text, and a pending intake has no Parties record attached,
+  so there would be nowhere to record a result. Confirmed as the intended behaviour on
+  8 August 2026 — not a gap.
 
 ## Known gaps and unfinished work
 
