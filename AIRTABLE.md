@@ -857,3 +857,44 @@ If that is ever revisited — someone wanting the form styled to match the site,
 conflict check has to be rebuilt to trigger on record creation rather than form submission
 *before* the switch, not after. Otherwise every intake stops being checked and nothing says
 so.
+
+## Forms: two places, one confusing overlap
+
+This cost two rounds of confusion, so it is worth writing down carefully — including the
+part that is still not understood.
+
+**Forms appear in two places in Airtable:**
+
+- The **Forms** tab in the top navigation
+- The **view list** down the left of a table in the **Data** tab
+
+They are not independent. Deleting the card **"New State Case Info & RIAC Progress"** from
+the Forms tab also removed the form *view* called **"Form"** from the case table — same
+object, two places, two different displayed names. The Forms tab appears to auto-name a
+generically-named form view as "New <Table Name>".
+
+**Not understood:** `Attorney Intake Form` is a form view on Pending Intakes, yet it did
+**not** appear in the Forms tab, while `Client Info` on Parties appeared in the Forms tab
+but was never a view on Parties. The two listings clearly overlap but do not match, and no
+explanation here has survived contact with the evidence. **Check both places** before
+concluding a form does or does not exist.
+
+**The API only sees form views** — `list_views_for_table` returns them; whatever the Forms
+tab holds beyond that is invisible to it. So "the API says there is no form" is not proof.
+
+### The form that must not be deleted
+
+**`Attorney Intake Form`** on Pending Intakes (`viw60aBEiAQi6Jcxr`). The Conflict Check
+automation is bound to it **by internal ID**, so deleting it stops every intake being
+conflict-checked. To confirm it is healthy, check the automation's `configurationStatus`
+reads `valid` — it turns invalid if the form it points at disappears.
+
+As of 8 August 2026 it is the **only** form in the base. Three others were deleted
+deliberately, so that every case arrives through one route and is therefore always
+conflict-checked:
+
+- `New State Case Info & RIAC Progress` / the case table's `Form` view — created cases
+  directly, skipping intake
+- `Client Info` on Parties — created people directly
+
+All were unpublished, so nothing ever came through them.
