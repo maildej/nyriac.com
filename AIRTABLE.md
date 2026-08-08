@@ -81,6 +81,7 @@ another. That separation is what makes the conflict check possible.
 | **Case Viewer** | List | The main case file. |
 | **Monthly Reminders** | List | Review the chasers before they go out. |
 | **Run Monthly Reminders** | List | The two buttons on the Reminder Control record. |
+| **EOIR Checks** | List | Backstop only — people with an A-Number nobody has looked up yet. See "EOIR checks" below. |
 
 Two pop-up forms: **Add a Charge** and **Add Case Note**.
 
@@ -108,11 +109,76 @@ This was a deliberate design goal. Each of these is a single edit in one place:
 | Who gets chased (statuses, the 30-day threshold) | The **`Reminder Due`** formula on the case table |
 | The wording of reminder emails | The **Email Templates** table |
 | The subject-line caption, court, docket | The **`Reminder Subject Prefix`** formula on the case table |
-| How often EOIR nil results are rechecked (currently 90 days) | The **`EOIR Recheck Due`** formula on Parties |
+| What counts as an EOIR check still outstanding | The **`EOIR Check Status`** formula on Parties |
 | Which statuses count as "ready for advisal" | The **`Readiness (calc)`** formula on the case table |
 | What shows on the second line of the Case Viewer list | The **`Case List Line`** formula |
 
 ---
+
+## EOIR checks (August 2026)
+
+Looking a client up in the EOIR/ACIS system — the immigration court's own case-status
+lookup — to see whether they have immigration proceedings on foot.
+
+### The decision: on demand, never on a timer
+
+**EOIR checks are run by hand, when a RIAC attorney is working on the case.** They are not
+scheduled, not batched, and nothing comes back round on its own.
+
+An earlier design had a 90-day recheck cycle: a "No records found" answer older than 90
+days would be flagged for checking again. That was dropped on 8 August 2026 as unnecessary.
+Two things follow, and both are easy to forget:
+
+- **`EOIR Recheck Due` was renamed `EOIR Check Status`** and its 90-day branch deleted. It
+  now does exactly one thing: read `⚠ Never checked` for anyone we hold an A-Number for
+  whose result has never been recorded, and go blank the moment one is. The old name
+  described a schedule that no longer exists.
+- **Once a result is recorded, that person never resurfaces anywhere.** That is intended. If
+  a periodic recheck is ever wanted again, this formula is where it goes — not an
+  automation.
+
+### How the workflow runs
+
+The whole thing is designed to happen on one screen, without the attorney going looking:
+
+1. Attorney opens the case in **Case Viewer** and sees `EOIR Result` and `EOIR Last Checked`
+   alongside the A-Number — "Not yet checked", or a result with the date it was true on.
+2. They click the client's name, which opens the client's own record.
+3. They run the lookup, pick a result from `EOIR Result`, and attach the PDF to
+   `EOIR Results PDF`.
+4. The **Stamp EOIR check date** automation writes today's date into `EOIR Last Checked`.
+
+The fields all live on **Parties**, on the person — never on the case. The same human can
+appear on several cases, and their EOIR position is a fact about them, not about any one
+matter. The case only ever *displays* it, through lookups.
+
+### The fields
+
+| Field | Table | What it does |
+|---|---|---|
+| `A Number` | Parties | The A-Number as held. Text, not a number — see the conventions above. |
+| `A-Number for EOIR` | Parties | The same digits padded to 9, which is the form ACIS expects. Flags a warning if there are no digits or more than nine. |
+| `EOIR Lookup` | Parties | The ACIS address, blank when there is no A-Number. |
+| `EOIR Result` | Parties | What the lookup found. The only field anyone types into. |
+| `EOIR Last Checked` | Parties | Stamped by automation — do not type into it. |
+| `EOIR Results PDF` | Parties | The printout, as evidence of what was seen on the day. |
+| `EOIR Check Status` | Parties | `⚠ Never checked`, or blank. Feeds the EOIR Checks page. |
+| `EOIR Result`, `EOIR Last Checked` | Cases | Lookups through `Client Code`. Read-only copies for the Case Viewer. |
+
+### Known limits, accepted
+
+- **A re-check that finds the same answer does not move the date.** The automation fires
+  when `EOIR Result` *changes*. Re-picking the value already there is not a change, so the
+  date stays as it was. Consequence: someone re-checked in November still reads as last
+  checked in March, and a later attorney may repeat work already done. Judged not worth
+  fixing while checks are occasional and manual. The fix, if it is ever wanted, is a
+  "Re-checked today" checkbox and a second automation that stamps the date and unticks it.
+- **The button cannot pre-fill the search.** ACIS ignores anything passed to it in the
+  address, so the button opens the site and the A-Number is still pasted in by hand. It is
+  a shortcut, not a lookup.
+- **The EOIR Checks page has no `Fake Entry?` filter.** Deliberate — it is what makes the
+  page testable while the base holds only test data. Add the filter before real client data
+  goes in, or the page will list test people forever.
 
 ## Known gaps and unfinished work
 
@@ -154,6 +220,29 @@ doing by hand.
 
 **5. Naming drift.** Several field descriptions refer to "the All Cases page". The page
 is now called **Find a Case**.
+
+**6. The EOIR workflow is half-built — three steps left, all by hand.**
+The data side is done and tested (fields, formula, automation, the EOIR Checks page, and the
+two lookups on the case table). What remains is interface layout and a button field, and the
+API can do neither — it cannot edit an existing page's layout, and it cannot create button
+fields. In the interface designer, on **Case Viewer**:
+
+1. **Add `EOIR Result` and `EOIR Last Checked`** to the client information area, next to
+   `A Number`. Both are lookups and land read-only, which is what we want — the case
+   displays the EOIR position, it never sets it.
+2. **Add `Client Code`** to the same area. This is the field that makes the client's name a
+   clickable chip; `Client Name` next to it is only a lookup and cannot be clicked. Then open
+   the chip once and set the client layout to show `A Number`, `A-Number for EOIR`,
+   `EOIR Lookup`, `EOIR Result`, `EOIR Last Checked` and `EOIR Results PDF`, with
+   `EOIR Result` and `EOIR Results PDF` left editable and the rest read-only.
+3. **Add a button field on Parties** — in the base, not the interface — labelled something
+   like "Look up on EOIR", set to open a URL, with the URL taken from the **`EOIR Lookup`**
+   formula rather than typed in. Taking it from the formula is what makes the button grey
+   itself out for anyone with no A-Number. Then hide `EOIR Lookup` from view, since the
+   button replaces it.
+
+Publishing the interface pushes **every** page's pending draft live at once, not just the
+page being worked on. Check nothing else is sitting in draft first.
 
 ---
 
@@ -284,30 +373,33 @@ entry is picked.
 
 This is the single most important thing to know when designing anything that asks a user to
 find a record. **Airtable's linked-record picker searches the primary field and nothing
-else.** It caused the charge-catalogue problem above, and it is still live in two places:
+else.** It caused the charge-catalogue problem above, and it caused a worse one on Parties
+and Attorneys & Requestors, where the primary field was a bare autoNumber — so a "find the
+person" picker offered `29`, `7`, `26` and could not be searched by name at all.
 
-| Table | Primary field | What a picker shows and searches |
-|---|---|---|
-| **Parties** | `Client Key Code` — autoNumber | `29`, `7`, `26` |
-| **Attorneys & Requestors** | `Attorney Code` — autoNumber | `29`, `7`, `26` |
+**Both are now fixed** (verified 8 August 2026). Each primary field is a formula:
 
-So a "find the person" or "find the attorney" picker **cannot be searched by name today**.
-Both tables hold the name (`Client Full Name`, `Attorney Full Name`) but in non-primary
-fields, where the picker cannot reach them.
+| Table | Primary field now reads |
+|---|---|
+| **Parties** | `Fatoumata Sissoko (D.o.B. 29 Oct 2005)` |
+| **Attorneys & Requestors** | The attorney's name |
 
-This matters most for **Case Parties**, because the whole conflict check depends on people
-being *linked* rather than typed — and staff will not link reliably to a list of bare
-numbers.
+The date of birth on the Parties picker is there for safety, not decoration: two people can
+share a name, and the conflict check depends on staff linking the *right* human. **Record a
+date of birth whenever it is known** — without one, a person cannot be told from a namesake
+at the moment of choosing.
 
-**The fix, and why it needs care.** Unlike the Penal Law citation, an autoNumber cannot be
-rebuilt by a formula — converting it destroys the numbers. So the order matters:
+**If this is ever redone in another region's base, the order matters.** Unlike the Penal Law
+citation, an autoNumber cannot be rebuilt by a formula — converting it destroys the numbers.
+So:
 
 1. Add a plain text field, e.g. `Client Key Code (original)`.
 2. Copy every existing autoNumber value into it (the API can do this).
-3. *Then* convert the primary field to a formula reading
-   `{Client Key Code (original)} & " — " & {Client Full Name}`.
+3. *Then* convert the primary field to a formula.
 
-The numbers survive, and the picker becomes searchable by name. Do not convert first.
+The numbers survive, and the picker becomes searchable by name. Do not convert first. The
+originals are preserved here in `Client Key Code (original)`; they carry no meaning outside
+the base that generated them and are deliberately not shown on the chip.
 
 ## Case Parties is a junction table
 
