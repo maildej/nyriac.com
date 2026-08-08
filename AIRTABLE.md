@@ -116,12 +116,25 @@ This was a deliberate design goal. Each of these is a single edit in one place:
 
 ## Known gaps and unfinished work
 
-**1. The "Advisal readiness" automation is missing.**
+**1. The "Advisal readiness" automation is missing — a latent fault, not a live one.**
 The `Status` field on the case table is documented as *"Set automatically from RIAC Next
-Steps by the 'Advisal readiness' automations — do not edit by hand."* No such automation
-exists in the base. `Readiness (calc)` computes the answer, but nothing copies it into
-`Status`, so the Ready / Not ready filter has nothing reliable to filter on. Either the
-automation was never built, or it was removed.
+Steps by the 'Advisal readiness' automations — do not edit by hand."* **No such automation
+exists in the base.**
+
+The data is nevertheless correct today: all 44 cases were seeded on 6 August with
+`Status` already matching `Readiness (calc)`, so the two agree on every record. Nothing
+keeps them agreeing. **The first time anyone changes `RIAC Next Steps`, `Status` will
+silently stop matching** — no error, no warning, just a field that quietly means the
+wrong thing, on a field labelled "do not edit by hand".
+
+Two ways to fix it:
+
+- **Retire `Status` and filter on `Readiness (calc)` directly.** Fewest moving parts, and
+  it can never drift. Only works if the interface control in question accepts a formula
+  field. Airtable's API cannot delete fields, so this has to be done by hand.
+- **Build the missing automation** — trigger on `RIAC Next Steps` changing, copy
+  `Readiness (calc)` into `Status`. Restores the original design and can be done through
+  the API, but keeps two fields that can disagree.
 
 **2. The Case Viewer is still editable.**
 A session on 7 August was titled *"Make Airtable case interfaces read-only with record
@@ -143,6 +156,25 @@ doing by hand.
 is now called **Find a Case**.
 
 ---
+
+## Status: this is still a pilot
+
+Everything currently in the base is either **fake test data or information already in the
+public domain**, and the same goes for the chats about it. That is a deliberate position
+for the testing phase, and it is why this file, the field descriptions and the working
+conversations can all be as open as they are.
+
+**Before real client data goes in, that changes.** At minimum:
+
+- Delete the test data. Every table that carries it has a **`Fake Entry?`** checkbox for
+  exactly this purpose — filter on it and clear the lot. Parties, State Case Info, Case
+  Parties, Attorneys & Requestors and Case Charges all have one.
+- Review who can see the base, the interfaces, and any shared links.
+- Revisit where conversations about the database happen, since transcripts will then
+  contain client information.
+
+Until that point, treat nothing here as confidential. After it, treat everything as
+confidential.
 
 ## Before you change anything
 
