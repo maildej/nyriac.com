@@ -19,7 +19,16 @@ it is yours rather than Claude's.
 The three new fields exist but nothing can reach them yet, so the intake form is currently
 collecting the *old* free-text office. Do this first — it is short.
 
-Open the **Pending Intakes** table → the intake **form view** → then:
+**The form is called "Attorney Intake Form", and it is the only form in the base.**
+
+Find it in the **Data** tab → **Pending Intakes** table → the **view list down the left**,
+below "Grid view". It does **not** appear in the Forms tab in the top navigation — see
+`AIRTABLE.md` on why the two listings do not match.
+
+⚠️ **Never delete this form.** The conflict check is bound to it by internal ID; delete it
+and every intake stops being conflict-checked.
+
+Then:
 
 - [ ] Add **`Attorney's Office`** to the form
 - [ ] On that field, **turn OFF the option allowing submitters to create new records**
