@@ -341,7 +341,14 @@ of misidentification rather than a cosmetic annoyance.
 
 So the Parties primary field carries **date of birth** as well as name:
 
-> `15 — Josefina Almonte-Vidal (19 Aug 1972)`
+> `Josefina Almonte-Vidal (D.o.B. 19 Aug 1972)`
+
+The old `Client Key Code` is deliberately **not** shown. It was an autoNumber generated
+when this base was built, it means nothing outside it, and — because an autoNumber cannot
+survive becoming a formula — people added after August 2026 do not get one at all, so it
+is not even a consistent identifier going forward. At 3,000+ clients it would put four
+meaningless digits in front of every name. It is preserved in `Client Key Code (original)`
+if ever needed.
 
 Date of birth is the right discriminator here — it is what the conflict check already
 matches on, and it is what distinguishes two people of the same name in practice. **Record
@@ -359,6 +366,44 @@ their office to that formula; there is no equivalent of date of birth to fall ba
 The stakes differ, which is why the treatment differs: linking the wrong *client* corrupts
 the conflict check, while linking the wrong *attorney* sends a chaser to the wrong lawyer —
 serious, but visible and recoverable.
+
+## Client details cannot be edited on the case. Ever.
+
+Every client field on the Case Viewer — name, date of birth, A Number, country of birth,
+immigration status, status date, client flags, immigration notes, immigration documents —
+is a **lookup** through the `Client Code` link into Parties. A lookup is a mirror of another
+table's field: it is read-only by definition, and **no interface setting can make it
+editable**. This is not a permissions toggle that has been left off.
+
+That is the design working as intended — a person is recorded once, and one edit updates
+every case they appear on. The price is that editing must happen on the client's own
+record.
+
+So there is exactly **one** route to editing client details from a case: clicking through
+to the client's record via the `Client Code` link, which opens the Parties record detail
+page. Remove that route and there is no way to edit a client from the Case Viewer at all.
+
+### The client detail page is missing fields
+
+Even when that route is in place, the Parties record detail page only exposes: `First`,
+`Last Name`, `Current immigration status`, `Date of current immigration status`,
+`Client Flags`, `Immigration Docs Received`, `Case Info`.
+
+**Not editable anywhere from the Case Viewer**, because they are on neither the case nor
+the client detail page:
+
+| Field | Why it matters |
+|---|---|
+| `DoB` | **Now shown in every picker label.** A wrong or missing one cannot be corrected from here. |
+| `A Number` | Feeds `A-Number for EOIR` and the EOIR lookup |
+| `Country` | Needed for the EOIR search |
+| `Address` | |
+| `Notes on Imm Status or History` | |
+| `Immigration Docs Upload` | |
+| `EOIR Result`, `EOIR Results PDF` | Stamping `EOIR Result` is what dates an EOIR check |
+
+Add these to the client detail page, or they can only be reached by opening the Parties
+table directly.
 
 ## The comma trap in ARRAYJOIN
 
