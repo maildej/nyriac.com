@@ -12,7 +12,8 @@ It is a map, not a manual. The detailed reasoning for individual fields lives in
 descriptions are unusually full and are the primary documentation; this file exists to
 tell you where to look and to record the things a field description cannot say.
 
-Last verified against the live base: **8 August 2026.**
+Last verified against the live base: **8 August 2026** (schema re-read via the API that
+day; the attorney-office retirement and both primary-field conversions confirmed complete).
 
 ---
 
@@ -83,6 +84,26 @@ another. That separation is what makes the conflict check possible.
 | **Run Monthly Reminders** | List | The two buttons on the Reminder Control record. |
 
 Two pop-up forms: **Add a Charge** and **Add Case Note**.
+
+### The record detail pages
+
+These are the pages that open when you click a linked record. They do not appear in the
+interface's page list — they are reached only by clicking through — so they are easy to
+forget when auditing what exists.
+
+| Page | ID | Table |
+|---|---|---|
+| **Person Detail** | `pag2b5hvAL08En50y` | Attorneys & Requestors |
+| **Case Note** | `pagHJVzA9G2BZNUhu` | RIAC Case Notes |
+| **Case Charges Detail** | `pagqobilqBoy7bNRA` | Case Charges |
+| **Record Detail** | `paghDYGgSyam8V728` | Agencies |
+| **Record Detail** | `pagpk6TAGs1zgXTDx` | Pending Intakes |
+| *(unnamed)* | `pagpU8GLwLeHz83Mo` | State Case Info & RIAC Progress |
+| **Parties detail page** | — | Parties — exists, but currently unreachable; see below |
+
+**There is already a detail page for attorneys.** Do not build a second one. `Person
+Detail` carries Attorney First Name, Attorney Last Name, Email Address, Cell Phone and
+Notes About Requestor, and every field on it is currently read-only.
 
 ---
 
@@ -284,50 +305,37 @@ entry is picked.
 
 This is the single most important thing to know when designing anything that asks a user to
 find a record. **Airtable's linked-record picker searches the primary field and nothing
-else.** It caused the charge-catalogue problem above, and it is still live in two places:
+else.** It caused the charge-catalogue problem above.
+
+**Both person tables are now fixed (verified 8 August 2026).** Each primary field is a
+formula, and each reports valid:
 
 | Table | Primary field | What a picker shows and searches |
 |---|---|---|
-| **Parties** | `Client Key Code` — autoNumber | `29`, `7`, `26` |
-| **Attorneys & Requestors** | `Attorney Code` — autoNumber | `29`, `7`, `26` |
+| **Parties** | `Client Key Code` — formula | `Josefina Almonte-Vidal (D.o.B. 19 Aug 1972)` |
+| **Attorneys & Requestors** | `Attorney Code` — formula | `Kwabena Asamoah` |
 
-So a "find the person" or "find the attorney" picker **cannot be searched by name today**.
-Both tables hold the name (`Client Full Name`, `Attorney Full Name`) but in non-primary
-fields, where the picker cannot reach them.
+Each falls back to the historic code if a record has no name — `Client 29`, `Attorney 7` —
+so a record can never appear as a blank chip. The historic numbers themselves are preserved
+in `Client Key Code (original)` and `Attorney Code (original)`: 53 people and 50 attorneys,
+none missing.
 
-This matters most for **Case Parties**, because the whole conflict check depends on people
+This mattered most for **Case Parties**, because the whole conflict check depends on people
 being *linked* rather than typed — and staff will not link reliably to a list of bare
 numbers.
 
-**The fix, and why it needs care.** Unlike the Penal Law citation, an autoNumber cannot be
-rebuilt by a formula — converting it destroys the numbers. So the order matters, and step 2
-must happen before step 3.
+**Why the order mattered, recorded in case it is ever repeated in another region's base.**
+Unlike the Penal Law citation, an autoNumber cannot be rebuilt by a formula — converting it
+destroys the numbers. So the codes had to be copied to `(original)` text fields *before*
+the primary fields were converted, and the conversion itself was hand work, since the API
+cannot change a field's type. Airtable warns that data will be lost at that point; the data
+in question is the autoNumber, already copied to safety.
 
-**Steps 1 and 2 are done (8 August 2026).** `Client Key Code (original)` and
-`Attorney Code (original)` exist and hold every historic number — 53 people and 50
-attorneys, none missing.
-
-**Step 3 is by hand**, since the API cannot change a field's type. Convert each primary
-field to a formula:
-
-*Parties → `Client Key Code`:*
-```
-IF({Client Key Code (original)}, {Client Key Code (original)} & " — ", "") & {Client Full Name}
-```
-
-*Attorneys & Requestors → `Attorney Code`:*
-```
-IF({Attorney Code (original)}, {Attorney Code (original)} & " — ", "") & {Attorney Full Name}
-```
-
-Airtable will warn that data will be lost. That is the autoNumber, and it has already been
-copied to safety — accept it.
-
-**One consequence to accept knowingly: after conversion, new people and attorneys no longer
-receive a code number.** The `IF` above means they simply show as a name, which reads fine
-in a picker. Airtable's own record ID remains the real identity, so nothing breaks. If
-codes must continue, add a fresh autoNumber field afterwards and fold it into the formula —
-but be aware its numbering starts from row order and can collide with the historic codes.
+**One consequence, accepted knowingly: new people and attorneys no longer receive a code
+number.** They simply show as a name, which reads fine in a picker. Airtable's own record
+ID remains the real identity, so nothing breaks. If codes must ever continue, add a fresh
+autoNumber field and fold it into the formula — but be aware its numbering starts from row
+order and can collide with the historic codes.
 
 ## Two people with the same name
 
@@ -398,12 +406,19 @@ the client detail page:
 | `A Number` | Feeds `A-Number for EOIR` and the EOIR lookup |
 | `Country` | Needed for the EOIR search |
 | `Address` | |
-| `Notes on Imm Status or History` | |
+| `Notes on Imm Status or History` | Renamed 8 August 2026 — it was `Notes on Imm Status or HIstory`, with a stray capital I |
 | `Immigration Docs Upload` | |
 | `EOIR Result`, `EOIR Results PDF` | Stamping `EOIR Result` is what dates an EOIR check |
 
 Add these to the client detail page, or they can only be reached by opening the Parties
 table directly.
+
+**Why the page is currently invisible to the API.** `list_pages_for_base` returns a record
+detail page only if it can be reached by expanding a linked-record field from a published
+page. Because `Client Code` was removed from the Case Viewer, nothing points at the Parties
+detail page any more, so the API reports it as though it did not exist. It does exist. This
+is a useful diagnostic in its own right: **a record detail page missing from the API listing
+usually means its route was removed, not that the page was deleted.**
 
 ## Which office: a fact about a case, not about a person
 
@@ -476,17 +491,34 @@ in reality — it reads cleanly. Not worth engineering around.
 - Combined with the API's inability to delete fields, this means **a rollup's aggregation
   is effectively fixed once created**. Get it right first time, or expect hand work.
 
-### Retiring the old fields — in this order
+### Retiring the old fields — DONE, 8 August 2026
 
-The API cannot delete fields, so these are by hand. Order matters, because each depends on
-the next:
+All four steps are complete. `Office on This Case`, `Attorney's Usual Office` and
+`Affiliation` are gone; the case table carries `Attorney's Office` and nothing else claims
+to know an attorney's office. `Offices Acted For` on the attorney was checked after the
+deletion and still reports valid — it rolls up through `Case Info` → `Attorney's Office`
+and never touched `Affiliation`.
 
-1. On the Case Viewer, display **`Attorney's Office`** instead of `Office on This Case`
-2. Delete **`Office on This Case`** (case table)
-3. Delete **`Attorney's Usual Office`** (case table)
-4. Delete **`Affiliation`** (Attorneys & Requestors)
+**One piece of debris was left behind, and it needs deleting by hand.**
 
-Every case already carries its own office, so nothing is lost at step 4.
+Deleting `Affiliation` was expected to remove the matching `Attorneys & Requestors` column
+from Agencies — the other end of the same link. It did not. Airtable **converted that
+column to plain text** instead, freezing whatever the link happened to say at that moment.
+It now holds **50 stale attorney names** across the 124 agency records — "Kwabena Asamoah"
+sitting on The Bronx Defenders, and so on.
+
+This is worse than a merely useless column, because it looks like live data and is not.
+It will never update again: an attorney who moves office, or is renamed, or is deleted,
+leaves that text behind unchanged. Anyone reading an agency record will reasonably take it
+for the current list of attorneys there.
+
+**Delete `Attorneys & Requestors` on Agencies by hand.** Nothing reads it — the real
+relationship now runs Agency ← `Attorney's Office` ← Case. The API cannot delete fields,
+which is why this is not already done.
+
+**The general lesson:** deleting one side of a link does not reliably delete the other
+side. Check the far table afterwards, and expect a frozen text column rather than a clean
+removal.
 
 ## The comma trap in ARRAYJOIN
 
@@ -517,24 +549,6 @@ and referred-out contacts, never the client. That is by design, not an omission.
 Always populate the `Party` link rather than relying on the typed `Name`. The link is what
 ties a co-defendant on one case to the same human appearing as a client on another, which
 is the entire basis of the conflict check.
-
-## The attorney's office: default, with a per-case override
-
-Airtable cannot give a linked-record field a default value drawn from another record, so
-"pre-fill it and let them change it" is not directly available. The same result is reached
-with a formula instead, which has the advantage that it cannot drift:
-
-| Field | Role |
-|---|---|
-| `Attorney's Usual Office` | Lookup. The attorney's affiliation from their own record. |
-| `Attorney's Office (this case)` | The **override box**. Filled in by hand only when a panel attorney is acting for a different office than usual. Empty on almost every case. |
-| **`Office on This Case`** | Formula. Reads the override if set, otherwise the usual office. **This is the one to display.** |
-
-So the right office always shows without anyone filling anything in, and setting the
-override changes it for that case alone. The alternative — an automation stamping the usual
-office into the override box on creation — was rejected: it makes every case carry a value
-that only differs on a handful, and a later correction to the attorney's record would not
-reach cases already stamped.
 
 ### Spec for the "Add Related Party" popup
 
