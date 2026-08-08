@@ -300,14 +300,34 @@ being *linked* rather than typed — and staff will not link reliably to a list 
 numbers.
 
 **The fix, and why it needs care.** Unlike the Penal Law citation, an autoNumber cannot be
-rebuilt by a formula — converting it destroys the numbers. So the order matters:
+rebuilt by a formula — converting it destroys the numbers. So the order matters, and step 2
+must happen before step 3.
 
-1. Add a plain text field, e.g. `Client Key Code (original)`.
-2. Copy every existing autoNumber value into it (the API can do this).
-3. *Then* convert the primary field to a formula reading
-   `{Client Key Code (original)} & " — " & {Client Full Name}`.
+**Steps 1 and 2 are done (8 August 2026).** `Client Key Code (original)` and
+`Attorney Code (original)` exist and hold every historic number — 53 people and 50
+attorneys, none missing.
 
-The numbers survive, and the picker becomes searchable by name. Do not convert first.
+**Step 3 is by hand**, since the API cannot change a field's type. Convert each primary
+field to a formula:
+
+*Parties → `Client Key Code`:*
+```
+IF({Client Key Code (original)}, {Client Key Code (original)} & " — ", "") & {Client Full Name}
+```
+
+*Attorneys & Requestors → `Attorney Code`:*
+```
+IF({Attorney Code (original)}, {Attorney Code (original)} & " — ", "") & {Attorney Full Name}
+```
+
+Airtable will warn that data will be lost. That is the autoNumber, and it has already been
+copied to safety — accept it.
+
+**One consequence to accept knowingly: after conversion, new people and attorneys no longer
+receive a code number.** The `IF` above means they simply show as a name, which reads fine
+in a picker. Airtable's own record ID remains the real identity, so nothing breaks. If
+codes must continue, add a fresh autoNumber field afterwards and fold it into the formula —
+but be aware its numbering starts from row order and can collide with the historic codes.
 
 ## Case Parties is a junction table
 
