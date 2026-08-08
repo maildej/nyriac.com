@@ -499,26 +499,28 @@ to know an attorney's office. `Offices Acted For` on the attorney was checked af
 deletion and still reports valid — it rolls up through `Case Info` → `Attorney's Office`
 and never touched `Affiliation`.
 
-**One piece of debris was left behind, and it needs deleting by hand.**
+**One piece of debris was left behind. It has since been cleared, but the trap is worth
+recording, because it will recur the next time a link is retired.**
 
 Deleting `Affiliation` was expected to remove the matching `Attorneys & Requestors` column
 from Agencies — the other end of the same link. It did not. Airtable **converted that
-column to plain text** instead, freezing whatever the link happened to say at that moment.
-It now holds **50 stale attorney names** across the 124 agency records — "Kwabena Asamoah"
-sitting on The Bronx Defenders, and so on.
+column to plain text** instead, freezing whatever the link happened to say at that moment:
+**50 stale attorney names** across the 124 agency records, "Kwabena Asamoah" sitting on The
+Bronx Defenders and so on.
 
-This is worse than a merely useless column, because it looks like live data and is not.
-It will never update again: an attorney who moves office, or is renamed, or is deleted,
-leaves that text behind unchanged. Anyone reading an agency record will reasonably take it
-for the current list of attorneys there.
+That is worse than a merely useless column, because it looks like live data and is not. It
+would never have updated again — an attorney who moves office, or is renamed, or is
+deleted, leaves that text behind unchanged, and anyone reading an agency record would
+reasonably take it for the current list of attorneys there.
 
-**Delete `Attorneys & Requestors` on Agencies by hand.** Nothing reads it — the real
-relationship now runs Agency ← `Attorney's Office` ← Case. The API cannot delete fields,
-which is why this is not already done.
+Deleted by hand on 8 August 2026, since the API cannot delete fields. Checked afterwards:
+Agencies still holds its real link to cases (`State Case Info & RIAC Progress`, the far
+side of `Attorney's Office`), and `Offices Acted For` still reports valid.
 
-**The general lesson:** deleting one side of a link does not reliably delete the other
-side. Check the far table afterwards, and expect a frozen text column rather than a clean
-removal.
+**The general lesson: deleting one side of a link does not reliably delete the other side.**
+Check the far table afterwards and expect a frozen text column rather than a clean removal.
+It is easy to miss, because the field keeps its old name and its old contents — nothing
+about it announces that it has stopped being a link.
 
 ## The comma trap in ARRAYJOIN
 

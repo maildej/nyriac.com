@@ -112,13 +112,13 @@ picker. If editing it works, the whole route works.
 - [x] ~~**`Affiliation`** on **Attorneys & Requestors**~~ — **done, 8 August 2026.**
       `Offices Acted For` was checked afterwards and still reports valid
 
-- [ ] **`Attorneys & Requestors` on Agencies** — **new, and worth doing soon.**
+- [x] ~~**`Attorneys & Requestors` on Agencies**~~ — **done, 8 August 2026.**
       Deleting `Affiliation` was expected to remove this column too, as the other end of the
-      same link. It did not. Airtable **converted it to plain text**, freezing the old values
-      in place: **50 stale attorney names across the 124 agency records**, e.g. "Kwabena
-      Asamoah" sitting on The Bronx Defenders.
-      It now looks like live data and is not — it will never update again. Delete the whole
-      field. Nothing reads it; the real relationship runs Agency ← `Attorney's Office` ← Case
+      same link. It did not — Airtable **converted it to plain text**, freezing 50 stale
+      attorney names across the 124 agency records. Deleted by hand.
+      Checked afterwards: Agencies still holds its real link to cases
+      (`State Case Info & RIAC Progress`, the far side of `Attorney's Office`), and
+      `Offices Acted For` still reports valid
 
 - [ ] **`Affiliation`** on **Pending Intakes**, *after* the three test submissions are
       cleared.
