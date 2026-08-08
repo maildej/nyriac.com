@@ -634,7 +634,11 @@ not by hand, not by a different form, not by a custom web form posting into Airt
 is no error and nothing on the record to show the check never ran — `Possible Conflict
 Matches` is simply empty, which looks identical to "checked, nothing found".
 
-This matters most when the website is connected. Linking to the Airtable form keeps the
-check working; building a custom form on nyriac.com that posts into Airtable silently
-disables it. **Decide which route the website takes before building it**, because the two
-differ enormously in effort and one of them quietly removes the conflict check.
+**DECIDED, 8 August 2026: nyriac.com will link to the Airtable form**, not host its own
+form posting into Airtable. This keeps the conflict check working and is a fraction of the
+effort. The website connection is the last step before go-live.
+
+If that is ever revisited — someone wanting the form styled to match the site, say — the
+conflict check has to be rebuilt to trigger on record creation rather than form submission
+*before* the switch, not after. Otherwise every intake stops being checked and nothing says
+so.
