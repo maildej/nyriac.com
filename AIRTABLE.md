@@ -144,9 +144,30 @@ The whole thing is designed to happen on one screen, without the attorney going 
 1. Attorney opens the case in **Case Viewer** and sees `EOIR Result` and `EOIR Last Checked`
    alongside the A-Number — "Not yet checked", or a result with the date it was true on.
 2. They click the client's name, which opens the client's own record.
-3. They run the lookup, pick a result from `EOIR Result`, and attach the PDF to
-   `EOIR Results PDF`.
-4. The **Stamp EOIR check date** automation writes today's date into `EOIR Last Checked`.
+3. They click **Look up on EOIR**, which opens the ACIS site. *Nothing is recorded by this.*
+4. They paste the A-Number into ACIS — the button cannot pre-fill it — and run the search.
+5. **They pick the answer in `EOIR Result`.** This is the step that records the check.
+6. Optionally they print the result to PDF and attach it to `EOIR Results PDF`.
+
+The **Stamp EOIR check date** automation then writes today's date into `EOIR Last Checked`.
+
+### Two things that record nothing — read this before assuming otherwise
+
+Both are easy to believe and both lose data silently.
+
+**Clicking the button records nothing.** It opens a website. That is all it does. The
+automation fires on `EOIR Result` *changing* and on nothing else — a click is not an edit to
+the record, so the date does not move and no check is logged. A person can have that button
+clicked fifty times and still read `⚠ Never checked`.
+
+**Doing nothing does NOT mean "no records found".** There is no silent nil. If the search
+comes back empty, someone must still pick "No records found" — that is what stamps the date
+and turns an empty screen into a dated finding. Leave it blank and the record simply says
+nobody has ever looked, which six months later is indistinguishable from the truth. Attaching
+the PDF on its own does not help either; it carries no date stamp and fires no automation.
+
+**The only action that records anything is picking a value in `EOIR Result`.** Everything
+else in the workflow is navigation and evidence.
 
 The fields all live on **Parties**, on the person — never on the case. The same human can
 appear on several cases, and their EOIR position is a fact about them, not about any one
@@ -222,6 +243,13 @@ made by hand on 8 August 2026.
 - **The EOIR Checks page has no `Fake Entry?` filter.** Deliberate — it is what makes the
   page testable while the base holds only test data. Add the filter before real client data
   goes in, or the page will list test people forever.
+- **EOIR checks cannot be done at intake.** The intake form does capture `A Number` and
+  `Country of Birth`, but they sit on the **Pending Intakes** row as loose text and a pending
+  intake has no Parties record attached — so there is nowhere to record a result until the
+  intake is accepted and the client record created. The Pending Intakes page does not
+  currently display either field. If intake-time checking is ever wanted, that is the gap to
+  close: show the fields, and decide where an answer would live before a client record
+  exists.
 
 ## Known gaps and unfinished work
 
