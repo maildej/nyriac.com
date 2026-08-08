@@ -300,14 +300,127 @@ being *linked* rather than typed — and staff will not link reliably to a list 
 numbers.
 
 **The fix, and why it needs care.** Unlike the Penal Law citation, an autoNumber cannot be
-rebuilt by a formula — converting it destroys the numbers. So the order matters:
+rebuilt by a formula — converting it destroys the numbers. So the order matters, and step 2
+must happen before step 3.
 
-1. Add a plain text field, e.g. `Client Key Code (original)`.
-2. Copy every existing autoNumber value into it (the API can do this).
-3. *Then* convert the primary field to a formula reading
-   `{Client Key Code (original)} & " — " & {Client Full Name}`.
+**Steps 1 and 2 are done (8 August 2026).** `Client Key Code (original)` and
+`Attorney Code (original)` exist and hold every historic number — 53 people and 50
+attorneys, none missing.
 
-The numbers survive, and the picker becomes searchable by name. Do not convert first.
+**Step 3 is by hand**, since the API cannot change a field's type. Convert each primary
+field to a formula:
+
+*Parties → `Client Key Code`:*
+```
+IF({Client Key Code (original)}, {Client Key Code (original)} & " — ", "") & {Client Full Name}
+```
+
+*Attorneys & Requestors → `Attorney Code`:*
+```
+IF({Attorney Code (original)}, {Attorney Code (original)} & " — ", "") & {Attorney Full Name}
+```
+
+Airtable will warn that data will be lost. That is the autoNumber, and it has already been
+copied to safety — accept it.
+
+**One consequence to accept knowingly: after conversion, new people and attorneys no longer
+receive a code number.** The `IF` above means they simply show as a name, which reads fine
+in a picker. Airtable's own record ID remains the real identity, so nothing breaks. If
+codes must continue, add a fresh autoNumber field afterwards and fold it into the formula —
+but be aware its numbering starts from row order and can collide with the historic codes.
+
+## Two people with the same name
+
+The database always tells them apart — separate records, separate internal IDs, and linking
+to one never touches the other. **The person choosing in a picker is the weak point**, not
+the data. A picker shows only the primary field, so two records reading `Maria Torres` and
+`Maria Torres` are indistinguishable on screen, and whoever is clicking picks one at random.
+
+In a system whose conflict check depends on linking the *right* person, that is a real risk
+of misidentification rather than a cosmetic annoyance.
+
+So the Parties primary field carries **date of birth** as well as name:
+
+> `Josefina Almonte-Vidal (D.o.B. 19 Aug 1972)`
+
+The old `Client Key Code` is deliberately **not** shown. It was an autoNumber generated
+when this base was built, it means nothing outside it, and — because an autoNumber cannot
+survive becoming a formula — people added after August 2026 do not get one at all, so it
+is not even a consistent identifier going forward. At 3,000+ clients it would put four
+meaningless digits in front of every name. It is preserved in `Client Key Code (original)`
+if ever needed.
+
+Date of birth is the right discriminator here — it is what the conflict check already
+matches on, and it is what distinguishes two people of the same name in practice. **Record
+it whenever it is known.** A person with no date of birth on file is one who cannot be
+told apart from a namesake at the moment of choosing.
+
+Three test records currently have none, so they read as name alone.
+
+**Attorneys are treated differently on purpose.** Their primary field shows the **name
+only** — no code — because the code means nothing to the people using the interface and
+the name is what they search on. The code is preserved in `Attorney Code (original)` and
+can be put back into the formula at any time. If two attorneys ever share a name, add
+their office to that formula; there is no equivalent of date of birth to fall back on.
+
+The stakes differ, which is why the treatment differs: linking the wrong *client* corrupts
+the conflict check, while linking the wrong *attorney* sends a chaser to the wrong lawyer —
+serious, but visible and recoverable.
+
+## Client details cannot be edited on the case. Ever.
+
+Every client field on the Case Viewer — name, date of birth, A Number, country of birth,
+immigration status, status date, client flags, immigration notes, immigration documents —
+is a **lookup** through the `Client Code` link into Parties. A lookup is a mirror of another
+table's field: it is read-only by definition, and **no interface setting can make it
+editable**. This is not a permissions toggle that has been left off.
+
+That is the design working as intended — a person is recorded once, and one edit updates
+every case they appear on. The price is that editing must happen on the client's own
+record.
+
+So there is exactly **one** route to editing client details from a case: clicking through
+to the client's record via the `Client Code` link, which opens the Parties record detail
+page. Remove that route and there is no way to edit a client from the Case Viewer at all.
+
+### The client detail page is missing fields
+
+Even when that route is in place, the Parties record detail page only exposes: `First`,
+`Last Name`, `Current immigration status`, `Date of current immigration status`,
+`Client Flags`, `Immigration Docs Received`, `Case Info`.
+
+**Not editable anywhere from the Case Viewer**, because they are on neither the case nor
+the client detail page:
+
+| Field | Why it matters |
+|---|---|
+| `DoB` | **Now shown in every picker label.** A wrong or missing one cannot be corrected from here. |
+| `A Number` | Feeds `A-Number for EOIR` and the EOIR lookup |
+| `Country` | Needed for the EOIR search |
+| `Address` | |
+| `Notes on Imm Status or History` | |
+| `Immigration Docs Upload` | |
+| `EOIR Result`, `EOIR Results PDF` | Stamping `EOIR Result` is what dates an EOIR check |
+
+Add these to the client detail page, or they can only be reached by opening the Parties
+table directly.
+
+## The comma trap in ARRAYJOIN
+
+When a formula reads a linked-record or lookup field, Airtable escapes any value containing
+a comma by wrapping it in double quotes. So `ARRAYJOIN` over agency names produced:
+
+> `"Suffolk County — Legal Aid Society of Suffolk County, Inc."`
+
+quotes and all, while comma-free names like `The Bronx Defenders` came through clean — which
+makes it look like a data problem affecting only some records. Wrap the result to strip them:
+
+```
+SUBSTITUTE( <the ARRAYJOIN expression> , '"', '')
+```
+
+Watch for this in any new formula that joins linked records whose names may contain commas —
+agencies and courts especially.
 
 ## Case Parties is a junction table
 
@@ -321,6 +434,52 @@ and referred-out contacts, never the client. That is by design, not an omission.
 Always populate the `Party` link rather than relying on the typed `Name`. The link is what
 ties a co-defendant on one case to the same human appearing as a client on another, which
 is the entire basis of the conflict check.
+
+## The attorney's office: default, with a per-case override
+
+Airtable cannot give a linked-record field a default value drawn from another record, so
+"pre-fill it and let them change it" is not directly available. The same result is reached
+with a formula instead, which has the advantage that it cannot drift:
+
+| Field | Role |
+|---|---|
+| `Attorney's Usual Office` | Lookup. The attorney's affiliation from their own record. |
+| `Attorney's Office (this case)` | The **override box**. Filled in by hand only when a panel attorney is acting for a different office than usual. Empty on almost every case. |
+| **`Office on This Case`** | Formula. Reads the override if set, otherwise the usual office. **This is the one to display.** |
+
+So the right office always shows without anyone filling anything in, and setting the
+override changes it for that case alone. The alternative — an automation stamping the usual
+office into the override box on creation — was rejected: it makes every case carry a value
+that only differs on a handful, and a later correction to the attorney's record would not
+reach cases already stamped.
+
+### Spec for the "Add Related Party" popup
+
+The data side supports this fully. `Name` on Case Parties is already a formula reading
+`{Party Full Name} — {Role}`, so a row names itself and the blank-row problem that affected
+Case Charges cannot recur here — **provided `Party` is filled**. With it empty the row reads
+` — Witness`, so make `Party` a **required** field on the form.
+
+The popup should collect exactly four things:
+
+| Box | Field | Notes |
+|---|---|---|
+| The person | `Party` | Link to Parties. **Required.** Searchable by name and date of birth since the primary-field fix. New people can be created inline. |
+| Their role on this case | `Role` | Client, Witness, Victim, Co-Defendant, Complainant, Other, Referred Out - Client |
+| Notes | `Notes` | Optional |
+| *(hidden)* | `Case` | Fills itself from the case the popup was opened on |
+
+Creating a person inline gives them a name only — the immigration fields stay empty, which
+is correct: those are filled in only for people we actually act for.
+
+**`Role` includes "Client" even though the client is not held in this table.** That option
+is for legacy imported rows, which carry a `Legacy Case No.` instead of a `Case` link. Do
+not use it on new rows.
+
+**The API cannot build this form.** `create_page` supports only visualization and dashboard
+pages, not forms — so the popup, the button and the list beneath it are all hand work in
+the interface designer. Expect the button's own label to be unchangeable, as with
+"+ Add case".
 
 ## Status: this is still a pilot
 
