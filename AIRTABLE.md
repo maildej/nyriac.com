@@ -779,6 +779,121 @@ pages, not forms — so the popup, the button and the list beneath it are all ha
 the interface designer. Expect the button's own label to be unchangeable, as with
 "+ Add case".
 
+## Disposition: a case note, not a per-charge field (PROPOSED — August 2026)
+
+**Status: analysed, not yet built. Dan's decisions are still outstanding — see the open
+questions at the end.** Written down because the reasoning is worth more than the chat it
+came from.
+
+### The problem with recording disposition per charge
+
+`Case Charges` carries `Disposition`, `Disposition Date` and `Sentence`. The premise —
+every charge gets an outcome — does not survive contact with real cases. Cases are
+regularly disposed of by a plea in a *different* case, or by a plea unrelated to the
+charges listed here, and there is no honest per-charge answer in either situation. The
+existing `Covered by plea to another count` option was an attempt to say this and only
+half-manages it: it cannot express "covered by a plea in another matter entirely".
+
+**The evidence agrees.** Checked 8 August 2026: all 48 rows in Case Charges have
+`Disposition`, `Disposition Date` and `Sentence` **empty**. Nothing has ever been recorded
+in them, so deleting them loses no data.
+
+### The proposal, and why it holds up
+
+Record disposition as a **case note** tagged `Case Disposed` on `Note Type`. Four things
+follow, all verified against the live base:
+
+1. **The tag is visible and filterable everywhere.** `RIAC Case Notes Key` — the primary
+   field, so it is what shows on every chip — already reads the Note Type, so a disposed
+   note announces itself: `12 Aug 2026 | Case Disposed | Subject: …`.
+2. **It survives however the information arrives.** An email auto-filed by the
+   "1. Email to Case Note" automation only needs the tag ticking; nothing has to be
+   retyped anywhere.
+3. **Paperwork rides along.** The note has an `Attachments` field and it is already on the
+   Add Case Note popup.
+4. **One note can cover several cases.** `Also Relates To` exists on the note and is on the
+   popup, which is the only place in the base that can say "this one disposal ended three
+   matters".
+
+`Case Disposed` is also **safe as a tag name** — it contains none of *email received*,
+*phone call*, *documents received* or *substantive*, so it does not accidentally count as
+the attorney having responded. See "Before you change anything".
+
+### The holes
+
+**1. `Also Relates To` is a second-class link, and this is the sharp one.** The `Last
+Attorney Contact` rollup reads `RIAC Case Notes` only — the primary link — and ignores
+`Notes From Other Cases`. Anything built to answer "is this case disposed?" must read
+**both** link fields, or exactly the multi-case scenario this design exists to handle will
+report the extra cases as undisposed, silently.
+
+**2. Nothing stops the monthly chaser.** `Reminder Due` looks at `RIAC Next Steps`,
+`Closing Code`, `Date Closed`, `Days Since Attorney Contact` and `Attorney Email`. A
+`Case Disposed` note touches none of them. So a case disposed without RIAC ever advising —
+attorney went dark, client pled — **keeps being emailed a chaser every month, forever**,
+asking for documents in a case that is over. If the disposal arrived by email the note will
+usually also carry `Email Received`, which stamps `Attorney Contact Date` and buys 30 days
+of quiet; then the chasing resumes. This is not a nice-to-have; it is live mail going to
+real attorneys.
+
+**3. A tag is not an outcome.** The tag says *that* the case ended, never *how*. `Pled
+guilty to a reduced charge` and `Dismissed` are the same tag. Anyone wanting to count
+outcomes has to read prose. Deleting the per-charge fields removes the only structured
+record of what the client was actually convicted of — which, for immigration purposes, is
+the single most consequential fact on the file (the offence pled to, and whether the
+sentence reached a year). RIAC's own work is pre-plea advice, so this may genuinely not
+matter; it should be a decision rather than a side effect.
+
+**4. Note date ≠ disposition date.** The note's `Date` is when the note was written. Learn
+about a disposal three weeks late and the two diverge, with nowhere to say so.
+
+**5. Nothing enforces the tag.** The scheme depends on a human noticing that an email
+mentions a plea and ticking a box. Same shape as the EOIR trap: an untagged case looks
+identical to a case that is not disposed. No backstop exists, and none is proposed.
+
+**6. "Also Relates To" is all-or-nothing.** A note can be linked to case B for some other
+reason, and the tag then marks B disposed too. Keep disposal notes to disposal.
+
+**7. Disposal ≠ RIAC closing its file.** RIAC may still owe an advisal after a plea. Do
+not wire `Case Disposed` to `Closing Code` or `Date Closed`.
+
+### What building it would take
+
+**By hand, because the API cannot do it** (it cannot delete a field or change a field
+type):
+
+1. Delete `Disposition`, `Disposition Date` and `Sentence` on Case Charges. Safe — all 48
+   rows are empty, no automation reads them, and none of the three is on the Add A New
+   Charge popup.
+2. Check by eye whether any of the three shows inside the expanded charge on the Case
+   Viewer. **The API cannot see how a linked-record field is displayed**, so this cannot be
+   confirmed from here.
+3. Any rollup with a *condition* on it, and any interface layout change.
+
+**Buildable through the API:**
+
+4. Two rollups on the case counting notes tagged `Case Disposed` — one over `RIAC Case
+   Notes`, one over `Notes From Other Cases` (hole 1) — plus a `Disposed?` formula reading
+   both. **A rollup's aggregation cannot be changed through the API afterwards**, so get it
+   right first time.
+5. **Add `{Disposed?}` to the `Reminder Due` formula** so disposed cases drop off the chase
+   list (hole 2). This is the documented single place to change who gets chased, it cannot
+   drift, and it destroys nothing — which is why it is preferred over an automation that
+   overwrites `RIAC Next Steps`. Overwriting a status field from an automation is the exact
+   pattern that produced the dead `Status` field; it would also wipe a live state such as
+   `Ready For Advisal` with no record of what it had been.
+6. Optionally, two boxes on the case note, both optional so the tag-only path keeps
+   working: `Disposition` (single select) and `Date Disposed` (date) — holes 3 and 4. At
+   case level the useful options differ from the old per-charge list and should include
+   *acquitted after trial*, which the per-charge field never had.
+
+### Open questions for Dan
+
+- Does per-charge conviction data (what was pled to, and the sentence on it) need to
+  survive at all, or is the case note enough?
+- Structured `Disposition` and `Date Disposed` on the note, or free text in the note body?
+- Confirm disposed cases should drop off the monthly chaser (they should).
+
 ## Status: this is still a pilot
 
 Everything currently in the base is either **fake test data or information already in the
