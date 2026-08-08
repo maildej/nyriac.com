@@ -36,38 +36,7 @@ Open the **Pending Intakes** table → the intake **form view** → then:
 
 ---
 
-## 2. Make client details editable again — the important one
-
-Right now **no client detail can be edited from a case at all**, because the click-through
-was removed and every client field on the case is a lookup, which can never be made
-editable. Date of birth in particular now appears in every person picker, so a wrong one
-cannot currently be corrected without opening the Parties table directly.
-
-### 2a. Restore the route
-
-- [ ] On the **Case Viewer**, make the **`Client Code`** link open the client's record on
-      **one click** — no confirmation, no "edit client details" button. The ceremony was
-      the thing you disliked; the route itself is the only way in
-
-### 2b. Add the missing fields to the client record page
-
-The Parties record detail page currently offers only First, Last Name, Current immigration
-status, Date of current immigration status, Client Flags, Immigration Docs Received and
-Case Info. Add:
-
-- [ ] **`DoB`** ← put this near the top
-- [ ] **`A Number`** ← and this
-- [ ] `Country`
-- [ ] `Address`
-- [ ] `Notes on Imm Status or History`
-- [ ] `Immigration Docs Upload`
-- [ ] `EOIR Result`
-- [ ] `EOIR Results PDF`
-- [ ] Publish, then open a case and actually change a date of birth to confirm it works
-
----
-
-## 3. Delete the superseded fields
+## 2. Delete the superseded fields
 
 Each is safe — every case now carries its own office.
 
@@ -83,7 +52,7 @@ Each is safe — every case now carries its own office.
 
 ---
 
-## 4. The Add Related Party popup
+## 3. The Add Related Party popup
 
 Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup".
 
@@ -94,7 +63,7 @@ Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup"
 
 ---
 
-## 5. Check the attorney popup
+## 4. Check the attorney popup
 
 You built this already — worth confirming it covers:
 
@@ -120,6 +89,12 @@ Do not start these until testing is finished.
 - [ ] **Delete all test data.** Filter on **`Fake Entry?`** and clear it in: Parties,
       State Case Info & RIAC Progress, Case Parties, Attorneys & Requestors, Case Charges
 - [ ] Delete the three test intakes in Pending Intakes
+- [ ] **Add a `Fake Entry?` filter to the EOIR Checks page.** It was deliberately left off
+      so the page had something to show during testing; leave it off and the page lists
+      test people for ever
+- [ ] **Reset Espoir Mukendi's EOIR fields** if he survives the test-data clear-out — his
+      result was set on 8 August 2026 to prove the automation works, not because anyone
+      looked him up
 - [ ] Review who can see the base, the interfaces, and any shared links
 - [ ] **Switch the reminder emails to Outlook.** They currently send from Airtable's own
       mail server; the "Send the chaser" step needs swapping to the Microsoft Outlook send
