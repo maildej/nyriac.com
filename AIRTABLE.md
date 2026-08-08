@@ -280,6 +280,48 @@ Labels differ from the underlying field names, deliberately — they read as ins
 `Charge` is deliberately **not** on the form — it names itself from whichever catalogue
 entry is picked.
 
+## Pickers can only search a table's primary field
+
+This is the single most important thing to know when designing anything that asks a user to
+find a record. **Airtable's linked-record picker searches the primary field and nothing
+else.** It caused the charge-catalogue problem above, and it is still live in two places:
+
+| Table | Primary field | What a picker shows and searches |
+|---|---|---|
+| **Parties** | `Client Key Code` — autoNumber | `29`, `7`, `26` |
+| **Attorneys & Requestors** | `Attorney Code` — autoNumber | `29`, `7`, `26` |
+
+So a "find the person" or "find the attorney" picker **cannot be searched by name today**.
+Both tables hold the name (`Client Full Name`, `Attorney Full Name`) but in non-primary
+fields, where the picker cannot reach them.
+
+This matters most for **Case Parties**, because the whole conflict check depends on people
+being *linked* rather than typed — and staff will not link reliably to a list of bare
+numbers.
+
+**The fix, and why it needs care.** Unlike the Penal Law citation, an autoNumber cannot be
+rebuilt by a formula — converting it destroys the numbers. So the order matters:
+
+1. Add a plain text field, e.g. `Client Key Code (original)`.
+2. Copy every existing autoNumber value into it (the API can do this).
+3. *Then* convert the primary field to a formula reading
+   `{Client Key Code (original)} & " — " & {Client Full Name}`.
+
+The numbers survive, and the picker becomes searchable by name. Do not convert first.
+
+## Case Parties is a junction table
+
+One row = **one person + one case + the role they played on it**. "Adding a related party"
+therefore means creating a Case Parties row, not editing a list on the case.
+
+The **client is deliberately not in this table** — the client is the `Client Code` link on
+the case itself. So a "related parties" list shows co-defendants, complainants, witnesses
+and referred-out contacts, never the client. That is by design, not an omission.
+
+Always populate the `Party` link rather than relying on the typed `Name`. The link is what
+ties a co-defendant on one case to the same human appearing as a client on another, which
+is the entire basis of the conflict check.
+
 ## Status: this is still a pilot
 
 Everything currently in the base is either **fake test data or information already in the
