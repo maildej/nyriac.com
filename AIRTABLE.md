@@ -405,6 +405,31 @@ the client detail page:
 Add these to the client detail page, or they can only be reached by opening the Parties
 table directly.
 
+## Three levels of "which office", and one hazard
+
+The Case Viewer can be clicked through: case → attorney → agency, each opening an editable
+popup. That works, but **what you are editing changes level at each step**, and the levels
+are easy to confuse.
+
+| Level | Field | Scope of an edit |
+|---|---|---|
+| **Person** | `Affiliation`, on the attorney's record | Where this attorney *normally* works. Changing it changes them on **every case, past and future**. |
+| **Case** | `Attorney's Office (this case)` | The override. Affects **this case only**. Empty on almost every case. |
+| **Display** | `Office on This Case` | Formula. Shows the override if set, otherwise the usual office. Read-only — put this on the case tab. |
+
+**The hazard.** A panel attorney is acting for a different county on this case. Someone
+opens the case, clicks through to the attorney, sees `Affiliation` sitting there editable,
+and corrects it — silently rewriting that attorney's office on every other case they have.
+No warning, no error, and nothing on screen to suggest the edit reached beyond the case
+they were looking at.
+
+Guard against it: on the attorney popup, either make `Affiliation` read-only, or label it
+so its scope is obvious — *"usual office — changing this affects all their cases"*. Put the
+per-case override on the **case** tab, where its scope matches what the user is looking at.
+
+The same principle applies one step further in: editing agency details from the agency popup
+changes that agency for everyone linked to it.
+
 ## The comma trap in ARRAYJOIN
 
 When a formula reads a linked-record or lookup field, Airtable escapes any value containing
