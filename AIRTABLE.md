@@ -198,6 +198,16 @@ looks different in every picker afterwards; and **the conflict check matches on 
 regardless of name**, so a correction makes future checks sharper and a typo quietly blunts
 them.
 
+### The button
+
+`Look up on EOIR` on Parties is a button field set to **Open URL**, with the URL coming from
+a formula reading `{EOIR Lookup}` rather than a typed-in address. Reading it from the formula
+is what makes the button grey itself out for anyone with no A-Number.
+
+`EOIR Lookup` is therefore **hidden, not deleted** — the button depends on it, and the EOIR
+Checks page still displays it. Button fields cannot be created through the API; this one was
+made by hand on 8 August 2026.
+
 ### Known limits, accepted
 
 - **A re-check that finds the same answer does not move the date.** The automation fires
@@ -254,27 +264,22 @@ doing by hand.
 **5. Naming drift.** Several field descriptions refer to "the All Cases page". The page
 is now called **Find a Case**.
 
-**6. The EOIR workflow is half-built — three steps left, all by hand.**
-The data side is done and tested (fields, formula, automation, the EOIR Checks page, and the
-two lookups on the case table). What remains is interface layout and a button field, and the
-API can do neither — it cannot edit an existing page's layout, and it cannot create button
-fields. In the interface designer, on **Case Viewer**:
+**6. ~~The EOIR workflow~~ — RESOLVED and published, 8 August 2026.**
+Built, tested end to end, and live. See the **EOIR checks** section above for how it works and
+what was deliberately left out.
 
-1. **Add `EOIR Result` and `EOIR Last Checked`** to the client information area, next to
-   `A Number`. Both are lookups and land read-only, which is what we want — the case
-   displays the EOIR position, it never sets it.
-2. **Add `Client Code`** to the same area. This is the field that makes the client's name a
-   clickable chip; `Client Name` next to it is only a lookup and cannot be clicked. Then open
-   the chip once and lay out the client's record — see "What is editable where" below.
-3. **Add a button field on Parties** — in the base, not the interface — labelled something
-   like "Look up on EOIR", set to **Open URL**, with the URL set to a formula reading
-   `{EOIR Lookup}` rather than a typed-in address. Taking it from the formula is what makes
-   the button grey itself out for anyone with no A-Number. Then hide `EOIR Lookup` from
-   view, since the button replaces it — hide, not delete: the EOIR Checks page still shows
-   it.
+Worth keeping from the build, because it will apply to anything similar:
 
-Publishing the interface pushes **every** page's pending draft live at once, not just the
-page being worked on. Check nothing else is sitting in draft first.
+- **The API cannot finish this kind of job.** It can create fields, formulas, automations and
+  whole new interface pages, but it **cannot** edit an existing page's layout and **cannot**
+  create button fields. Both had to be done by hand in the designer. Plan for that split
+  rather than discovering it late.
+- **Publishing is all-or-nothing.** It pushes *every* page's pending draft live at once, not
+  just the page being worked on. Check nothing else is sitting half-finished first.
+- **Client details on a case are lookups, and lookups cannot be clicked or edited.** `Client
+  Name` on the Case Viewer is a copy of the text. The clickable chip is `Client Code`, the
+  actual link field — that distinction is what makes the whole case-to-person workflow
+  possible, and it is easy to miss.
 
 ---
 
