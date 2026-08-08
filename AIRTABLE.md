@@ -329,6 +329,27 @@ in a picker. Airtable's own record ID remains the real identity, so nothing brea
 codes must continue, add a fresh autoNumber field afterwards and fold it into the formula —
 but be aware its numbering starts from row order and can collide with the historic codes.
 
+## Two people with the same name
+
+The database always tells them apart — separate records, separate internal IDs, and linking
+to one never touches the other. **The person choosing in a picker is the weak point**, not
+the data. A picker shows only the primary field, so two records reading `Maria Torres` and
+`Maria Torres` are indistinguishable on screen, and whoever is clicking picks one at random.
+
+In a system whose conflict check depends on linking the *right* person, that is a real risk
+of misidentification rather than a cosmetic annoyance.
+
+So the Parties primary field carries **date of birth** as well as name:
+
+> `15 — Josefina Almonte-Vidal (19 Aug 1972)`
+
+Date of birth is the right discriminator here — it is what the conflict check already
+matches on, and it is what distinguishes two people of the same name in practice. **Record
+it whenever it is known.** A person with no date of birth on file is one who cannot be
+told apart from a namesake at the moment of choosing.
+
+Three test records currently have none, so they read as name alone.
+
 ## Case Parties is a junction table
 
 One row = **one person + one case + the role they played on it**. "Adding a related party"
@@ -341,6 +362,34 @@ and referred-out contacts, never the client. That is by design, not an omission.
 Always populate the `Party` link rather than relying on the typed `Name`. The link is what
 ties a co-defendant on one case to the same human appearing as a client on another, which
 is the entire basis of the conflict check.
+
+### Spec for the "Add Related Party" popup
+
+The data side supports this fully. `Name` on Case Parties is already a formula reading
+`{Party Full Name} — {Role}`, so a row names itself and the blank-row problem that affected
+Case Charges cannot recur here — **provided `Party` is filled**. With it empty the row reads
+` — Witness`, so make `Party` a **required** field on the form.
+
+The popup should collect exactly four things:
+
+| Box | Field | Notes |
+|---|---|---|
+| The person | `Party` | Link to Parties. **Required.** Searchable by name and date of birth since the primary-field fix. New people can be created inline. |
+| Their role on this case | `Role` | Client, Witness, Victim, Co-Defendant, Complainant, Other, Referred Out - Client |
+| Notes | `Notes` | Optional |
+| *(hidden)* | `Case` | Fills itself from the case the popup was opened on |
+
+Creating a person inline gives them a name only — the immigration fields stay empty, which
+is correct: those are filled in only for people we actually act for.
+
+**`Role` includes "Client" even though the client is not held in this table.** That option
+is for legacy imported rows, which carry a `Legacy Case No.` instead of a `Case` link. Do
+not use it on new rows.
+
+**The API cannot build this form.** `create_page` supports only visualization and dashboard
+pages, not forms — so the popup, the button and the list beneath it are all hand work in
+the interface designer. Expect the button's own label to be unchangeable, as with
+"+ Add case".
 
 ## Status: this is still a pilot
 
