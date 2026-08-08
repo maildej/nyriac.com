@@ -116,25 +116,25 @@ This was a deliberate design goal. Each of these is a single edit in one place:
 
 ## Known gaps and unfinished work
 
-**1. The "Advisal readiness" automation is missing — a latent fault, not a live one.**
-The `Status` field on the case table is documented as *"Set automatically from RIAC Next
-Steps by the 'Advisal readiness' automations — do not edit by hand."* **No such automation
-exists in the base.**
+**1. `Status` on the case table is an artefact — delete it.**
+It is documented as *"Set automatically from RIAC Next Steps by the 'Advisal readiness'
+automations."* No such automation exists, and never did. The data looks right only because
+all 44 cases were seeded on 6 August with `Status` already matching `Readiness (calc)`.
+Nothing keeps them matching, so the first edit to `RIAC Next Steps` would have broken it
+silently.
 
-The data is nevertheless correct today: all 44 cases were seeded on 6 August with
-`Status` already matching `Readiness (calc)`, so the two agree on every record. Nothing
-keeps them agreeing. **The first time anyone changes `RIAC Next Steps`, `Status` will
-silently stop matching** — no error, no warning, just a field that quietly means the
-wrong thing, on a field labelled "do not edit by hand".
+It is safe to delete. There are exactly two calculations on this table, and neither uses
+it — verified by reading their formulas:
 
-Two ways to fix it:
+- **`Readiness (calc)`** groups `RIAC Next Steps` into ready / not ready. Reads only
+  `RIAC Next Steps`.
+- **`Reminder Due`** decides who goes on the monthly chase list. Reads `RIAC Next Steps`,
+  `Closing Code`, `Date Closed`, `Days Since Attorney Contact` and `Attorney Email`.
 
-- **Retire `Status` and filter on `Readiness (calc)` directly.** Fewest moving parts, and
-  it can never drift. Only works if the interface control in question accepts a formula
-  field. Airtable's API cannot delete fields, so this has to be done by hand.
-- **Build the missing automation** — trigger on `RIAC Next Steps` changing, copy
-  `Readiness (calc)` into `Status`. Restores the original design and can be done through
-  the API, but keeps two fields that can disagree.
+No other formula, rollup or lookup in the base references `Status`. **One thing the API
+cannot see is whether an interface filter points at it** — so before deleting, check the
+filters on the case pages, or rename it to `Status (DELETING)` first and see whether
+anything complains.
 
 **2. The Case Viewer is still editable.**
 A session on 7 August was titled *"Make Airtable case interfaces read-only with record
@@ -156,6 +156,95 @@ doing by hand.
 is now called **Find a Case**.
 
 ---
+
+## The charge picker rebuild (August 2026)
+
+### The problem
+
+The `Charge` field on **Case Charges** was doing two incompatible jobs. It is the row's
+**name** (the primary field, so it is what shows in the case's charge list) *and* the only
+**store for non-catalogue offences**. Job one means it must always be filled; job two
+means it must be free text. The result: users had to type "P.L. 155.25" by hand
+immediately after picking P.L. 155.25 from a list of 1,918 — and if they didn't, the case
+showed a blank charge row. Two such blank rows existed when this was found.
+
+Separately, the catalogue could only be searched by citation, never by offence name,
+because Airtable's linked-record picker only ever searches an entry's **primary field** —
+which was just `P.L. 240.05`.
+
+### The fix
+
+Split the two jobs. `Charge` becomes a formula that names the row automatically from
+whichever catalogue entry is linked; a new free-text field takes the hand-typing.
+
+Fields added to **Case Charges** (already done):
+
+| Field | Type | Purpose |
+|---|---|---|
+| `Other Charge (not in catalogues)` | Text | The **only** place to hand-type. Out-of-state, federal, other statutes. |
+| `Attempted?` | Checkbox | Charge is an attempt, not the completed offence. |
+| `Effective Class` | Formula | The class the charge actually carries — attempt class if attempted, else the completed class. **Read this, not `Classification`.** |
+| `Classification (from catalogue)` | Lookup | Class of the completed offence. |
+| `Attempt Class (from catalogue)` | Lookup | What the class becomes on an attempt. |
+| `Statutory Text (from catalogue)` | Lookup | Verbatim text, readable on the case. |
+| `NY Senate Link`, `CJI Link` | Lookup | Source links. |
+
+**Deliberately not done with an automation.** An automation could fill `Charge` when it
+is empty, but that is the same two-fields-that-can-disagree pattern that produced the
+dead `Status` field. A formula cannot drift.
+
+### Manual steps — Airtable's API cannot do these
+
+The API can create fields and edit names, descriptions and formulas. It **cannot** change
+a field's type, delete a field, reassign which field is primary, or edit a form's field
+list. So these four are by hand.
+
+**1. Convert `Charge` on Case Charges from text to a formula.**
+Safe: all 47 existing rows were checked. 45 carry text identical to the linked catalogue
+entry, 2 are blank with a link (the bug), and **none** have text without a link — so no
+typed information is lost.
+
+```
+IF({Attempted?}, "Attempted ", "") &
+IF(
+  {Penal Law Offense},
+  ARRAYJOIN({Penal Law Offense}, ", "),
+  IF(
+    {VTL Offense},
+    ARRAYJOIN({VTL Offense}, ", "),
+    {Other Charge (not in catalogues)}
+  )
+)
+```
+
+**2. Convert `Citation` on NY Penal Law Offenses from text to a formula**, so the picker
+can be searched by offence name. This reproduces all 1,918 existing citations exactly —
+`P.L. 240.05`, `P.L. 140.10(a)`, `P.L. 265.01-D(2)(c)`, `P.L. 496.06 - SUBSECTION UNKNOWN`
+— and appends the name:
+
+```
+"P.L. " & {Section} &
+IF({Subdivision} = "SUBSECTION UNKNOWN", " - SUBSECTION UNKNOWN", {Subdivision}) &
+" — " & {Offense Name}
+```
+
+Cost: every charge chip gets longer. Drop the final line to keep short chips, but then
+name search stops working — searchability and brevity are the same setting.
+
+**3. Add the new boxes to the Add a Charge popup**: `Other Charge (not in catalogues)`
+and `Attempted?`. Remove `Charge` from the form once it is a formula.
+
+**4. Delete `Status`** on the case table — see Known gaps.
+
+### Known limits, tested
+
+- **"+ Add case" cannot be renamed.** Hard-coded by Airtable. Renaming the record page,
+  the form title and the form's own button label all leave it unchanged.
+- **No padding or line-height control** in the Record panel, and no toggle for the
+  up/down record picker. Only title size, full width, tab navigation and edit mode.
+- **A form cannot display information back about what you picked.** Statutory text and
+  the Senate/CJI links therefore cannot appear inside the add popup. They are instead on
+  the charge row on the case page, via the lookups above.
 
 ## Status: this is still a pilot
 
