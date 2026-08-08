@@ -238,11 +238,51 @@ made by hand on 8 August 2026.
 
 **The button pre-fills nothing.** The A-Number appears in that formula only as a test — "does
 this person have one?" — and never in the address, which is a fixed string. Clicking opens the
-ACIS front page and stops there. ACIS does not accept the A-Number as part of a web address,
+ACIS front page and stops there. ACIS does not accept search terms as part of a web address,
 which is why `A-Number for EOIR` exists: it holds the padded 9-digit form ready to copy into
-the ACIS box by hand. Country is not a search key on ACIS at all, so there is nothing to pass
-there either. If ACIS ever gains a deep link, this button's formula is the one place to
-change.
+the ACIS box by hand. If ACIS ever gains a deep link, this button's formula is the one place
+to change.
+
+**There is no way to copy the A-Number to the clipboard automatically.** Airtable button
+fields have no copy action, and the scripting extension is sandboxed without clipboard access.
+Click into `A-Number for EOIR` and copy it the ordinary way. Nine digits — not worth
+engineering around.
+
+### ACIS needs TWO things: A-Number *and* country
+
+**A search cannot be run without both.** ACIS requires the client's nationality alongside the
+A-Number; an A-Number on its own will not return a result. Confirmed by Dan, 8 August 2026.
+
+This does not change how any field works — nothing can be pre-filled either way — but it does
+change what "ready to check" means:
+
+- **A person with an A-Number but no `Country` cannot be looked up at all.** Recording the
+  country is a prerequisite, not a nice-to-have.
+- `EOIR Check Status` tests only for an A-Number, so such a person reads `⚠ Never checked` and
+  appears actionable on the EOIR Checks page when in fact the first job is to find out where
+  they are from. **No records are in that state today** (checked 8 August 2026: every person
+  with an A-Number also has a country), which is why this was left alone rather than fixed.
+- If real data does start producing them, the fix is one formula edit — give
+  `EOIR Check Status` a third branch:
+
+  ```
+  IF(
+    {A Number} = BLANK(),
+    "",
+    IF(
+      {Country} = BLANK(),
+      "⚠ Cannot check - no country recorded",
+      IF(
+        OR({EOIR Result} = BLANK(), {EOIR Result} = "Not yet checked"),
+        "⚠ Never checked",
+        ""
+      )
+    )
+  )
+  ```
+
+`Country` is already shown on the EOIR Checks page and in the client popup, so the information
+is in front of whoever is doing the check either way.
 
 ### Known limits, accepted
 
