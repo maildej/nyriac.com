@@ -132,9 +132,14 @@ it — verified by reading their formulas:
   `Closing Code`, `Date Closed`, `Days Since Attorney Contact` and `Attorney Email`.
 
 No other formula, rollup or lookup in the base references `Status`. **One thing the API
-cannot see is whether an interface filter points at it** — so before deleting, check the
-filters on the case pages, or rename it to `Status (DELETING)` first and see whether
-anything complains.
+cannot see is whether an interface filter points at it.** Check the filter settings on the
+case pages in the interface designer before deleting.
+
+Note that renaming the field first proves nothing: Airtable references fields by internal
+ID, not by name, so a filter would carry on working under any new name. Renaming only
+makes the field conspicuous wherever it is displayed. If a filter does turn out to depend
+on it, the fix is to re-point that filter at `Readiness (calc)`, which holds the same two
+values.
 
 **2. The Case Viewer is still editable.**
 A session on 7 August was titled *"Make Airtable case interfaces read-only with record
@@ -183,11 +188,19 @@ Fields added to **Case Charges** (already done):
 |---|---|---|
 | `Other Charge (not in catalogues)` | Text | The **only** place to hand-type. Out-of-state, federal, other statutes. |
 | `Attempted?` | Checkbox | Charge is an attempt, not the completed offence. |
-| `Effective Class` | Formula | The class the charge actually carries — attempt class if attempted, else the completed class. **Read this, not `Classification`.** |
-| `Classification (from catalogue)` | Lookup | Class of the completed offence. |
+| `Effective Class` | Formula | The class the charge actually carries — attempt class if attempted, else the Penal Law class, falling through to the VTL class. **Read this, not `Classification`.** |
+| `Classification (from catalogue)` | Lookup | Class of the completed Penal Law offence. |
 | `Attempt Class (from catalogue)` | Lookup | What the class becomes on an attempt. |
 | `Statutory Text (from catalogue)` | Lookup | Verbatim text, readable on the case. |
 | `NY Senate Link`, `CJI Link` | Lookup | Source links. |
+| `VTL Classification (from catalogue)` | Lookup | Class of the linked VTL offence. |
+| `VTL Statutory Text (from catalogue)` | Lookup | Verbatim VTL text. |
+| `VTL Sentencing (from catalogue)` | Lookup | Sentencing exposure at the prior-conviction tier picked. |
+| `VTL Source Link` | Lookup | NY Senate link. There is no CJI equivalent for VTL. |
+| `VTL Practice Note (from catalogue)` | Lookup | Points not part of the offence definition, e.g. VTL 1192(12) notation duties. |
+
+VTL entries carry **no attempt class**, so ticking `Attempted?` on a VTL charge falls
+through to its ordinary class rather than going blank.
 
 **Deliberately not done with an automation.** An automation could fill `Charge` when it
 is empty, but that is the same two-fields-that-can-disagree pattern that produced the
