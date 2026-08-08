@@ -405,30 +405,88 @@ the client detail page:
 Add these to the client detail page, or they can only be reached by opening the Parties
 table directly.
 
-## Three levels of "which office", and one hazard
+## Which office: a fact about a case, not about a person
 
-The Case Viewer can be clicked through: case → attorney → agency, each opening an editable
-popup. That works, but **what you are editing changes level at each step**, and the levels
-are easy to confuse.
+**An attorney has no office in this database.** The office is recorded on the case, and
+only on the case.
 
-| Level | Field | Scope of an edit |
+This replaced an earlier arrangement — a usual office on the attorney, plus a per-case
+override — which carried a real hazard. Someone looking at one case could click through to
+the attorney, see the office sitting there editable, correct it, and silently rewrite that
+attorney's office on every other case they had. Nothing on screen suggested the edit
+reached past the case in front of them.
+
+Recording it per case removes the hazard rather than warning about it, and is truer to the
+work: panel attorneys sit on several counties' panels and move between offices, so "their
+office" was never a single fact. The old model needed an override precisely because the
+underlying claim was false.
+
+| Field | Where | What it is |
 |---|---|---|
-| **Person** | `Affiliation`, on the attorney's record | Where this attorney *normally* works. Changing it changes them on **every case, past and future**. |
-| **Case** | `Attorney's Office (this case)` | The override. Affects **this case only**. Empty on almost every case. |
-| **Display** | `Office on This Case` | Formula. Shows the override if set, otherwise the usual office. Read-only — put this on the case tab. |
+| **`Attorney's Office`** | Case | The office the attorney is acting for on this case. The single source. Fill it in when a case is opened. |
+| **`Offices Acted For`** | Attorney | Read-only rollup of every office they have acted for, gathered from their cases. Self-maintaining. |
 
-**The hazard.** A panel attorney is acting for a different county on this case. Someone
-opens the case, clicks through to the attorney, sees `Affiliation` sitting there editable,
-and corrects it — silently rewriting that attorney's office on every other case they have.
-No warning, no error, and nothing on screen to suggest the edit reached beyond the case
-they were looking at.
+Nothing can be edited at the person level, so nothing at the person level can be wrong.
 
-Guard against it: on the attorney popup, either make `Affiliation` read-only, or label it
-so its scope is obvious — *"usual office — changing this affects all their cases"*. Put the
-per-case override on the **case** tab, where its scope matches what the user is looking at.
+**The cost:** every new case needs the office picking, where before it was inherited.
+Accepted deliberately — it is the price of the office always being true of the case in
+front of you.
 
-The same principle applies one step further in: editing agency details from the agency popup
-changes that agency for everyone linked to it.
+**Seeding it from the intake form is not worth doing yet**, for two reasons:
+
+1. `Affiliation` on Pending Intakes is **free text**, typed by the requesting attorney,
+   while the case field is a **link to Agencies**. Bridging them means matching a typed
+   string to an agency record — which fails silently on abbreviations and typos, and
+   worse, can match the wrong agency confidently.
+2. **No automation creates a case from an intake.** Someone accepts the intake and creates
+   the case by hand, so a person is already there and can pick the office in the same
+   motion.
+
+The useful first step, if this is ever wanted, is to make the intake form's `Affiliation`
+a picker of Agencies rather than free text. Then seeding is exact rather than a guess —
+and by that point the automation may not be needed at all.
+
+The same scope principle still applies one step further in: editing agency details from the
+agency popup changes that agency for everyone linked to it. That is correct — agency contact
+details genuinely are shared — but worth knowing before editing.
+
+### What happens with two attorneys on one case
+
+Three cases carry two offices — 6017, 6024 and 6041. Not a backfill error: each has **two
+attorneys, from two different offices**, and both offices were correctly recorded.
+
+This exposes the model's one real limitation. The office attaches to the **case**, not to
+the attorney-on-the-case, so a case with co-counsel from different offices records that
+both offices are involved without saying which attorney belongs to which.
+
+That is acceptable because **co-counsel on a case are in practice always from the same
+organisation** — the three examples are artefacts of randomly generated test data, not
+situations that occur. Recording an office per attorney-per-case would need a junction
+table, which is a large amount of machinery for a case that does not arise.
+
+**Cosmetic consequence:** `Offices Acted For` de-duplicates whole cell values rather than
+individual offices, so an attorney who appears on a two-office case shows a doubled entry
+(`A, B | B`). For every attorney whose cases each have one office — which is all of them,
+in reality — it reads cleanly. Not worth engineering around.
+
+### Two API limits found here
+
+- **A rollup's aggregation formula cannot be changed** through the API. `update_field`
+  accepts `formula` for formula fields only; a rollup has to be rebuilt by hand.
+- Combined with the API's inability to delete fields, this means **a rollup's aggregation
+  is effectively fixed once created**. Get it right first time, or expect hand work.
+
+### Retiring the old fields — in this order
+
+The API cannot delete fields, so these are by hand. Order matters, because each depends on
+the next:
+
+1. On the Case Viewer, display **`Attorney's Office`** instead of `Office on This Case`
+2. Delete **`Office on This Case`** (case table)
+3. Delete **`Attorney's Usual Office`** (case table)
+4. Delete **`Affiliation`** (Attorneys & Requestors)
+
+Every case already carries its own office, so nothing is lost at step 4.
 
 ## The comma trap in ARRAYJOIN
 
