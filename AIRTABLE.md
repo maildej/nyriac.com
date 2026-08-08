@@ -350,6 +350,33 @@ told apart from a namesake at the moment of choosing.
 
 Three test records currently have none, so they read as name alone.
 
+**Attorneys are treated differently on purpose.** Their primary field shows the **name
+only** — no code — because the code means nothing to the people using the interface and
+the name is what they search on. The code is preserved in `Attorney Code (original)` and
+can be put back into the formula at any time. If two attorneys ever share a name, add
+their office to that formula; there is no equivalent of date of birth to fall back on.
+
+The stakes differ, which is why the treatment differs: linking the wrong *client* corrupts
+the conflict check, while linking the wrong *attorney* sends a chaser to the wrong lawyer —
+serious, but visible and recoverable.
+
+## The comma trap in ARRAYJOIN
+
+When a formula reads a linked-record or lookup field, Airtable escapes any value containing
+a comma by wrapping it in double quotes. So `ARRAYJOIN` over agency names produced:
+
+> `"Suffolk County — Legal Aid Society of Suffolk County, Inc."`
+
+quotes and all, while comma-free names like `The Bronx Defenders` came through clean — which
+makes it look like a data problem affecting only some records. Wrap the result to strip them:
+
+```
+SUBSTITUTE( <the ARRAYJOIN expression> , '"', '')
+```
+
+Watch for this in any new formula that joins linked records whose names may contain commas —
+agencies and courts especially.
+
 ## Case Parties is a junction table
 
 One row = **one person + one case + the role they played on it**. "Adding a related party"
@@ -362,6 +389,24 @@ and referred-out contacts, never the client. That is by design, not an omission.
 Always populate the `Party` link rather than relying on the typed `Name`. The link is what
 ties a co-defendant on one case to the same human appearing as a client on another, which
 is the entire basis of the conflict check.
+
+## The attorney's office: default, with a per-case override
+
+Airtable cannot give a linked-record field a default value drawn from another record, so
+"pre-fill it and let them change it" is not directly available. The same result is reached
+with a formula instead, which has the advantage that it cannot drift:
+
+| Field | Role |
+|---|---|
+| `Attorney's Usual Office` | Lookup. The attorney's affiliation from their own record. |
+| `Attorney's Office (this case)` | The **override box**. Filled in by hand only when a panel attorney is acting for a different office than usual. Empty on almost every case. |
+| **`Office on This Case`** | Formula. Reads the override if set, otherwise the usual office. **This is the one to display.** |
+
+So the right office always shows without anyone filling anything in, and setting the
+override changes it for that case alone. The alternative — an automation stamping the usual
+office into the override box on creation — was rejected: it makes every case carry a value
+that only differs on a handful, and a later correction to the attorney's record would not
+reach cases already stamped.
 
 ### Spec for the "Add Related Party" popup
 
