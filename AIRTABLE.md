@@ -509,17 +509,216 @@ share a name, and the conflict check depends on staff linking the *right* human.
 date of birth whenever it is known** — without one, a person cannot be told from a namesake
 at the moment of choosing.
 
-**If this is ever redone in another region's base, the order matters.** Unlike the Penal Law
-citation, an autoNumber cannot be rebuilt by a formula — converting it destroys the numbers.
-So:
+**How it was done, and why the order mattered.** Unlike the Penal Law citation, an autoNumber
+cannot be rebuilt by a formula — converting it destroys the numbers. So the historic codes had
+to be copied to safety *first*:
 
-1. Add a plain text field, e.g. `Client Key Code (original)`.
-2. Copy every existing autoNumber value into it (the API can do this).
-3. *Then* convert the primary field to a formula.
+1. `Client Key Code (original)` and `Attorney Code (original)` were created and filled with
+   every historic number — 53 people and 50 attorneys, none missing.
+2. *Then* each primary field was converted to a formula, by hand, since the API cannot change
+   a field's type. Airtable warns that data will be lost at this point; that is the
+   autoNumber, already copied, so it is safe to accept.
 
-The numbers survive, and the picker becomes searchable by name. Do not convert first. The
-originals are preserved here in `Client Key Code (original)`; they carry no meaning outside
-the base that generated them and are deliberately not shown on the chip.
+**Do not convert first.** In another region's base, follow the same order.
+
+The formulas as actually built — note that neither shows the code, following the decision to
+drop it from chips:
+
+*Parties → `Client Key Code`:*
+```
+IF({Client Full Name}, {Client Full Name}, "Client " & {Client Key Code (original)})
+  & IF({DoB}, " (D.o.B. " & DATETIME_FORMAT({DoB}, "D MMM YYYY") & ")", "")
+```
+
+*Attorneys & Requestors → `Attorney Code`:*
+```
+IF({Attorney Full Name}, {Attorney Full Name}, "Attorney " & {Attorney Code (original)})
+```
+
+The code appears only as a fallback, so a person with no name recorded can never show as a
+blank chip. The originals carry no meaning outside the base that generated them.
+
+**One consequence, accepted knowingly: new people and attorneys no longer receive a code
+number.** They simply show as a name, which reads fine in a picker, and Airtable's own record
+ID remains the real identity, so nothing breaks. If codes must continue, add a fresh
+autoNumber afterwards and fold it into the formula — but be aware its numbering starts from
+row order and can collide with the historic codes.
+
+## Two people with the same name
+
+The database always tells them apart — separate records, separate internal IDs, and linking
+to one never touches the other. **The person choosing in a picker is the weak point**, not
+the data. A picker shows only the primary field, so two records reading `Maria Torres` and
+`Maria Torres` are indistinguishable on screen, and whoever is clicking picks one at random.
+
+In a system whose conflict check depends on linking the *right* person, that is a real risk
+of misidentification rather than a cosmetic annoyance.
+
+So the Parties primary field carries **date of birth** as well as name:
+
+> `Josefina Almonte-Vidal (D.o.B. 19 Aug 1972)`
+
+The old `Client Key Code` is deliberately **not** shown. It was an autoNumber generated
+when this base was built, it means nothing outside it, and — because an autoNumber cannot
+survive becoming a formula — people added after August 2026 do not get one at all, so it
+is not even a consistent identifier going forward. At 3,000+ clients it would put four
+meaningless digits in front of every name. It is preserved in `Client Key Code (original)`
+if ever needed.
+
+Date of birth is the right discriminator here — it is what the conflict check already
+matches on, and it is what distinguishes two people of the same name in practice. **Record
+it whenever it is known.** A person with no date of birth on file is one who cannot be
+told apart from a namesake at the moment of choosing.
+
+Three test records currently have none, so they read as name alone.
+
+**Attorneys are treated differently on purpose.** Their primary field shows the **name
+only** — no code — because the code means nothing to the people using the interface and
+the name is what they search on. The code is preserved in `Attorney Code (original)` and
+can be put back into the formula at any time. If two attorneys ever share a name, add
+their office to that formula; there is no equivalent of date of birth to fall back on.
+
+The stakes differ, which is why the treatment differs: linking the wrong *client* corrupts
+the conflict check, while linking the wrong *attorney* sends a chaser to the wrong lawyer —
+serious, but visible and recoverable.
+
+## Client details cannot be edited on the case. Ever.
+
+Every client field on the Case Viewer — name, date of birth, A Number, country of birth,
+immigration status, status date, client flags, immigration notes, immigration documents —
+is a **lookup** through the `Client Code` link into Parties. A lookup is a mirror of another
+table's field: it is read-only by definition, and **no interface setting can make it
+editable**. This is not a permissions toggle that has been left off.
+
+That is the design working as intended — a person is recorded once, and one edit updates
+every case they appear on. The price is that editing must happen on the client's own
+record.
+
+So there is exactly **one** route to editing client details from a case: clicking through
+to the client's record via the `Client Code` link, which opens the Parties record detail
+page. Remove that route and there is no way to edit a client from the Case Viewer at all.
+
+### ~~The client detail page is missing fields~~ — RESOLVED, 8 August 2026
+
+This page used to expose only `First`, `Last Name`, `Current immigration status`,
+`Date of current immigration status`, `Client Flags`, `Immigration Docs Received` and
+`Case Info` — which left `DoB`, `A Number`, `Country`, `Address`,
+`Notes on Imm Status or History`, `Immigration Docs Upload`, `EOIR Result` and
+`EOIR Results PDF` reachable only by opening the Parties table directly.
+
+All of them were added when the EOIR workflow was built, and **inline editing was switched
+on**, which it had not been — without that the fields displayed but could not be changed,
+which is the same dead end wearing a different hat.
+
+Two of those matter more than the rest:
+
+- **`DoB`** is in every picker label now, and the conflict check matches on it regardless of
+  name. Correcting a wrong one sharpens every future check; mistyping one quietly blunts them.
+- **`A Number` and `Country`** are both required for an EOIR search — see the EOIR checks
+  section. Neither could be entered from anywhere a normal user could reach before this.
+
+**The general lesson: adding a field to a record page is only half the job.** If inline
+editing is off, a field that must be filled in is still unfillable.
+
+## Which office: a fact about a case, not about a person
+
+**An attorney has no office in this database.** The office is recorded on the case, and
+only on the case.
+
+This replaced an earlier arrangement — a usual office on the attorney, plus a per-case
+override — which carried a real hazard. Someone looking at one case could click through to
+the attorney, see the office sitting there editable, correct it, and silently rewrite that
+attorney's office on every other case they had. Nothing on screen suggested the edit
+reached past the case in front of them.
+
+Recording it per case removes the hazard rather than warning about it, and is truer to the
+work: panel attorneys sit on several counties' panels and move between offices, so "their
+office" was never a single fact. The old model needed an override precisely because the
+underlying claim was false.
+
+| Field | Where | What it is |
+|---|---|---|
+| **`Attorney's Office`** | Case | The office the attorney is acting for on this case. The single source. Fill it in when a case is opened. |
+| **`Offices Acted For`** | Attorney | Read-only rollup of every office they have acted for, gathered from their cases. Self-maintaining. |
+
+Nothing can be edited at the person level, so nothing at the person level can be wrong.
+
+**The cost:** every new case needs the office picking, where before it was inherited.
+Accepted deliberately — it is the price of the office always being true of the case in
+front of you.
+
+**Seeding it from the intake form is not worth doing yet**, for two reasons:
+
+1. `Affiliation` on Pending Intakes is **free text**, typed by the requesting attorney,
+   while the case field is a **link to Agencies**. Bridging them means matching a typed
+   string to an agency record — which fails silently on abbreviations and typos, and
+   worse, can match the wrong agency confidently.
+2. **No automation creates a case from an intake.** Someone accepts the intake and creates
+   the case by hand, so a person is already there and can pick the office in the same
+   motion.
+
+The useful first step, if this is ever wanted, is to make the intake form's `Affiliation`
+a picker of Agencies rather than free text. Then seeding is exact rather than a guess —
+and by that point the automation may not be needed at all.
+
+The same scope principle still applies one step further in: editing agency details from the
+agency popup changes that agency for everyone linked to it. That is correct — agency contact
+details genuinely are shared — but worth knowing before editing.
+
+### What happens with two attorneys on one case
+
+Three cases carry two offices — 6017, 6024 and 6041. Not a backfill error: each has **two
+attorneys, from two different offices**, and both offices were correctly recorded.
+
+This exposes the model's one real limitation. The office attaches to the **case**, not to
+the attorney-on-the-case, so a case with co-counsel from different offices records that
+both offices are involved without saying which attorney belongs to which.
+
+That is acceptable because **co-counsel on a case are in practice always from the same
+organisation** — the three examples are artefacts of randomly generated test data, not
+situations that occur. Recording an office per attorney-per-case would need a junction
+table, which is a large amount of machinery for a case that does not arise.
+
+**Cosmetic consequence:** `Offices Acted For` de-duplicates whole cell values rather than
+individual offices, so an attorney who appears on a two-office case shows a doubled entry
+(`A, B | B`). For every attorney whose cases each have one office — which is all of them,
+in reality — it reads cleanly. Not worth engineering around.
+
+### Two API limits found here
+
+- **A rollup's aggregation formula cannot be changed** through the API. `update_field`
+  accepts `formula` for formula fields only; a rollup has to be rebuilt by hand.
+- Combined with the API's inability to delete fields, this means **a rollup's aggregation
+  is effectively fixed once created**. Get it right first time, or expect hand work.
+
+### Retiring the old fields — in this order
+
+The API cannot delete fields, so these are by hand. Order matters, because each depends on
+the next:
+
+1. On the Case Viewer, display **`Attorney's Office`** instead of `Office on This Case`
+2. Delete **`Office on This Case`** (case table)
+3. Delete **`Attorney's Usual Office`** (case table)
+4. Delete **`Affiliation`** (Attorneys & Requestors)
+
+Every case already carries its own office, so nothing is lost at step 4.
+
+## The comma trap in ARRAYJOIN
+
+When a formula reads a linked-record or lookup field, Airtable escapes any value containing
+a comma by wrapping it in double quotes. So `ARRAYJOIN` over agency names produced:
+
+> `"Suffolk County — Legal Aid Society of Suffolk County, Inc."`
+
+quotes and all, while comma-free names like `The Bronx Defenders` came through clean — which
+makes it look like a data problem affecting only some records. Wrap the result to strip them:
+
+```
+SUBSTITUTE( <the ARRAYJOIN expression> , '"', '')
+```
+
+Watch for this in any new formula that joins linked records whose names may contain commas —
+agencies and courts especially.
 
 ## Case Parties is a junction table
 
@@ -533,6 +732,52 @@ and referred-out contacts, never the client. That is by design, not an omission.
 Always populate the `Party` link rather than relying on the typed `Name`. The link is what
 ties a co-defendant on one case to the same human appearing as a client on another, which
 is the entire basis of the conflict check.
+
+## The attorney's office: default, with a per-case override
+
+Airtable cannot give a linked-record field a default value drawn from another record, so
+"pre-fill it and let them change it" is not directly available. The same result is reached
+with a formula instead, which has the advantage that it cannot drift:
+
+| Field | Role |
+|---|---|
+| `Attorney's Usual Office` | Lookup. The attorney's affiliation from their own record. |
+| `Attorney's Office (this case)` | The **override box**. Filled in by hand only when a panel attorney is acting for a different office than usual. Empty on almost every case. |
+| **`Office on This Case`** | Formula. Reads the override if set, otherwise the usual office. **This is the one to display.** |
+
+So the right office always shows without anyone filling anything in, and setting the
+override changes it for that case alone. The alternative — an automation stamping the usual
+office into the override box on creation — was rejected: it makes every case carry a value
+that only differs on a handful, and a later correction to the attorney's record would not
+reach cases already stamped.
+
+### Spec for the "Add Related Party" popup
+
+The data side supports this fully. `Name` on Case Parties is already a formula reading
+`{Party Full Name} — {Role}`, so a row names itself and the blank-row problem that affected
+Case Charges cannot recur here — **provided `Party` is filled**. With it empty the row reads
+` — Witness`, so make `Party` a **required** field on the form.
+
+The popup should collect exactly four things:
+
+| Box | Field | Notes |
+|---|---|---|
+| The person | `Party` | Link to Parties. **Required.** Searchable by name and date of birth since the primary-field fix. New people can be created inline. |
+| Their role on this case | `Role` | Client, Witness, Victim, Co-Defendant, Complainant, Other, Referred Out - Client |
+| Notes | `Notes` | Optional |
+| *(hidden)* | `Case` | Fills itself from the case the popup was opened on |
+
+Creating a person inline gives them a name only — the immigration fields stay empty, which
+is correct: those are filled in only for people we actually act for.
+
+**`Role` includes "Client" even though the client is not held in this table.** That option
+is for legacy imported rows, which carry a `Legacy Case No.` instead of a `Case` link. Do
+not use it on new rows.
+
+**The API cannot build this form.** `create_page` supports only visualization and dashboard
+pages, not forms — so the popup, the button and the list beneath it are all hand work in
+the interface designer. Expect the button's own label to be unchangeable, as with
+"+ Add case".
 
 ## Status: this is still a pilot
 
@@ -564,3 +809,51 @@ confidential.
 - **Do not name a new Note Type tag** containing the words *email received*, *phone
   call*, *documents received* or *substantive* unless you intend it to count as the
   attorney having responded. The `Attorney Contact Date` formula matches on those words.
+
+## The intake form: office as a picker
+
+The old `Affiliation` on Pending Intakes was free text typed by the requesting attorney,
+which produced a different spelling every time and could not be matched to an agency.
+Replaced by three fields:
+
+| Field | Type | Purpose |
+|---|---|---|
+| `Attorney's Office` | Link to Agencies | The picker. Empty means not found. |
+| `Office Not Listed?` | Checkbox | Makes "not found" an **answer** rather than a blank. Without it, an empty office could equally mean the question was skipped. |
+| `Office Not Listed - Details` | Long text | What the attorney can tell us. Shown on the form only when the checkbox is ticked. Working text for the reviewer, not a substitute for the link. |
+
+**"Not Listed" is deliberately NOT an agency record.** Adding one would put a fake office
+into the Agencies table, where it would surface in county rollups, agency reports and every
+future picker — and an intake nobody got round to fixing would sit permanently linked to a
+non-existent office with nothing flagging it. An empty link plus a ticked checkbox says the
+same thing without polluting the data.
+
+The review queue is then a filter: **checkbox ticked, link still empty.**
+
+### Two traps
+
+- **Do not convert the old text field to a link.** Airtable matches existing values against
+  the target table and **creates new records for whatever does not match** — the three test
+  submissions alone would mint agencies called "Test Submission Two - Genesee PD (test)".
+  The API cannot delete them. Create a new link field instead, which is what was done.
+- **Turn off inline record creation** on the form's link field, or attorneys will invent
+  agencies from the public form — precisely what the picker exists to prevent.
+
+## The conflict check only fires from one specific form
+
+The "Conflict Check on New Intake" automation triggers on `formSubmitted`, bound to one
+form view (`viw60aBEiAQi6Jcxr`) on Pending Intakes.
+
+**An intake record created any other way does not get conflict-checked.** Not by the API,
+not by hand, not by a different form, not by a custom web form posting into Airtable. There
+is no error and nothing on the record to show the check never ran — `Possible Conflict
+Matches` is simply empty, which looks identical to "checked, nothing found".
+
+**DECIDED, 8 August 2026: nyriac.com will link to the Airtable form**, not host its own
+form posting into Airtable. This keeps the conflict check working and is a fraction of the
+effort. The website connection is the last step before go-live.
+
+If that is ever revisited — someone wanting the form styled to match the site, say — the
+conflict check has to be rebuilt to trigger on record creation rather than form submission
+*before* the switch, not after. Otherwise every intake stops being checked and nothing says
+so.
