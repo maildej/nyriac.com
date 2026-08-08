@@ -165,6 +165,39 @@ matter. The case only ever *displays* it, through lookups.
 | `EOIR Check Status` | Parties | `⚠ Never checked`, or blank. Feeds the EOIR Checks page. |
 | `EOIR Result`, `EOIR Last Checked` | Cases | Lookups through `Client Code`. Read-only copies for the Case Viewer. |
 
+### What is editable where
+
+Two screens show the same EOIR information and they behave differently on purpose.
+
+**On the case (Case Viewer) — read-only, and not by choice.** `EOIR Result` and
+`EOIR Last Checked` there are *lookups*: live copies of what sits on the client's record.
+Airtable does not allow typing into a lookup at all. The case displays the EOIR position; it
+never sets it.
+
+**On the client's record (the popup from the client chip) — editable, and it must be.**
+These are the real fields, and this popup is the only place most staff will ever reach them.
+Locking them here would leave nowhere to enter an A-Number short of the raw base.
+
+Only three fields are forced read-only, and only because they are formulas — there is
+nothing to type into:
+
+| Forced read-only | Why |
+|---|---|
+| `A-Number for EOIR` | Computed — pads the A-Number to the 9 digits ACIS expects |
+| `EOIR Lookup` | Computed — the ACIS address |
+| `Client Key Code` | Computed — the name + date-of-birth chip |
+
+Everything else on that popup should stay editable, including `EOIR Last Checked`. That last
+one looks like it should be locked, since an automation writes it — but leaving it editable
+is the manual fallback for the limitation below: when a re-check finds the same answer the
+automation does not fire, and typing the date is then the only way to correct it.
+
+**Date of birth is editable too, deliberately** — DoBs do get corrected from bad prior
+information. Two consequences to be deliberate about: it feeds the client chip, so the person
+looks different in every picker afterwards; and **the conflict check matches on date of birth
+regardless of name**, so a correction makes future checks sharper and a typo quietly blunts
+them.
+
 ### Known limits, accepted
 
 - **A re-check that finds the same answer does not move the date.** The automation fires
@@ -232,14 +265,13 @@ fields. In the interface designer, on **Case Viewer**:
    displays the EOIR position, it never sets it.
 2. **Add `Client Code`** to the same area. This is the field that makes the client's name a
    clickable chip; `Client Name` next to it is only a lookup and cannot be clicked. Then open
-   the chip once and set the client layout to show `A Number`, `A-Number for EOIR`,
-   `EOIR Lookup`, `EOIR Result`, `EOIR Last Checked` and `EOIR Results PDF`, with
-   `EOIR Result` and `EOIR Results PDF` left editable and the rest read-only.
+   the chip once and lay out the client's record — see "What is editable where" below.
 3. **Add a button field on Parties** — in the base, not the interface — labelled something
-   like "Look up on EOIR", set to open a URL, with the URL taken from the **`EOIR Lookup`**
-   formula rather than typed in. Taking it from the formula is what makes the button grey
-   itself out for anyone with no A-Number. Then hide `EOIR Lookup` from view, since the
-   button replaces it.
+   like "Look up on EOIR", set to **Open URL**, with the URL set to a formula reading
+   `{EOIR Lookup}` rather than a typed-in address. Taking it from the formula is what makes
+   the button grey itself out for anyone with no A-Number. Then hide `EOIR Lookup` from
+   view, since the button replaces it — hide, not delete: the EOIR Checks page still shows
+   it.
 
 Publishing the interface pushes **every** page's pending draft live at once, not just the
 page being worked on. Check nothing else is sitting in draft first.
