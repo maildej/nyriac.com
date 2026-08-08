@@ -405,30 +405,63 @@ the client detail page:
 Add these to the client detail page, or they can only be reached by opening the Parties
 table directly.
 
-## Three levels of "which office", and one hazard
+## Which office: a fact about a case, not about a person
 
-The Case Viewer can be clicked through: case → attorney → agency, each opening an editable
-popup. That works, but **what you are editing changes level at each step**, and the levels
-are easy to confuse.
+**An attorney has no office in this database.** The office is recorded on the case, and
+only on the case.
 
-| Level | Field | Scope of an edit |
+This replaced an earlier arrangement — a usual office on the attorney, plus a per-case
+override — which carried a real hazard. Someone looking at one case could click through to
+the attorney, see the office sitting there editable, correct it, and silently rewrite that
+attorney's office on every other case they had. Nothing on screen suggested the edit
+reached past the case in front of them.
+
+Recording it per case removes the hazard rather than warning about it, and is truer to the
+work: panel attorneys sit on several counties' panels and move between offices, so "their
+office" was never a single fact. The old model needed an override precisely because the
+underlying claim was false.
+
+| Field | Where | What it is |
 |---|---|---|
-| **Person** | `Affiliation`, on the attorney's record | Where this attorney *normally* works. Changing it changes them on **every case, past and future**. |
-| **Case** | `Attorney's Office (this case)` | The override. Affects **this case only**. Empty on almost every case. |
-| **Display** | `Office on This Case` | Formula. Shows the override if set, otherwise the usual office. Read-only — put this on the case tab. |
+| **`Attorney's Office`** | Case | The office the attorney is acting for on this case. The single source. Fill it in when a case is opened. |
+| **`Offices Acted For`** | Attorney | Read-only rollup of every office they have acted for, gathered from their cases. Self-maintaining. |
 
-**The hazard.** A panel attorney is acting for a different county on this case. Someone
-opens the case, clicks through to the attorney, sees `Affiliation` sitting there editable,
-and corrects it — silently rewriting that attorney's office on every other case they have.
-No warning, no error, and nothing on screen to suggest the edit reached beyond the case
-they were looking at.
+Nothing can be edited at the person level, so nothing at the person level can be wrong.
 
-Guard against it: on the attorney popup, either make `Affiliation` read-only, or label it
-so its scope is obvious — *"usual office — changing this affects all their cases"*. Put the
-per-case override on the **case** tab, where its scope matches what the user is looking at.
+**The cost, stated plainly:** every new case needs the office picking, where before it was
+inherited. For an attorney who always works from the same office that is retyping. It is
+the price of the office always being true of the case you are looking at. If it becomes a
+burden, the intake form already collects `Affiliation` as free text, which could seed the
+field when a case is created from an intake.
 
-The same principle applies one step further in: editing agency details from the agency popup
-changes that agency for everyone linked to it.
+The same scope principle still applies one step further in: editing agency details from the
+agency popup changes that agency for everyone linked to it. That is correct — agency contact
+details genuinely are shared — but worth knowing before editing.
+
+### Cases with two offices need resolving
+
+Backfilling took the office from each attorney's old affiliation. Three attorneys had two
+affiliations on file, so rather than guess, both were written to the case. **A case should
+have exactly one office**, and until these are settled the `Offices Acted For` rollup shows
+a doubled-up value for those attorneys:
+
+- **6017 Josefina Almonte-Vidal** — Westchester Legal Aid Society / Westchester Independent Office of Assigned Counsel
+- **6024 Bekim Gjonbalaj** — Appellate Advocates / Center for Appellate Litigation
+- **6041 Leonel Ayestas** — Suffolk Legal Aid Society / Nassau Legal Aid Society
+
+Pick one on each case and the rollup tidies itself.
+
+### Retiring the old fields — in this order
+
+The API cannot delete fields, so these are by hand. Order matters, because each depends on
+the next:
+
+1. On the Case Viewer, display **`Attorney's Office`** instead of `Office on This Case`
+2. Delete **`Office on This Case`** (case table)
+3. Delete **`Attorney's Usual Office`** (case table)
+4. Delete **`Affiliation`** (Attorneys & Requestors)
+
+Every case already carries its own office, so nothing is lost at step 4.
 
 ## The comma trap in ARRAYJOIN
 
