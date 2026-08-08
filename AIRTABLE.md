@@ -428,28 +428,53 @@ underlying claim was false.
 
 Nothing can be edited at the person level, so nothing at the person level can be wrong.
 
-**The cost, stated plainly:** every new case needs the office picking, where before it was
-inherited. For an attorney who always works from the same office that is retyping. It is
-the price of the office always being true of the case you are looking at. If it becomes a
-burden, the intake form already collects `Affiliation` as free text, which could seed the
-field when a case is created from an intake.
+**The cost:** every new case needs the office picking, where before it was inherited.
+Accepted deliberately — it is the price of the office always being true of the case in
+front of you.
+
+**Seeding it from the intake form is not worth doing yet**, for two reasons:
+
+1. `Affiliation` on Pending Intakes is **free text**, typed by the requesting attorney,
+   while the case field is a **link to Agencies**. Bridging them means matching a typed
+   string to an agency record — which fails silently on abbreviations and typos, and
+   worse, can match the wrong agency confidently.
+2. **No automation creates a case from an intake.** Someone accepts the intake and creates
+   the case by hand, so a person is already there and can pick the office in the same
+   motion.
+
+The useful first step, if this is ever wanted, is to make the intake form's `Affiliation`
+a picker of Agencies rather than free text. Then seeding is exact rather than a guess —
+and by that point the automation may not be needed at all.
 
 The same scope principle still applies one step further in: editing agency details from the
 agency popup changes that agency for everyone linked to it. That is correct — agency contact
 details genuinely are shared — but worth knowing before editing.
 
-### Cases with two offices need resolving
+### What happens with two attorneys on one case
 
-Backfilling took the office from each attorney's old affiliation. Three attorneys had two
-affiliations on file, so rather than guess, both were written to the case. **A case should
-have exactly one office**, and until these are settled the `Offices Acted For` rollup shows
-a doubled-up value for those attorneys:
+Three cases carry two offices — 6017, 6024 and 6041. Not a backfill error: each has **two
+attorneys, from two different offices**, and both offices were correctly recorded.
 
-- **6017 Josefina Almonte-Vidal** — Westchester Legal Aid Society / Westchester Independent Office of Assigned Counsel
-- **6024 Bekim Gjonbalaj** — Appellate Advocates / Center for Appellate Litigation
-- **6041 Leonel Ayestas** — Suffolk Legal Aid Society / Nassau Legal Aid Society
+This exposes the model's one real limitation. The office attaches to the **case**, not to
+the attorney-on-the-case, so a case with co-counsel from different offices records that
+both offices are involved without saying which attorney belongs to which.
 
-Pick one on each case and the rollup tidies itself.
+That is acceptable because **co-counsel on a case are in practice always from the same
+organisation** — the three examples are artefacts of randomly generated test data, not
+situations that occur. Recording an office per attorney-per-case would need a junction
+table, which is a large amount of machinery for a case that does not arise.
+
+**Cosmetic consequence:** `Offices Acted For` de-duplicates whole cell values rather than
+individual offices, so an attorney who appears on a two-office case shows a doubled entry
+(`A, B | B`). For every attorney whose cases each have one office — which is all of them,
+in reality — it reads cleanly. Not worth engineering around.
+
+### Two API limits found here
+
+- **A rollup's aggregation formula cannot be changed** through the API. `update_field`
+  accepts `formula` for formula fields only; a rollup has to be rebuilt by hand.
+- Combined with the API's inability to delete fields, this means **a rollup's aggregation
+  is effectively fixed once created**. Get it right first time, or expect hand work.
 
 ### Retiring the old fields — in this order
 
