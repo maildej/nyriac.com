@@ -594,3 +594,47 @@ confidential.
 - **Do not name a new Note Type tag** containing the words *email received*, *phone
   call*, *documents received* or *substantive* unless you intend it to count as the
   attorney having responded. The `Attorney Contact Date` formula matches on those words.
+
+## The intake form: office as a picker
+
+The old `Affiliation` on Pending Intakes was free text typed by the requesting attorney,
+which produced a different spelling every time and could not be matched to an agency.
+Replaced by three fields:
+
+| Field | Type | Purpose |
+|---|---|---|
+| `Attorney's Office` | Link to Agencies | The picker. Empty means not found. |
+| `Office Not Listed?` | Checkbox | Makes "not found" an **answer** rather than a blank. Without it, an empty office could equally mean the question was skipped. |
+| `Office Not Listed - Details` | Long text | What the attorney can tell us. Shown on the form only when the checkbox is ticked. Working text for the reviewer, not a substitute for the link. |
+
+**"Not Listed" is deliberately NOT an agency record.** Adding one would put a fake office
+into the Agencies table, where it would surface in county rollups, agency reports and every
+future picker — and an intake nobody got round to fixing would sit permanently linked to a
+non-existent office with nothing flagging it. An empty link plus a ticked checkbox says the
+same thing without polluting the data.
+
+The review queue is then a filter: **checkbox ticked, link still empty.**
+
+### Two traps
+
+- **Do not convert the old text field to a link.** Airtable matches existing values against
+  the target table and **creates new records for whatever does not match** — the three test
+  submissions alone would mint agencies called "Test Submission Two - Genesee PD (test)".
+  The API cannot delete them. Create a new link field instead, which is what was done.
+- **Turn off inline record creation** on the form's link field, or attorneys will invent
+  agencies from the public form — precisely what the picker exists to prevent.
+
+## The conflict check only fires from one specific form
+
+The "Conflict Check on New Intake" automation triggers on `formSubmitted`, bound to one
+form view (`viw60aBEiAQi6Jcxr`) on Pending Intakes.
+
+**An intake record created any other way does not get conflict-checked.** Not by the API,
+not by hand, not by a different form, not by a custom web form posting into Airtable. There
+is no error and nothing on the record to show the check never ran — `Possible Conflict
+Matches` is simply empty, which looks identical to "checked, nothing found".
+
+This matters most when the website is connected. Linking to the Airtable form keeps the
+check working; building a custom form on nyriac.com that posts into Airtable silently
+disables it. **Decide which route the website takes before building it**, because the two
+differ enormously in effort and one of them quietly removes the conflict check.
