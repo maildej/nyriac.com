@@ -1136,10 +1136,43 @@ succeeding, or a delivery failure would quietly stall the escalation.
 **Testing.** All 50 attorney emails were `@example.com` — a reserved domain that cannot
 deliver — which is what made building the sending end safe at all. For a live proof of
 concept, **Tomasz Wielgus's address was changed to `dejackson@outlook.com`** on 9 August
-2026; he is the attorney on case 6010, which sits top of the queue. **Change it back before
-real data goes in.** Note that until the templates are written the email body will be nearly
-empty — a test proves the plumbing (right recipient, subject prefix, note logged, approval
-unticked, date stamped), not the wording.
+2026; he is the attorney on case 6010. **Change it back before real data goes in.**
+
+**Proven end to end on 9 August 2026, on case 6010.** The email arrived. Subject came out as
+`RIAC Case 6010 - People v. Dmytro Havryliuk (Buffalo City Court - CR-00987-26) - Referral
+Still Outstanding` — the case prefix and the template's subject line joined correctly. Both
+notes appeared: the internal one tagged `Email Chaser Sent`, and the BCC'd copy tagged
+`Email (filed)`, which **attached itself to the right case automatically** off the case
+number in the subject. `Chasers Sent` went to 1, `Last Reminder Sent` stamped, the approval
+cleared itself, and the case left the queue — it returns at rung 2 once the 21-day gap has
+passed. Every moving part did what it should.
+
+### A failed send is silent, and the case sits approved for ever
+
+Found in the same test. Case 6022 was approved alongside 6010 and **did not send**: no note,
+no date, approval still ticked, `Chasers Sent` still 0. The automation certainly ran — it
+cleared the button and stamped `Approved reminders last sent` both times — so the failure is
+inside that case's branch. Its attorney address is `saoirse.devaney@example.com`, and
+**`example.com` has no mail exchanger**, so the send step almost certainly errored.
+
+For the test data that is an artifact, not a defect. What matters is the shape of the
+failure, which will outlive the test data:
+
+- **Nothing is lost.** Because the send errors *before* the log and update steps, the ladder
+  does not advance and the approval is not cleared, so the case is retried on the next run.
+  That is the right order to have put the nodes in, and worth preserving in any rebuild.
+- **But nothing says so either.** A case with a dead or mistyped address stays approved,
+  never advances, and is silently retried for ever. It looks identical on the queue to a case
+  waiting its turn. Same shape as the EOIR trap: an absence that reads as normal.
+- **Unknown, and worth checking in the run history: whether one bad address halts the rest
+  of the batch.** If the failure aborts the whole run rather than one iteration, every case
+  after it in the ordering is skipped too — which in production would be a single typo
+  quietly stopping that month's chasers.
+
+If that proves to be the behaviour, the fix is to stop bad addresses reaching the send step
+rather than to catch the error: add an email-shaped test to `Reminder Stage` so a case with
+an implausible address never enters the queue, and surface those cases somewhere else so
+someone fixes the address.
 
 ### The original proposal, for reference
 

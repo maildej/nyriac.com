@@ -112,9 +112,14 @@ Nothing can send until you do step 2.
       old text in it, and `Second chaser`, `Final warning` and `Closing notice` are empty
       shells. Until then a test email arrives nearly blank
 - [ ] **Decide who an attorney is reported to**, so the rung 3 wording can be written
-- [ ] *Test:* cases 6010 and 6022 are already approved. Tick `Send approved reminders` in
-      the second section at the bottom of the Reminder Queue page. Only 6010 will reach a
-      real inbox — Tomasz Wielgus's address has been set to dejackson@outlook.com
+- [x] Tested end to end on case 6010, 9 August 2026 — email arrived, both notes logged, the
+      BCC'd copy filed itself against the right case, approval cleared, ladder advanced
+- [ ] **Open the "Send approved reminders" automation's run history and look at the failed
+      case (6022).** It did not send — almost certainly because its attorney address is
+      `@example.com`, which cannot receive mail. Two things to read off: what the error
+      actually says, and **whether the cases after it in the run were skipped**. If one bad
+      address halts the whole batch, that matters in production, and `AIRTABLE.md` records
+      the fix. 6022 is still ticked as approved, so it will retry on the next send
       for this. Expect **two** notes on the case — one tagged `Email Chaser Sent` (logged
       directly, and what the ladder counts) and one tagged `Email (filed)` (the BCC'd copy
       of the real email, filing itself as evidence). Also check the mail arrives, the
