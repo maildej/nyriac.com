@@ -193,6 +193,22 @@ Do not start these until testing is finished.
 - [ ] **Switch the reminder emails to Outlook.** They currently send from Airtable's own
       mail server; the "Send the chaser" step needs swapping to the Microsoft Outlook send
       action so mail comes from the real RIAC address
+- [ ] **Set up the forwarding rule on the RIAC mailbox** — forward anything whose subject
+      contains "RIAC Case" to the auto-filing address held in `Case File BCC Address` on the
+      Reminder Control record. This is what makes an attorney's reply file itself against
+      the case.
+
+      **Do this instead of putting the filing address in CC.** Anything emailed to that
+      address becomes a case note, so CC would show every attorney an unauthenticated way to
+      write into the base — and to anyone they forward the mail to. The forwarding rule gets
+      the same result, keeps the address private, and works when someone hits plain Reply
+      rather than Reply All. Reasoning in `AIRTABLE.md` under "Why the case-file address
+      stays BCC and not CC"
+- [ ] **If a base has been copied for another RIAC: replace `Case File BCC Address` before
+      anything is sent.** A duplicate keeps the original region's address, so the new
+      region's mail would file into the old region's case files with both bases looking
+      healthy. Read the correct address off that base's own "1. Email to Case Note"
+      automation
 - [ ] **Link nyriac.com to the Airtable intake form.** Link to it — do not build a form on
       the website that posts into Airtable, or the conflict check silently stops running
       on every intake

@@ -1286,13 +1286,13 @@ prevent, arriving through an omission rather than a decision. **Reading the new 
 address off its "1. Email to Case Note" automation is therefore a go-live step, not a
 tidying-up step.**
 
-**A consequence worth deciding deliberately rather than discovering.** The base is also the
-permission boundary in Airtable, so separating regions this way necessarily separates their
-**conflict checks** — the automation searches the Parties table in its own base and nothing
-else, so a person known to one RIAC will not flag in another. That follows from treating each
-RIAC's data as confidential to it, and is presumably right; but it is a substantive choice
-about the scope of conflict checking, not a technical detail, and should be recorded as
-settled rather than assumed.
+**Conflict checking is region by region — CONFIRMED by Dan, 9 August 2026.** RIAC conflict
+checks its own offices only, so the conflict universe is properly the region's, not the
+state's. That matters because the base is also Airtable's permission boundary: the conflict
+check searches the Parties table in its own base and nothing else, so a person known to one
+RIAC will not flag in another. That is the intended behaviour, not a limitation to engineer
+around — and it means the per-region base is the right unit for confidentiality *and* for
+conflicts, which is a happy alignment rather than a compromise.
 
 ### Why the case-file address stays BCC and not CC
 
