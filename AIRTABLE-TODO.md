@@ -115,8 +115,11 @@ Nothing can send until you do step 2.
       Run Monthly Reminders. Tomasz Wielgus's address has been set to dejackson@outlook.com
       for this. Check the mail arrives, a note appears tagged `Email Chaser Sent`, the
       approval unticks itself and the case moves to rung 2
-- [ ] Add a longer explanatory note to the Reminder Queue page by hand if you want one —
-      the API can only write titles, capped at 255 characters
+- [ ] Check the Reminder Queue page reads well. The full rules are the **field notes on
+      `Reminder Stage`** (hover the ⓘ on that column); the page itself carries only the
+      warning that cases stay listed even when the attorney has been in touch. If you want
+      a proper paragraph on the page instead, it has to be added by hand — dashboards have
+      no text element and the API can only write titles, capped at 255 characters
 - [ ] **Change Tomasz Wielgus's email back** before real data goes in
 - [ ] Once proven, retire the old batch machinery: `Reminder Due`, `In Reminder Batch`,
       `Reminder Email Draft`, `Reminder Email Subject`, the two `Reminder Control` buttons

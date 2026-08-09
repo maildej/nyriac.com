@@ -1052,7 +1052,7 @@ still letting review happen case by case at leisure.
 | What | Where | Does |
 |---|---|---|
 | `Approved to Send` | Cases (checkbox) | The paralegal's confirmation. **Sends nothing by itself.** |
-| **Reminder Queue** page | Interface | The standing queue, grouped by rung, longest-waiting first |
+| **Reminder Queue** page `pagOzq7FUZa2enuIr` | Interface | The standing queue, grouped by rung, longest-waiting first |
 | `Send approved reminders` | Reminder Control (checkbox) | **Sends real mail. No undo.** |
 | `Approved reminders last sent` | Reminder Control (date) | Stamped by the automation |
 | **Send approved reminders** | Automation `wflms095u1rZ6sIWs` | Does the work |
