@@ -974,7 +974,72 @@ alone cannot distinguish a first chase from a third. Step 4 also *writes* to the
 (closing it), which no reminder step currently does. Expect new fields and a reworked
 "Monthly reminders 1" automation rather than a tweak.
 
-### The queue model (Dan's proposal, 9 August 2026) — DESIGNED, NOT BUILT
+### The queue model — DECIDED, half built (9 August 2026)
+
+**Built and tested: the calculated backbone.** Not built: the approval control, the send
+automation, and the queue page. Nothing yet can send an email. The decisions below are
+settled; read them before touching any of it.
+
+| Field | Table | What it does |
+|---|---|---|
+| `Chaser Flag (calc)` | Notes | 1 if the note is tagged `Email Chaser Sent` |
+| `Chasers Sent (calc)` | Cases | How many chasers have gone out — decides *which* email is next |
+| `Days Since Referral (calc)` | Cases | Days from `Request Date` — decides *when* |
+| **`Reminder Stage`** | Cases | Which reminder is due, or blank. **This is the queue.** |
+| `Days Waiting in Queue` | Cases | How long it has sat unapproved. Sort on this, highest first |
+
+**`Reminder Due` and the old batch machinery were deliberately left alone.** The existing
+monthly system still works exactly as before. Retire it only once the new one is proven,
+or there will be two ways to send and they can disagree.
+
+**Timed from the referral date, but the rung is decided by chaser count.** Dan's call, 9
+August 2026: 30 / 60 / 90 / 120 days from `Request Date`, because cover exists when someone
+is away and it is not critical that emails land on exactly the right day — only that three
+escalating warnings arrive roughly a month apart. Using the *count* of chasers already sent
+to pick which email goes means a case reviewed late catches up rather than skipping a rung,
+so nobody receives a final warning without first receiving the polite one. A 21-day guard
+since the last chaser stops a late-started case firing all three inside a week.
+
+**What removes a case from the queue is documents, not contact.** This is the subtlest part
+of the design and the easiest to get wrong later. The attorney simply being in touch does
+**not** clear a case — only actually supplying what we need does, which happens when the
+paralegal moves `RIAC Next Steps` off the three waiting-for-documents statuses. So the queue
+deliberately includes cases where the attorney has been in touch but sent nothing, and the
+paralegal's review is the filter. Same philosophy as the conflict check: over-return, and
+let a human decide.
+
+**Consequence: attorney contact no longer gates the chaser at all.** `Last Attorney Contact`
+and `Days Since Attorney Contact` change role from *gate* to *information* — they are shown
+on the queue so the paralegal can see "they rang last week, leave it" and decline to
+approve. The related-cases work done earlier the same day still earns its keep for exactly
+that reason, but it no longer decides who gets chased.
+
+**A bug in the old model that the new one fixes.** Case 6051 was referred on 4 August but
+carried a note dated 8 June, so `Days Since Attorney Contact` read 62 and `Reminder Due`
+read 1 — a referral five days old was queued for a non-response chaser. Counting from the
+referral date makes that impossible.
+
+**Formula trap, cost half an hour.** `{Date} != BLANK()` does **not** reliably work in
+Airtable — the first version of `Reminder Stage` returned blank for every case because of
+it. `{Date} = BLANK()` is sound, so write the negative as `NOT({Date} = BLANK())`. Same for
+`= ""` on lookups and multi-selects. Use the proven direction and negate it.
+
+**Templates.** Four wordings are needed where two existed. `Standard chaser` (existing)
+serves rung 1; three **drafts** were added for rungs 2, 3 and 4 — `Second chaser`,
+`Final warning`, `Closing notice`. **`Final warning` contains a placeholder in double angle
+brackets and must not be sent until Dan replaces it**: his specification says that email
+warns the attorney will be reported, but never said *to whom*. The older `Final chase before
+closing` row is superseded but left in place. Remember the standing rule: **never rename a
+`Used For` value** — automations find templates by it.
+
+**Still to build:** an approval control, an automation that sends on approval and logs the
+note, closing behaviour at rung 4 (`Closing Code` = "No Atty Response" plus today's date,
+which drops the case out of the queue by itself), and the queue page — which must carry an
+obvious note explaining that the list includes cases where the attorney has communicated but
+not sent what we need. **The approval checkbox was deliberately NOT created yet**: a tick box
+that looks like it sends mail but does nothing is worse than no box at all.
+
+### The original proposal, for reference
 
 Replace the monthly batch ritual with a **standing queue**. A case joins it the moment it
 becomes eligible; the paralegal works the queue at their own pace, confirms each case really
@@ -1023,15 +1088,14 @@ automation that sends on approval, logs the note and stamps the date; and for st
 queue by itself, since the formula already excludes closed cases. Once proven, retire the two
 `Reminder Control` buttons, or there are two ways to send and they can disagree.
 
-**Still to decide before this can be built:**
+**Both open questions were answered on 9 August 2026:**
 
-- **Does an attorney replying reset the ladder?** An attorney who answers on day 65 with
-  nothing useful and then goes quiet again — do they resume at the final warning, or start
-  over? Not resetting is simpler, and the paralegal reviews every case anyway so can hold one
-  back by hand. Recommended: **do not reset**. This is a policy question about how RIAC wants
-  to treat attorneys, not a technical one.
-- **Is the eligibility check really all the paralegal does**, or do they want to adjust
-  wording per case before it goes? The answer decides whether the draft fields are retired.
+- **A reply does not reset the ladder.** An attorney who answers with nothing useful and goes
+  quiet again resumes where they were. The paralegal can hold a case back by hand.
+- **The paralegal never edits the email.** They are checking case data to confirm a standard
+  form email is warranted, nothing more — so `Reminder Email Draft` and `Reminder Email
+  Subject` can be retired along with the drafting step, once the new automation replaces the
+  old one.
 
 ## Status: this is still a pilot
 
