@@ -8,6 +8,24 @@ Dan runs this project. **Dan is not a developer** and knows little about web des
 - Make edits for him rather than telling him how to code.
 - Keep the site simple — resist adding frameworks, build tools, or JavaScript unless truly needed.
 - When something requires action outside this folder (GitHub, Wix), give exact click-by-click steps.
+- **Say when something looked wrong, even after fixing it** — see below.
+
+### Flag the odd stuff, and say what it means
+
+Asked for by Dan, 9 August 2026. When something technical looks surprising — a check that
+comes back wrong, a number that does not add up, a step that behaves unexpectedly — **do not
+just quietly fix it and move on.** Say that it happened, what it meant, and whether it
+mattered. Two or three sentences in plain English is right; he cannot tell from the outside
+which oddities are routine and which are serious, so silence reads as "nothing happened".
+
+The example that prompted this: before opening a pull request, the summary of changes claimed
+1,750 new lines across three files, including one that had not been touched. The cause was
+that the local copy of the project's history was out of date, so it was comparing against a
+months-old version of the site rather than the current one. Refreshing it first gave the true
+figure — 714 lines across two files. Harmless once spotted, and misleading if not.
+
+The general shape is worth knowing: **a wrong-looking number is usually a wrong question, not
+broken data.** Check what is actually being compared before believing the answer.
 
 ## What this site is
 

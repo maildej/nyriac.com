@@ -61,7 +61,92 @@ Each is safe — every case now carries its own office.
 
 ---
 
-## 3. The Add Related Party popup
+## 3. Finish the disposition change
+
+Built, tested, and nearly finished — see `AIRTABLE.md`, "Disposition: a case note, not a
+per-charge field". Done already: the three per-charge fields are deleted, and `Disposed?` is
+on the Case Viewer (verified 9 August 2026, correctly read-only).
+
+- [ ] *Optional, and genuinely cosmetic.* On the **Monthly Reminders** page, swap the
+      displayed **`Last Contact on This Case (calc)`** for **`Last Attorney Contact`**.
+
+      **The number that matters on that page is already right.** `Days Since Attorney
+      Contact` is displayed there and was repointed at the combined figure, so the page
+      already counts contact across related cases. Only the supporting date beside it is
+      the narrower this-case-only version. Nothing on the page misleads anyone about who
+      gets chased.
+
+      **It is an interface page, not an automation.** Four things share almost the same
+      name: the *Monthly reminders 1* and *2* **automations** (the machinery), the
+      **Monthly Reminders** interface page (the review list of cases), and the **Run
+      Monthly Reminders** interface page (the two buttons).
+
+      Two traps found on 9 August 2026, both of which cost a round:
+
+      1. **Selecting the list of cases gives you the wrong element.** The right-hand panel
+         then reads **"Record list"**, which only ever offers Title, Field 1 and Field 2.
+         The fields in question live on the **record detail** panel — select that instead.
+      2. **The page is filtered to cases in the reminder batch, so it is empty most of the
+         time.** With no record to show, the detail panel renders nothing and its field
+         list cannot be reached. Tick **"Generate this month's list"** on Run Monthly
+         Reminders first — that button drafts but **sends nothing** — then click a case.
+         Re-generating afterwards clears the batch again.
+
+- [ ] *Optional:* add **`Disposed?`** to the **Find a Case** grid so disposed cases can be
+      filtered there too. Not currently on it.
+- [x] Nothing needed on the Add Case Note popup — `Case Disposed` already appears there
+
+---
+
+## 4. Turn on the reminder queue
+
+Built 9 August 2026 and ready to try — see `AIRTABLE.md`, "The review-and-send front end".
+Nothing can send until you do step 2.
+
+- [x] Publish the interface, and turn the "Send approved reminders" automation ON — done
+      9 August 2026
+- [ ] **Publish again.** The Reminder Queue page was rebuilt to carry the send tick-box in a
+      second section beneath the list, so approving and sending happen on one screen. The old
+      version is staged for removal and the new one is not live until you publish
+- [ ] **Write the four email wordings** in Email Templates — `Standard chaser` (rung 1) has
+      old text in it, and `Second chaser`, `Final warning` and `Closing notice` are empty
+      shells. Until then a test email arrives nearly blank
+- [ ] **Decide who an attorney is reported to**, so the rung 3 wording can be written
+- [x] Tested end to end on case 6010, 9 August 2026 — email arrived, both notes logged, the
+      BCC'd copy filed itself against the right case, approval cleared, ladder advanced
+- [x] Diagnosed the one failure: "No MX record found for saoirse.devaney@example.com" — the
+      fake test domain. Confirmed from run history that a bad address does **not** halt the
+      batch, and that a failed case keeps its approval and retries
+- [x] Unticked case 6022, and changed Tomasz Wielgus's address back to the test one — done
+      9 August 2026
+- [x] The "still ticked means it did not send" rule is now on the page itself, as a live
+      count with the explanation beneath it
+- [ ] **Publish again** — the page was rebuilt a third time to add that section, so the live
+      version is still the two-section one
+      for this. Expect **two** notes on the case — one tagged `Email Chaser Sent` (logged
+      directly, and what the ladder counts) and one tagged `Email (filed)` (the BCC'd copy
+      of the real email, filing itself as evidence). Also check the mail arrives, the
+      approval unticks itself, and the case moves to rung 2
+- [ ] Check the Reminder Queue page reads well. The full rules are the **field notes on
+      `Reminder Stage`** (hover the ⓘ on that column); the page itself carries only the
+      warning that cases stay listed even when the attorney has been in touch. If you want
+      a proper paragraph on the page instead, it has to be added by hand — dashboards have
+      no text element and the API can only write titles, capped at 255 characters
+- [x] Replies now go to `RIAC2@ocbaacp.org` — set on every send, 9 August 2026
+- [ ] *When you want mail to come **from** RIAC rather than Airtable:* connect the **shared
+      RIAC mailbox** to Airtable as an integration — not a personal account, or every chaser
+      comes from one named person and stops working when they leave. Tell me once it is
+      connected and I will swap the four send steps to the Outlook action
+- [ ] **When the domain changes to @nyriac.com**, edit `Reply-To Address` on the Reminder
+      Control record. One cell — nothing else needs touching
+- [ ] Once proven, retire the old batch machinery: `Reminder Due`, `In Reminder Batch`,
+      `Reminder Email Draft`, `Reminder Email Subject`, the two `Reminder Control` buttons
+      and the two `Monthly reminders` automations. **Not before** — until then there are two
+      ways to send and they can disagree
+
+---
+
+## 5. The Add Related Party popup
 
 Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup".
 
@@ -72,7 +157,7 @@ Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup"
 
 ---
 
-## 4. Check the attorney popup
+## 6. Check the attorney popup
 
 You built this already — worth confirming it covers:
 
@@ -108,6 +193,22 @@ Do not start these until testing is finished.
 - [ ] **Switch the reminder emails to Outlook.** They currently send from Airtable's own
       mail server; the "Send the chaser" step needs swapping to the Microsoft Outlook send
       action so mail comes from the real RIAC address
+- [ ] **Set up the forwarding rule on the RIAC mailbox** — forward anything whose subject
+      contains "RIAC Case" to the auto-filing address held in `Case File BCC Address` on the
+      Reminder Control record. This is what makes an attorney's reply file itself against
+      the case.
+
+      **Do this instead of putting the filing address in CC.** Anything emailed to that
+      address becomes a case note, so CC would show every attorney an unauthenticated way to
+      write into the base — and to anyone they forward the mail to. The forwarding rule gets
+      the same result, keeps the address private, and works when someone hits plain Reply
+      rather than Reply All. Reasoning in `AIRTABLE.md` under "Why the case-file address
+      stays BCC and not CC"
+- [ ] **If a base has been copied for another RIAC: replace `Case File BCC Address` before
+      anything is sent.** A duplicate keeps the original region's address, so the new
+      region's mail would file into the old region's case files with both bases looking
+      healthy. Read the correct address off that base's own "1. Email to Case Note"
+      automation
 - [ ] **Link nyriac.com to the Airtable intake form.** Link to it — do not build a form on
       the website that posts into Airtable, or the conflict check silently stops running
       on every intake
