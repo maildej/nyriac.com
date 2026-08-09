@@ -915,6 +915,23 @@ Also confirmed: the flag fires on a note carrying **several** tags (`Internal No
 Case Disposed`), and a note linked to the same case by both routes at once is harmless —
 the counts add to 2, which still reads `Disposed`, and the two dates are identical.
 
+### Why `Disposed?` is calculated rather than a box someone ticks
+
+Being a formula, it is read-only whatever any interface setting says — but the reason it was
+built as a formula rather than a dropdown matters more than the mechanics, and is Dan's:
+
+> A dropdown lets someone assert that a case is disposed **with no record of where that came
+> from.** A case note carries the date, who wrote it, what we were told and the paperwork —
+> so the provenance travels with the fact.
+
+Anyone wondering why a case reads `Disposed` clicks through to the note and finds out. Same
+principle as refusing to create a "Not Listed" agency record, and the same trap as EOIR,
+where a blank box could not be told apart from "nobody ever looked".
+
+**The consequence, which is not discoverable from the interface: the only way to undo a
+wrong `Disposed` is to find the note and untick the tag.** There is deliberately no override
+on the case. That is also the move if a plea is vacated or a case is restored.
+
 ### Still true, and still uncovered
 
 Holes 5, 6 and 7 above stand as accepted limits. In particular **nothing enforces the
