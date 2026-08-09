@@ -320,7 +320,8 @@ used it:
 - **`Readiness (calc)`** groups `RIAC Next Steps` into ready / not ready. Reads only
   `RIAC Next Steps`.
 - **`Reminder Due`** decides who goes on the monthly chase list. Reads `RIAC Next Steps`,
-  `Closing Code`, `Date Closed`, `Days Since Attorney Contact` and `Attorney Email`.
+  `Closing Code`, `Date Closed`, `Days Since Attorney Contact`, `Attorney Email` and — since
+  August 2026 — `Disposed?`.
 
 Confirmed after deletion: `Readiness (calc)` still computes, so no interface filter was
 depending on it. **If you ever need this check again**, note that renaming a field first
@@ -779,11 +780,10 @@ pages, not forms — so the popup, the button and the list beneath it are all ha
 the interface designer. Expect the button's own label to be unchangeable, as with
 "+ Add case".
 
-## Disposition: a case note, not a per-charge field (PROPOSED — August 2026)
+## Disposition: a case note, not a per-charge field (August 2026)
 
-**Status: analysed, not yet built. Dan's decisions are still outstanding — see the open
-questions at the end.** Written down because the reasoning is worth more than the chat it
-came from.
+**Status: the calculated side is BUILT AND TESTED. Three fields still need deleting by
+hand — see `AIRTABLE-TODO.md` item 3.**
 
 ### The problem with recording disposition per charge
 
@@ -857,42 +857,105 @@ reason, and the tag then marks B disposed too. Keep disposal notes to disposal.
 **7. Disposal ≠ RIAC closing its file.** RIAC may still owe an advisal after a plea. Do
 not wire `Case Disposed` to `Closing Code` or `Date Closed`.
 
-### What building it would take
+### Decisions taken
 
-**By hand, because the API cannot do it** (it cannot delete a field or change a field
-type):
+**Disposition detail stays as free text in the note body — deliberately.** Holes 3 and 4
+were considered and declined. The information arrives messy and incomplete, so it is a poor
+candidate for categorising; and the only version RIAC would ever fully rely on is an
+official certificate of disposition, which means past cases get looked up by hand on
+purpose anyway. No `Disposition` picker and no `Date Disposed` box were built. **Do not add
+them later without revisiting this** — the reason is about the nature of the information,
+not about effort.
 
-1. Delete `Disposition`, `Disposition Date` and `Sentence` on Case Charges. Safe — all 48
-   rows are empty, no automation reads them, and none of the three is on the Add A New
-   Charge popup.
-2. Check by eye whether any of the three shows inside the expanded charge on the Case
-   Viewer. **The API cannot see how a linked-record field is displayed**, so this cannot be
-   confirmed from here.
-3. Any rollup with a *condition* on it, and any interface layout change.
+**Contact on one of a client's cases now counts across all of them.** Previously `Last
+Attorney Contact` read only notes attached to the case itself. An attorney who rang about
+one matter was still chased on the client's others the same week, and one disposal ending
+several cases only ever registered on one of them.
 
-**Buildable through the API:**
+### What was built (August 2026)
 
-4. Two rollups on the case counting notes tagged `Case Disposed` — one over `RIAC Case
-   Notes`, one over `Notes From Other Cases` (hole 1) — plus a `Disposed?` formula reading
-   both. **A rollup's aggregation cannot be changed through the API afterwards**, so get it
-   right first time.
-5. **Add `{Disposed?}` to the `Reminder Due` formula** so disposed cases drop off the chase
-   list (hole 2). This is the documented single place to change who gets chased, it cannot
-   drift, and it destroys nothing — which is why it is preferred over an automation that
-   overwrites `RIAC Next Steps`. Overwriting a status field from an automation is the exact
-   pattern that produced the dead `Status` field; it would also wipe a live state such as
-   `Ready For Advisal` with no record of what it had been.
-6. Optionally, two boxes on the case note, both optional so the tag-only path keeps
-   working: `Disposition` (single select) and `Date Disposed` (date) — holes 3 and 4. At
-   case level the useful options differ from the old per-charge list and should include
-   *acquitted after trial*, which the per-charge field never had.
+Seven fields, all calculated — nothing here is ever typed into. Helpers carry `(calc)`,
+following the convention above.
 
-### Open questions for Dan
+| Field | Table | What it does |
+|---|---|---|
+| `Disposal Flag (calc)` | RIAC Case Notes | 1 if the note is tagged `Case Disposed`, else 0 |
+| `Last Contact on This Case (calc)` | Cases | The old `Last Attorney Contact` rollup, **renamed** |
+| `Last Contact on Related Cases (calc)` | Cases | Same, over `Notes From Other Cases` |
+| **`Last Attorney Contact`** | Cases | The later of those two. **This is the one to display** |
+| `Disposal Notes on This Case (calc)` | Cases | Count of disposal notes attached here |
+| `Disposal Notes on Related Cases (calc)` | Cases | Count reaching here via `Also Relates To` |
+| **`Disposed?`** | Cases | `Disposed` or blank |
 
-- Does per-charge conviction data (what was pled to, and the sentence on it) need to
-  survive at all, or is the case note enough?
-- Structured `Disposition` and `Date Disposed` on the note, or free text in the note body?
-- Confirm disposed cases should drop off the monthly chaser (they should).
+Two existing formulas were repointed:
+
+- **`Days Since Attorney Contact`** now counts from the combined `Last Attorney Contact`.
+- **`Reminder Due`** gained a sixth test, `{Disposed?} = ""`, so disposed cases drop off the
+  chase list.
+
+**No automation was written, deliberately.** An automation stamping `RIAC Next Steps` was
+rejected: it is the same pattern that produced the dead `Status` field, and it would wipe a
+live state such as `Ready For Advisal` with no record of what it had been. A formula cannot
+drift and destroys nothing.
+
+**Renaming was safe** because Airtable stores field references by internal ID — the
+interface pages and automations followed the rename automatically.
+
+### How it was tested
+
+On case 6008, which carries a note tagged `Case Disposed`:
+
+- Its status was temporarily set to `Intake Email Sent`, making **every** other test in
+  `Reminder Due` pass (331 days since contact, no Closing Code, no Date Closed, attorney
+  email held). `Reminder Due` stayed **0** — so the disposal is genuinely what removes it.
+- The tag was then removed: `Disposed?` went blank and `Reminder Due` flipped to **1**.
+- The tag and the original status (`Ready For Advisal`) were both restored.
+
+Also confirmed: the flag fires on a note carrying **several** tags (`Internal Note,
+Case Disposed`), and a note linked to the same case by both routes at once is harmless —
+the counts add to 2, which still reads `Disposed`, and the two dates are identical.
+
+### Still true, and still uncovered
+
+Holes 5, 6 and 7 above stand as accepted limits. In particular **nothing enforces the
+tag** — an untagged disposed case is indistinguishable from a live one, exactly as with the
+EOIR trap. There is no backstop and none is planned.
+
+## The monthly reminder workflow, in full (NOT YET BUILT)
+
+Only **step 2** exists today. Steps 1, 3 and 4 have never been built, and the automations
+would need real work — this is a job for its own session. Recorded here so the target is
+not lost.
+
+**Step 0 — per case, by hand.** A referral arrives one of three ways: the attorney completes
+the online intake form; the attorney sends a written intake form or an email about a new
+case; or an agency sends a list carrying little more than a client name and the assigned
+attorney. In every instance the paralegal creates the case from whatever is to hand, then
+forwards emails for automatic logging and uploads documents. The paralegal also sets
+`RIAC Next Steps` to reflect how much is still needed from the assigned attorney.
+
+**Step 1 — per case, by hand.** If no initial documents have arrived (RIAC intake form, RAP
+sheet, charges), send the template email: *we have your referral, please send x, y, z, and
+be aware of a, b, c meanwhile*. If some documents did arrive, the paralegal writes an
+individual email saying what is still missing.
+
+**Step 2 — periodic, all cases. THIS IS THE ONLY STEP THAT EXISTS.** No contact within 30
+days: template email saying *we still have this case, you have not sent what we need,
+please do so*.
+
+**Step 3 — periodic, all cases. Not built.** Another 30 days of silence: template email
+saying *we still have this case — send it, and if we do not hear within 30 days we will
+close the case and report you*.
+
+**Step 4 — periodic, all cases. Not built.** Another 30 days of silence: close the case for
+non-response and send a template email saying so.
+
+**What this implies for the build.** The present machinery has one threshold (30 days) and
+two wordings picked by status. Steps 2–4 are an escalating ladder, so something has to
+record **which rung a case is on** and when it was last climbed — `Last Reminder Sent`
+alone cannot distinguish a first chase from a third. Step 4 also *writes* to the case
+(closing it), which no reminder step currently does. Expect new fields and a reworked
+"Monthly reminders 1" automation rather than a tweak.
 
 ## Status: this is still a pilot
 

@@ -61,7 +61,28 @@ Each is safe — every case now carries its own office.
 
 ---
 
-## 3. The Add Related Party popup
+## 3. Finish the disposition change
+
+The calculated side is built and tested — see `AIRTABLE.md`, "Disposition: a case note, not
+a per-charge field". These are the parts the API cannot do.
+
+- [ ] **Delete `Disposition`, `Disposition Date` and `Sentence`** on **Case Charges**. Safe:
+      all 48 rows are empty, no automation reads them, and none of the three is on the Add
+      A New Charge popup
+- [ ] First, **look at an expanded charge on the Case Viewer** and check none of the three
+      is displayed there. The API cannot see inside a linked-record display, so this is the
+      one thing that has to be checked by eye
+- [ ] On the **Monthly Reminders** page, swap the displayed **`Last Contact on This Case
+      (calc)`** for **`Last Attorney Contact`**. The page is currently showing the
+      this-case-only figure, which is narrower than what the chaser now counts from — not
+      wrong, just less than the whole picture
+- [ ] Add **`Disposed?`** to the **Case Viewer** so staff can see it, and consider adding it
+      to the **Find a Case** grid so disposed cases can be filtered
+- [ ] Nothing to do on the Add Case Note popup — `Case Disposed` already appears there
+
+---
+
+## 4. The Add Related Party popup
 
 Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup".
 
@@ -72,7 +93,7 @@ Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup"
 
 ---
 
-## 4. Check the attorney popup
+## 5. Check the attorney popup
 
 You built this already — worth confirming it covers:
 
