@@ -1024,13 +1024,23 @@ Airtable — the first version of `Reminder Stage` returned blank for every case
 it. `{Date} = BLANK()` is sound, so write the negative as `NOT({Date} = BLANK())`. Same for
 `= ""` on lookups and multi-selects. Use the proven direction and negate it.
 
-**Templates.** Four wordings are needed where two existed. `Standard chaser` (existing)
-serves rung 1; three **drafts** were added for rungs 2, 3 and 4 — `Second chaser`,
-`Final warning`, `Closing notice`. **`Final warning` contains a placeholder in double angle
-brackets and must not be sent until Dan replaces it**: his specification says that email
-warns the attorney will be reported, but never said *to whom*. The older `Final chase before
-closing` row is superseded but left in place. Remember the standing rule: **never rename a
-`Used For` value** — automations find templates by it.
+**Templates: structure now, wording later — and Claude does not write the wording.**
+Established 9 August 2026. This is what the Email Templates table is *for*: the automation
+looks a row up by its `Used For` value and assembles the email from the fields, so the
+wording is data. RIAC can rewrite any of it at any time without an automation being touched.
+The standing rule is the other side of that bargain: **never rename a `Used For` value**, as
+it is the only thing tying a row to the automation.
+
+Four wordings are needed where two existed. `Standard chaser` (existing) serves rung 1.
+Three rows were added for rungs 2, 3 and 4 — `Second chaser`, `Final warning`,
+`Closing notice` — as **empty shells**: correct names, correct `Used For` values, every
+content field blank, and a note in each saying what that email is for in Dan's own words.
+Fill them in before the send automation goes live.
+
+One question must be settled before the rung-3 wording can be written: **who the attorney is
+reported to** was never specified. The older `Final chase before closing` row is superseded
+but left in place, and — like `Standard chaser` — carries wording written in an earlier
+session that Dan may want to review now that copy is his to write.
 
 **Still to build:** an approval control, an automation that sends on approval and logs the
 note, closing behaviour at rung 4 (`Closing Code` = "No Atty Response" plus today's date,
