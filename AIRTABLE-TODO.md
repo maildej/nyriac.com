@@ -113,8 +113,10 @@ Nothing can send until you do step 2.
 - [ ] **Decide who an attorney is reported to**, so the rung 3 wording can be written
 - [ ] *Test:* tick `Approved to Send` on case 6010, then tick `Send approved reminders` on
       Run Monthly Reminders. Tomasz Wielgus's address has been set to dejackson@outlook.com
-      for this. Check the mail arrives, a note appears tagged `Email Chaser Sent`, the
-      approval unticks itself and the case moves to rung 2
+      for this. Expect **two** notes on the case — one tagged `Email Chaser Sent` (logged
+      directly, and what the ladder counts) and one tagged `Email (filed)` (the BCC'd copy
+      of the real email, filing itself as evidence). Also check the mail arrives, the
+      approval unticks itself, and the case moves to rung 2
 - [ ] Check the Reminder Queue page reads well. The full rules are the **field notes on
       `Reminder Stage`** (hover the ⓘ on that column); the page itself carries only the
       warning that cases stay listed even when the attorney has been in touch. If you want
