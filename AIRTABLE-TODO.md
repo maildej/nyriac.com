@@ -67,17 +67,30 @@ Built, tested, and nearly finished — see `AIRTABLE.md`, "Disposition: a case n
 per-charge field". Done already: the three per-charge fields are deleted, and `Disposed?` is
 on the Case Viewer (verified 9 August 2026, correctly read-only).
 
-- [ ] On the **Monthly Reminders** page, swap the displayed **`Last Contact on This Case
-      (calc)`** for **`Last Attorney Contact`**. The page shows the this-case-only figure
-      while the chaser now counts from the fuller one — not dangerous, but a mismatch
-      between what you read and what the system does.
+- [ ] *Optional, and genuinely cosmetic.* On the **Monthly Reminders** page, swap the
+      displayed **`Last Contact on This Case (calc)`** for **`Last Attorney Contact`**.
+
+      **The number that matters on that page is already right.** `Days Since Attorney
+      Contact` is displayed there and was repointed at the combined figure, so the page
+      already counts contact across related cases. Only the supporting date beside it is
+      the narrower this-case-only version. Nothing on the page misleads anyone about who
+      gets chased.
 
       **It is an interface page, not an automation.** Four things share almost the same
       name: the *Monthly reminders 1* and *2* **automations** (the machinery), the
-      **Monthly Reminders** interface page (this one — the review list of cases), and the
-      **Run Monthly Reminders** interface page (the two buttons). Go to **Interfaces** in
-      the top navigation → the interface → **Monthly Reminders** in the left sidebar →
-      **Edit** → click the list of cases → change the fields in the right-hand panel.
+      **Monthly Reminders** interface page (the review list of cases), and the **Run
+      Monthly Reminders** interface page (the two buttons).
+
+      Two traps found on 9 August 2026, both of which cost a round:
+
+      1. **Selecting the list of cases gives you the wrong element.** The right-hand panel
+         then reads **"Record list"**, which only ever offers Title, Field 1 and Field 2.
+         The fields in question live on the **record detail** panel — select that instead.
+      2. **The page is filtered to cases in the reminder batch, so it is empty most of the
+         time.** With no record to show, the detail panel renders nothing and its field
+         list cannot be reached. Tick **"Generate this month's list"** on Run Monthly
+         Reminders first — that button drafts but **sends nothing** — then click a case.
+         Re-generating afterwards clears the batch again.
 
 - [ ] *Optional:* add **`Disposed?`** to the **Find a Case** grid so disposed cases can be
       filtered there too. Not currently on it.
