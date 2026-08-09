@@ -1068,11 +1068,40 @@ queue by itself because `Reminder Stage` already excludes closed cases.
 and the `Used For` values in Email Templates. Templates are matched by `Used For` — which is
 exactly why wording can be rewritten freely but those values cannot.
 
-**Two limits of the API found here.** Dashboard pages have **no free-text element**, so the
-explanation of who appears on the queue had to go into the section and grid titles, which
-cap at **255 characters** each. A longer note has to be added by hand in the designer. And a
-new automation is always **saved switched off** — a human must review and enable it in the
-Airtable UI, which is a useful gate rather than an obstacle.
+**Two limits of the API found here.** Dashboard pages have **no free-text element**, and
+section and grid titles cap at **255 characters**. There is also **no `update_page`** — a
+page's titles or layout can only be changed by deleting and recreating it, or by hand in the
+designer. And a new automation is always **saved switched off** — a human must review and
+enable it in the Airtable UI, which is a useful gate rather than an obstacle.
+
+**So the explanation lives in the field notes, not on the page.** Decided 9 August 2026: the
+page carries a short prominent warning plus a pointer, and the full "why is this case
+listed" text is the **description on `Reminder Stage`**, which Airtable surfaces as hover
+help. That text is written for the paralegal rather than for a developer, because it is now
+user-facing. Keep it that way.
+
+### BCC the reminders to the auto-filing address
+
+Dan's idea, 9 August 2026, and a better record than an internal note alone: an auto-filed
+copy is evidence that a real email actually left the building, where a note only records
+that the automation believed it sent one.
+
+**Two traps checked before agreeing, both clear:**
+
+- The auto-filing automation tags what it creates **`Email (filed)`**, not `Email Chaser
+  Sent`. So a BCC'd copy is **not** counted by `Chasers Sent (calc)` and cannot make a case
+  skip a rung. Had it been tagged as a chaser, every reminder would have counted twice.
+- `Email (filed)` also contains none of the words `Attorney Contact Date` matches on, so our
+  own outgoing mail cannot be misread as the attorney having replied to us.
+
+The copy will also attach itself to the right case: `Reminder Subject Prefix` begins
+`RIAC Case <number>`, which is exactly what the `Case No. in Subject` formula extracts, so
+"2. Attach Case Note to its case" will link it automatically.
+
+**Blocked on one thing: the actual address.** The trigger stores only the prefix
+(`riac-case-file`); Airtable generates the full address and shows it only in the automation's
+own screen. It must not be guessed — a wrong address means the audit copy silently never
+arrives. Once known, add it as `bcc` to all four `sendEmail` nodes.
 
 **Testing.** All 50 attorney emails were `@example.com` — a reserved domain that cannot
 deliver — which is what made building the sending end safe at all. For a live proof of
