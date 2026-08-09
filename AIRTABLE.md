@@ -12,7 +12,7 @@ It is a map, not a manual. The detailed reasoning for individual fields lives in
 descriptions are unusually full and are the primary documentation; this file exists to
 tell you where to look and to record the things a field description cannot say.
 
-Last verified against the live base: **8 August 2026.**
+Last verified against the live base: **9 August 2026.**
 
 ---
 
@@ -50,7 +50,7 @@ another. That separation is what makes the conflict check possible.
 |---|---|
 | **Counties**, **RIACs**, **Courts**, **Agencies** | Geography and institutions. A case inherits its county and region *through the court* — never typed. |
 | **NY Penal Law Offenses** | Every chargeable variant, with verbatim statutory text. |
-| **NY VTL Offenses** | Alcohol and driving offences, one row per prior-conviction tier. |
+| **NY VTL Offenses** | Alcohol and driving offences, one row per prior-conviction tier. `Short Name` is the column to edit — see "Classes, attempts and short names". |
 | **IDP Chart Entry** | Immigrant Defense Project quick-reference chart, reproduced with permission. **Do not add lookups or rollups of the IDP fields to other tables** — IDP content must only ever be readable in the context of an IDP record, so its source is always visible. |
 | **Email Templates** | The wording of automated emails, editable without touching any automation. |
 | **Reminder Control** | A single record acting as two buttons. **Never add a second record** — the automations would fire twice. |
@@ -392,7 +392,7 @@ Fields added to **Case Charges** (already done):
 |---|---|---|
 | `Other Charge (not in catalogues)` | Text | The **only** place to hand-type. Out-of-state, federal, other statutes. |
 | `Attempted?` | Checkbox | Charge is an attempt, not the completed offence. |
-| `Effective Class` | Formula | The class the charge actually carries — attempt class if attempted, else the Penal Law class, falling through to the VTL class. **Read this, not `Classification`.** |
+| `Effective Class` | Formula | The class the charge actually carries — attempt class if attempted, else the Penal Law class, falling through to the VTL class. **Read this, not `Classification`.** Since 9 Aug 2026 it also appears, abbreviated, inside `Charge`. |
 | `Classification (from catalogue)` | Lookup | Class of the completed Penal Law offence. |
 | `Attempt Class (from catalogue)` | Lookup | What the class becomes on an attempt. |
 | `Statutory Text (from catalogue)` | Lookup | Verbatim text, readable on the case. |
@@ -436,9 +436,9 @@ IF(
 ```
 
 **2. Convert `Citation` on NY Penal Law Offenses from text to a formula**, so the picker
-can be searched by offence name. This reproduces all 1,918 existing citations exactly —
+can be searched by offence name. This reproduced all 1,918 existing citations exactly —
 `P.L. 240.05`, `P.L. 140.10(a)`, `P.L. 265.01-D(2)(c)`, `P.L. 496.06 - SUBSECTION UNKNOWN`
-— and appends the name:
+— and appended the name:
 
 ```
 "P.L. " & {Section} &
@@ -448,6 +448,9 @@ IF({Subdivision} = "SUBSECTION UNKNOWN", " - SUBSECTION UNKNOWN", {Subdivision})
 
 Cost: every charge chip gets longer. Drop the final line to keep short chips, but then
 name search stops working — searchability and brevity are the same setting.
+
+*(This formula was superseded on 9 August 2026 — see "Classes, attempts and short names"
+below. It is kept here because it is the record of what the conversion had to reproduce.)*
 
 **3. Add the new boxes to the Add a Charge popup**: `Other Charge (not in catalogues)`
 and `Attempted?`. Remove `Charge` from the form once it is a formula.
@@ -488,6 +491,112 @@ Labels differ from the underlying field names, deliberately — they read as ins
 
 `Charge` is deliberately **not** on the form — it names itself from whichever catalogue
 entry is picked.
+
+## Classes, attempts and short names (9 August 2026)
+
+### What changed
+
+Three things, all display only. **No stored data was altered** — the verbatim statutory
+names, statute numbers and classifications are exactly as they were; only what is shown on
+top of them changed.
+
+| Where | Before | After |
+|---|---|---|
+| Penal Law picker | `P.L. 215.51(b)(iii) — Criminal Contempt in the First Degree` | `P.L. 215.51(b)(iii) — Criminal Contempt 1st (E Fel)` |
+| VTL picker | `V.T.L. 1192.2 - 1 Prior Conviction Within 10 Years` | `V.T.L. 1192.2 — DWI (0.08% BAC) — 1 Prior Conviction Within 10 Years (U Misd)` |
+| A charge on a case | `Attempted P.L. 215.51(b)(iii) — Criminal Contempt in the First Degree` | `P.L. 110-215.51(b)(iii) — Attempted Criminal Contempt 1st (A Misd)` |
+
+### The one rule that shaped the whole design
+
+**A picker can only ever show a table's primary field**, so putting the class into the
+Penal Law picker necessarily put it into `Citation` — and `Charge` used to be nothing more
+than `ARRAYJOIN` of the linked record's name, i.e. a copy of `Citation`. Left alone, an
+attempted E felony would have shown the completed offence's class in its own title while
+the attempt-adjusted class sat in a column beside it, contradicting it.
+
+So `Charge` no longer copies the catalogue entry's name. Each catalogue table now exposes
+its name in **two separable pieces**, and `Charge` reassembles them with the attempt parts
+inserted in the middle:
+
+| Piece | On Penal Law | On VTL |
+|---|---|---|
+| `Statute No.` | `215.51(b)(iii)` | `1192.2` |
+| `Display Name` | `Criminal Contempt 1st` | `DWI (0.08% BAC) — 1 Prior Conviction Within 10 Years` |
+
+Both deliberately **omit the "P.L. " / "V.T.L. " prefix**. That is the whole point: the
+prefix is added by whoever is assembling the line, so `Charge` can write
+`"P.L. " & "110-" & {Statute No.}` and produce `P.L. 110-215.51(b)(iii)`. Put the prefix
+back into `Statute No.` and the attempt citation becomes impossible without string surgery.
+
+### Two different classes, on purpose
+
+This is the thing most likely to look like a bug and is not.
+
+- **The picker always shows the completed offence's class.** It is a catalogue of statutes,
+  not of charges; nothing there knows whether any particular case is an attempt.
+- **The charge row always shows the calculated class** — `Effective Class`, which has
+  already dropped a rung for an attempt.
+
+So an attempted first-degree criminal contempt is picked from a list saying `(E Fel)` and
+lands on the case reading `(A Misd)`. Confirmed as acceptable by Dan before the work was
+done. The word "Attempted" and the `110-` both sit in the same line, which is what makes
+the drop legible rather than baffling.
+
+### The pieces, table by table
+
+| Field | Table | What it is |
+|---|---|---|
+| `Statute No.` | Penal Law | Formula. Number only, no prefix. Handles `SUBSECTION UNKNOWN`. |
+| `Display Name` | Penal Law | Formula. Offence name with "in the Nth Degree" shortened to "Nth". |
+| `Citation` | Penal Law | Primary. `Statute No.` + `Display Name` + abbreviated class. |
+| `Short Name` | VTL | **Text — the one field to edit.** Plain-English name per row. |
+| `Statute No.` | VTL | Formula. Number only. Works out `.` vs `-` for itself. |
+| `Display Name` | VTL | Formula. `Short Name` (or the full name if blank) + prior-conviction tier. |
+| `Citation` | VTL | Primary. Same shape as the Penal Law one. |
+| `PL Statute No.`, `PL Display Name`, `VTL Statute No.`, `VTL Display Name` | Case Charges | Lookups. The four pieces `Charge` assembles. |
+| `Charge` | Case Charges | Primary. The finished line. |
+| `Top Charge Label` | Case Charges | Now just `IF({Top Charge?}, {Charge}, "")`. |
+
+### Details that will not be obvious later
+
+- **The degree shortening is a find-and-replace inside a formula, not an edit to the data.**
+  Checked against all 1,918 rows first: every degree in the table is written
+  `in the Nth Degree` with those exact capitals, nothing else in any offence name uses the
+  word "degree", and 1,143 rows are affected. `SUBSTITUTE` is **case-sensitive**, so a row
+  added later with different capitalisation will simply not shorten — it will not break.
+- **`110-` is Penal Law only.** VTL has no attempt provision and its entries carry no
+  attempt class, so a VTL charge ticked as an attempt gets the word "Attempted" and keeps
+  its ordinary class. Tested.
+- **A write-in charge shows no class at all** — there is no catalogue entry to read one
+  from, so `Effective Class` is blank and the brackets are omitted rather than left empty.
+  Tested.
+- **The class abbreviations appear in three formulas** — `Citation` on both catalogues and
+  `Charge` on Case Charges. There is no single place to change them. Change one, change all
+  three. This was chosen over three more lookup fields and a fourth formula; the NY offence
+  ladder does not change, so the duplication is inert.
+- **The VTL `Short Name` column is meant to be edited by hand.** The picker and every charge
+  line update the moment it is. A blank falls back to the full statutory name, so a new row
+  is never nameless. Do not type the prior-conviction tier into it — that is appended
+  automatically, which is what lets one short name serve all the tiers of an offence.
+- **`Top Charge Label` must not append the class again.** It used to; `Charge` now carries
+  it. The case-level `Top Charge` rollup reads this field and is otherwise untouched.
+
+### What was checked before changing anything
+
+Every formula, rollup and automation in the base was traced. **No automation reads a charge
+or a catalogue entry**; the reminder emails do not mention charges. The only consumer of the
+catalogues was `Charge`, and the only consumer of `Charge` was `Top Charge Label` → the
+case-level `Top Charge` rollup. No case carried a VTL charge, so restyling the VTL entries
+could not disturb existing data. Three throwaway charge rows — plain VTL, attempted VTL, and
+an attempted write-in — were created, checked and deleted.
+
+### Still outstanding
+
+**The VTL `Citation` field is still plain text.** Until it is converted to a formula by hand
+the VTL *picker* shows the old citation-only text and cannot be searched by offence name.
+Everything else — including how VTL charges read once recorded — already works, because the
+charge line is built from the helper fields rather than from `Citation`. The formula and the
+step-by-step are in `AIRTABLE-TODO.md`, item 1.
 
 ## Pickers can only search a table's primary field
 

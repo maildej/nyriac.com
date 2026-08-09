@@ -4,8 +4,9 @@ A working checklist, in priority order. Delete items as they are done; when the 
 empty, delete the file. The reasoning behind every item is in `AIRTABLE.md` — this file is
 just the doing.
 
-Everything here is **interface work in Airtable**, which the API cannot touch. That is why
-it is yours rather than Claude's.
+Almost everything here is **interface work in Airtable**, which the API cannot touch. That
+is why it is yours rather than Claude's. Item 1 is the exception — it is a field type
+change, which the API also cannot make.
 
 **Base:** RIAC CMS Pilot · **Interface:** the one containing Case Viewer
 
@@ -14,10 +15,74 @@ it is yours rather than Claude's.
 
 ---
 
-## 1. Finish the intake form
+## 1. Turn the VTL `Citation` field into a formula
+
+**Table:** NY VTL Offenses · **Field:** `Citation` (the first column)
+
+This is the last piece of the charge-display work done on 9 August 2026. Everything else is
+already live: the Penal Law picker, the short VTL names, and the way charges read on a case
+all work now. Only the **VTL search box** is still showing the old text, and only this
+change fixes it.
+
+Right now the VTL picker offers `V.T.L. 1192.2 - 1 Prior Conviction Within 10 Years` — no
+offence name at all, so it cannot be searched by name. After this it will read:
+
+> `V.T.L. 1192.2 — DWI (0.08% BAC) — 1 Prior Conviction Within 10 Years (U Misd)`
+
+**How:**
+
+- [ ] Open **NY VTL Offenses**, click the **`Citation`** column header → **Edit field**
+- [ ] Change the type from **Single line text** to **Formula**
+- [ ] Paste this in:
+
+```
+"V.T.L. " & {Statute No.} & " — " & {Display Name} &
+IF(
+  {Classification},
+  " (" & SWITCH({Classification},
+    "A-I Felony", "A-I Fel",
+    "A-II Felony", "A-II Fel",
+    "B Felony", "B Fel",
+    "C Felony", "C Fel",
+    "D Felony", "D Fel",
+    "E Felony", "E Fel",
+    "A Misdemeanor", "A Misd",
+    "B Misdemeanor", "B Misd",
+    "Unclassified Misdemeanor", "U Misd",
+    "Violation", "Viol",
+    "Traffic Infraction", "Traffic Inf",
+    "Non-criminal", "Non-crim",
+    "N/A - Definition", "Definition",
+    "Depends on Priors", "Class depends on priors",
+    "Depends on Underlying Offense", "Class depends on underlying offense",
+    "Varies Based on Sub-Section", "Class varies by sub-section",
+    "Specific Penalty Laid Out In Statute", "See statute",
+    "Other", "Other",
+    {Classification}) & ")",
+  ""
+)
+```
+
+- [ ] Airtable will warn that data will be lost. **That is expected and safe.** The thing
+      being lost is the typed citation text, and the formula rebuilds every one of the 36
+      statute numbers exactly — checked against all 36 rows before this was written. The
+      links from existing charges are held by internal ID and are not affected
+
+**Then, once it is done:**
+
+- [ ] Open the **Add A New Charge** popup on a test case and type `DWI` into the VTL box.
+      Before this change it finds nothing; after it, it should find the DWI entries
+
+**If it goes wrong,** change the type back to Single line text — but note the old typed
+citations will not come back, so if you want to abandon this, tell Claude and the text can
+be written back in from the two helper columns.
+
+---
+
+## 2. Finish the intake form
 
 The three new fields exist but nothing can reach them yet, so the intake form is currently
-collecting the *old* free-text office. Do this first — it is short.
+collecting the *old* free-text office. It is short.
 
 **The form is called "Attorney Intake Form", and it is the only form in the base.**
 
@@ -45,7 +110,7 @@ Then:
 
 ---
 
-## 2. Delete the superseded fields
+## 3. Delete the superseded fields
 
 Each is safe — every case now carries its own office.
 
@@ -61,7 +126,7 @@ Each is safe — every case now carries its own office.
 
 ---
 
-## 3. The Add Related Party popup
+## 4. The Add Related Party popup
 
 Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup".
 
@@ -72,7 +137,7 @@ Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup"
 
 ---
 
-## 4. Check the attorney popup
+## 5. Check the attorney popup
 
 You built this already — worth confirming it covers:
 
