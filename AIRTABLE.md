@@ -1213,10 +1213,95 @@ Three things to get right, because they are easy to miss:
   where nothing is monitoring. Sending from a real mailbox means a reply lands somewhere a
   human reads.
 
-**A cheaper interim step, if connecting a mailbox is not imminent:** add `replyTo` to the
-existing sends. Mail still shows as coming from Airtable, but replies route to a real RIAC
-address. It is a one-line change per send node and needs no account — it just needs someone
-to say which address replies should go to.
+**Done in the meantime, 9 August 2026: every send carries a Reply-To of
+`RIAC2@ocbaacp.org`.** Mail still shows as coming from Airtable, but an attorney who hits
+Reply now writes to a mailbox someone reads. That closes the worst of it — a lawyer answering
+a chaser into an unmonitored address — without waiting for a mailbox to be connected. The old
+"Monthly reminders 2" automation does **not** have this and still replies into the void; add
+it there too if that automation is used again before it is retired.
+
+### Both addresses are configuration, not automation
+
+Neither email address is written inside the send automation. Both live as fields on the
+**Reminder Control** record and are read from it at send time:
+
+| Field | Holds |
+|---|---|
+| `Reply-To Address` | Where an attorney's reply goes |
+| `Case File BCC Address` | The auto-filing address the evidence copy is BCC'd to |
+
+**This works because the Reminder Control record *is* the automation's trigger record**, so
+any configuration field on it is available to every node with no lookup — the cheapest
+possible config mechanism in Airtable, and worth reusing for anything else that needs setting
+per-region.
+
+Two reasons this matters more than tidiness:
+
+- **RIAC is moving from `@ocbaacp.org` to `@nyriac.com`.** That migration is now one cell,
+  not four buried automation inputs.
+- **Rolling out to other RIACs.** See below — the BCC address is the dangerous one.
+
+### If this base is copied for another RIAC, change the BCC address FIRST
+
+The auto-filing address embeds **this base's ID and this base's email-trigger ID**:
+
+```
+riac-case-file-appwoHVXRp4vgfJB9.183c-wtrRwntbDiQDdpYsJ.29a1@automations.airtableemail.com
+                ^^^^^^^^^^^^^^^^      ^^^^^^^^^^^^^^^^^
+                this base             this base's email trigger
+```
+
+A duplicated base keeps that value, so **another region's reminders would file their evidence
+copies into RIAC 2's database** — one region's case correspondence landing in another
+region's case files, silently, with both bases appearing to work. Every new base must read
+its own address off its own "1. Email to Case Note" automation and paste it into
+`Case File BCC Address` before anything is sent.
+
+The same applies here: if that automation is ever deleted and rebuilt, the address changes
+and every BCC quietly stops filing while the reminders keep sending perfectly.
+
+**The wider point for rolling out to other RIACs.** Each region has to set up its own outbound
+mail regardless, so treat the Reminder Control record as the per-region setup sheet: reply-to
+address, case-file address, and — once mailboxes are connected — the account each send action
+uses. Anything else that turns out to be region-specific belongs there too, for the same
+reason.
+
+### Why the case-file address stays BCC and not CC
+
+Considered and rejected on 9 August 2026. The appeal is obvious: put the auto-filing address
+in CC and an attorney who hits *Reply All* has their reply filed against the case
+automatically.
+
+**The objection is that the case-file address is an unauthenticated way to write into this
+base.** Anything emailed to it becomes a case note, and if the subject carries `RIAC Case
+<number>` the companion automation attaches it to that case. Putting it in CC publishes that
+address to every attorney RIAC chases — and to anyone they forward the mail to, and to
+anything that scrapes it. From then on, a stranger could create notes on any case whose
+number they can guess, and spam to that address would land in the case log. With real client
+data in the base that is a confidentiality and integrity problem, not an annoyance.
+
+The benefit is also weaker than it looks: it only pays off when someone uses Reply All rather
+than Reply, which most people do not.
+
+**The safe way to get the same result** is a forwarding rule on `RIAC2@ocbaacp.org` — forward
+anything whose subject contains `RIAC Case` to the case-file address. Replies then file
+themselves exactly as CC would have achieved, the address stays private, and it works for
+plain Reply as well as Reply All. That is also precisely what the "1. Email to Case Note"
+automation was built for: *"BCC or forward any case email to this automation's address."*
+
+### Airtable emails the automation's owner when a run fails
+
+Confirmed 9 August 2026 — a "Something went wrong with an automation" message arrived after
+the two failed test runs. This softens, but does not remove, the silent-failure problem
+recorded above:
+
+- It goes to the person who owns or last edited the automation, **not** to a shared mailbox,
+  so it stops reaching anyone if that person leaves.
+- It is aggregated — *"failed 2 times"* — and names no case, so it tells you something broke,
+  not which attorney went unchased.
+
+Treat it as a smoke alarm, and the count on the Reminder Queue page as the thing that says
+what actually needs fixing.
 
 ### The original proposal, for reference
 

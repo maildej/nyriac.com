@@ -132,11 +132,13 @@ Nothing can send until you do step 2.
       warning that cases stay listed even when the attorney has been in touch. If you want
       a proper paragraph on the page instead, it has to be added by hand — dashboards have
       no text element and the API can only write titles, capped at 255 characters
-- [ ] *When you want mail to come from RIAC rather than Airtable:* connect the **shared RIAC
-      mailbox** to Airtable as an integration — not a personal account, or every chaser comes
-      from one named person and stops working when they leave. Tell me once it is connected
-      and I will swap the four send steps to the Outlook action. Cheaper interim: tell me
-      which address replies should go to and I will add `replyTo`, which needs no account
+- [x] Replies now go to `RIAC2@ocbaacp.org` — set on every send, 9 August 2026
+- [ ] *When you want mail to come **from** RIAC rather than Airtable:* connect the **shared
+      RIAC mailbox** to Airtable as an integration — not a personal account, or every chaser
+      comes from one named person and stops working when they leave. Tell me once it is
+      connected and I will swap the four send steps to the Outlook action
+- [ ] **When the domain changes to @nyriac.com**, edit `Reply-To Address` on the Reminder
+      Control record. One cell — nothing else needs touching
 - [ ] Once proven, retire the old batch machinery: `Reminder Due`, `In Reminder Batch`,
       `Reminder Email Draft`, `Reminder Email Subject`, the two `Reminder Control` buttons
       and the two `Monthly reminders` automations. **Not before** — until then there are two
