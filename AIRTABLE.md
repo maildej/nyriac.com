@@ -1266,6 +1266,34 @@ address, case-file address, and — once mailboxes are connected — the account
 uses. Anything else that turns out to be region-specific belongs there too, for the same
 reason.
 
+### One auto-filer address per RIAC — required, and already the case
+
+**Incoming case email cannot be pooled.** Conflicts mean a region's correspondence has to
+land directly in that region's own confidential data, never in a shared inbox that is later
+parsed and distributed. Dan's requirement, 9 August 2026.
+
+**The architecture already enforces this, and it is not an accident.** Airtable generates the
+auto-filing address from the base and the email trigger that owns it, so an address belongs
+to exactly one base and cannot be pointed at another. Give each RIAC its own base and each
+gets its own filer address automatically. There is no configuration in which one address
+serves two regions — pooling is not merely discouraged here, it is unavailable.
+
+**Which makes the copied-base trap the one real danger**, because it produces pooling by
+accident and in the wrong direction: a duplicate keeps the *original* address in
+`Case File BCC Address`, so the new region's mail files into the old region's case files
+while both bases look healthy. That is exactly the outcome this requirement exists to
+prevent, arriving through an omission rather than a decision. **Reading the new base's own
+address off its "1. Email to Case Note" automation is therefore a go-live step, not a
+tidying-up step.**
+
+**A consequence worth deciding deliberately rather than discovering.** The base is also the
+permission boundary in Airtable, so separating regions this way necessarily separates their
+**conflict checks** — the automation searches the Parties table in its own base and nothing
+else, so a person known to one RIAC will not flag in another. That follows from treating each
+RIAC's data as confidential to it, and is presumably right; but it is a substantive choice
+about the scope of conflict checking, not a technical detail, and should be recorded as
+settled rather than assumed.
+
 ### Why the case-file address stays BCC and not CC
 
 Considered and rejected on 9 August 2026. The appeal is obvious: put the auto-filing address
