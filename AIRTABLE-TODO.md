@@ -103,16 +103,18 @@ on the Case Viewer (verified 9 August 2026, correctly read-only).
 Built 9 August 2026 and ready to try — see `AIRTABLE.md`, "The review-and-send front end".
 Nothing can send until you do step 2.
 
-- [ ] **Publish the interface** so the new **Reminder Queue** page goes live. Remember
-      publishing is all-or-nothing — check nothing else is half-finished first
-- [ ] **Turn the "Send approved reminders" automation ON.** Airtable saves every new
-      automation switched off; open it and enable it
+- [x] Publish the interface, and turn the "Send approved reminders" automation ON — done
+      9 August 2026
+- [ ] **Publish again.** The Reminder Queue page was rebuilt to carry the send tick-box in a
+      second section beneath the list, so approving and sending happen on one screen. The old
+      version is staged for removal and the new one is not live until you publish
 - [ ] **Write the four email wordings** in Email Templates — `Standard chaser` (rung 1) has
       old text in it, and `Second chaser`, `Final warning` and `Closing notice` are empty
       shells. Until then a test email arrives nearly blank
 - [ ] **Decide who an attorney is reported to**, so the rung 3 wording can be written
-- [ ] *Test:* tick `Approved to Send` on case 6010, then tick `Send approved reminders` on
-      Run Monthly Reminders. Tomasz Wielgus's address has been set to dejackson@outlook.com
+- [ ] *Test:* cases 6010 and 6022 are already approved. Tick `Send approved reminders` in
+      the second section at the bottom of the Reminder Queue page. Only 6010 will reach a
+      real inbox — Tomasz Wielgus's address has been set to dejackson@outlook.com
       for this. Expect **two** notes on the case — one tagged `Email Chaser Sent` (logged
       directly, and what the ladder counts) and one tagged `Email (filed)` (the BCC'd copy
       of the real email, filing itself as evidence). Also check the mail arrives, the

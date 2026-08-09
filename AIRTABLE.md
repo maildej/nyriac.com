@@ -1052,7 +1052,7 @@ still letting review happen case by case at leisure.
 | What | Where | Does |
 |---|---|---|
 | `Approved to Send` | Cases (checkbox) | The paralegal's confirmation. **Sends nothing by itself.** |
-| **Reminder Queue** page `pagOzq7FUZa2enuIr` | Interface | The standing queue, grouped by rung, longest-waiting first |
+| **Reminder Queue** page `pagqiw6FvLwN6xy5e` | Interface | Review and approve at the top, send at the bottom — one screen |
 | `Send approved reminders` | Reminder Control (checkbox) | **Sends real mail. No undo.** |
 | `Approved reminders last sent` | Reminder Control (date) | Stamped by the automation |
 | **Send approved reminders** | Automation `wflms095u1rZ6sIWs` | Does the work |
@@ -1068,11 +1068,26 @@ queue by itself because `Reminder Stage` already excludes closed cases.
 and the `Used For` values in Email Templates. Templates are matched by `Used For` — which is
 exactly why wording can be rewritten freely but those values cannot.
 
-**Two limits of the API found here.** Dashboard pages have **no free-text element**, and
-section and grid titles cap at **255 characters**. There is also **no `update_page`** — a
-page's titles or layout can only be changed by deleting and recreating it, or by hand in the
-designer. And a new automation is always **saved switched off** — a human must review and
-enable it in the Airtable UI, which is a useful gate rather than an obstacle.
+**Approve and send live on one page, in two sections.** A dashboard section is backed by a
+single table, but a page can hold several sections each backed by a *different* one — so
+section 1 is the queue (the case table) and section 2 is the single Reminder Control record
+carrying the send tick-box. The paralegal reviews the rows and sends underneath them without
+changing screens, and the two-action safety survives because ticking rows still sends
+nothing.
+
+**A trap that cost a round, and will recur.** `Send approved reminders` was created *after*
+the Run Monthly Reminders page already existed, and **the API cannot add a field to an
+existing page's layout** — so the control existed on the record but appeared on no page at
+all, and the instructions said to tick something that was not there. **Whenever a new field
+is meant to be used by a human, creating it is only half the job**: it must also be put on a
+page, which means either building a new page or hand-work in the designer. Same lesson as
+"adding a field to a record page is only half the job" under the EOIR section.
+
+**Three limits of the API found here.** Dashboard pages have **no free-text element**, and
+section and grid titles cap at **255 characters**. There is **no `update_page`** — a page's
+titles, sections or layout can only be changed by deleting and recreating it, which is why
+this page has had three IDs in one day. And a new automation is always **saved switched
+off** — a human must review and enable it, which is a useful gate rather than an obstacle.
 
 **So the explanation lives in the field notes, not on the page.** Decided 9 August 2026: the
 page carries a short prominent warning plus a pointer, and the full "why is this case
