@@ -503,7 +503,7 @@ top of them changed.
 | Where | Before | After |
 |---|---|---|
 | Penal Law picker | `P.L. 215.51(b)(iii) — Criminal Contempt in the First Degree` | `P.L. 215.51(b)(iii) — Criminal Contempt 1st (E Fel)` |
-| VTL picker | `V.T.L. 1192.2 - 1 Prior Conviction Within 10 Years` | `V.T.L. 1192.2 — DWI (0.08% BAC) — 1 Prior Conviction Within 10 Years (U Misd)` |
+| VTL picker | `V.T.L. 1192.2 - 1 Prior Conviction Within 10 Years` | `V.T.L. 1192.2 — DWI (0.08% BAC) — 1 Prior Conviction Within 10 Years (E Fel)` |
 | A charge on a case | `Attempted P.L. 215.51(b)(iii) — Criminal Contempt in the First Degree` | `P.L. 110-215.51(b)(iii) — Attempted Criminal Contempt 1st (A Misd)` |
 
 ### The one rule that shaped the whole design
@@ -590,13 +590,32 @@ case-level `Top Charge` rollup. No case carried a VTL charge, so restyling the V
 could not disturb existing data. Three throwaway charge rows — plain VTL, attempted VTL, and
 an attempted write-in — were created, checked and deleted.
 
-### Still outstanding
+### The manual step, now done
 
-**The VTL `Citation` field is still plain text.** Until it is converted to a formula by hand
-the VTL *picker* shows the old citation-only text and cannot be searched by offence name.
-Everything else — including how VTL charges read once recorded — already works, because the
-charge line is built from the helper fields rather than from `Citation`. The formula and the
-step-by-step are in `AIRTABLE-TODO.md`, item 1.
+**`Citation` on NY VTL Offenses was converted from text to a formula by hand on 9 August
+2026**, completing the work. The API cannot change a field's type, so this was Dan's to do —
+the same job the Penal Law `Citation` needed on 8 August. All 36 rows verified afterwards:
+every statute number reproduced exactly, including the ones that do not follow the ordinary
+pattern — `V.T.L. 1192-a`, `V.T.L. 511.1(a)`, `V.T.L. 1192.2-a(b)`, `V.T.L. 1192.4-a`.
+
+The formula it now carries is the same shape as the Penal Law one:
+
+```
+"V.T.L. " & {Statute No.} & " — " & {Display Name} &
+IF({Classification}, " (" & SWITCH( … abbreviations … ) & ")", "")
+```
+
+Worth knowing if this is ever repeated in another region's base: **the VTL charge line on a
+case worked before this step and did not depend on it.** `Charge` is assembled from the
+helper fields, not from `Citation`, so only the *picker* was waiting on the conversion. That
+is a useful property — the risky hand-work can be left until last without holding anything
+else up.
+
+**One thing that confused the handover, worth writing down:** the field could not be found,
+because it is the **primary field**. In an expanded record the primary field is the title at
+the top and does not appear in the list of fields at all; in the grid it is the pinned
+leftmost column. Anyone told to "edit the Citation field" will look for a labelled box and
+not find one. Identify it by its values instead.
 
 ## Pickers can only search a table's primary field
 
