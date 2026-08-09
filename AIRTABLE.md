@@ -974,6 +974,65 @@ alone cannot distinguish a first chase from a third. Step 4 also *writes* to the
 (closing it), which no reminder step currently does. Expect new fields and a reworked
 "Monthly reminders 1" automation rather than a tweak.
 
+### The queue model (Dan's proposal, 9 August 2026) — DESIGNED, NOT BUILT
+
+Replace the monthly batch ritual with a **standing queue**. A case joins it the moment it
+becomes eligible; the paralegal works the queue at their own pace, confirms each case really
+does belong there, and approving one case sends that case's email. Two answers are still
+outstanding at the end.
+
+**This is less machinery than the batch model, not more — the flagging already happens by
+itself.** `Reminder Due` is a formula counting from `TODAY()`, so it already recalculates
+every day and a case becomes eligible overnight with nobody doing anything. The "Generate
+this month's list" button never *found* eligible cases; it only wrote draft text onto them
+and ticked a box. Drop those and the queue is a page filtered on the formula. No generate
+step, nothing to remember.
+
+**Count the 30/60/90 days from the last chaser we sent, not from the referral or the last
+attorney contact.** This is the decision that matters most. If the paralegal is away three
+weeks, a case counting from the referral returns to the queue already 60 days old and skips
+a rung — the attorney gets "final warning before we report you" without ever receiving the
+polite one. Counting from the last chaser gives every attorney a full 30 days to answer each
+message however the review timing slips, and keeps a waiting case on the rung it is on
+rather than escalating while it sits in the queue.
+
+**Per-case draft text is probably unnecessary.** The paralegal's check is *"is this case
+really eligible"*, not proofreading — the wording is the same every time and lives in Email
+Templates. That retires `Reminder Email Draft` and `Reminder Email Subject` along with the
+drafting step. Revisit only if wording ever needs tweaking case by case.
+
+**Three problems, two of them accepted:**
+
+1. **Nothing makes anyone look at the queue.** This is the real cost of dropping the monthly
+   rhythm: a fixed ritual forces someone to look, a standing queue can be ignored for months
+   while cases quietly age. Mitigate by sorting oldest-first and showing days-waiting, so
+   neglect is visible on the page rather than invisible.
+2. **One tick sends real mail, with no undo** — where today two deliberate actions stand in
+   the way. The counterweight is that the blast radius shrinks from forty emails to one, so
+   this is a net safety gain; but the failure mode changes from "sent the batch too early" to
+   "mis-tapped a row".
+3. **Volume.** Per-case approval scales less well than batch approval. Fine at 44 cases;
+   revisit if the queue ever runs to hundreds.
+
+**Roughly what it needs:** `Reminder Due` turned from yes/no into which-rung; a count of
+chasers already sent; an approval control; **four** rows in Email Templates where there are
+currently two wordings (1st, 2nd, final warning, closing notice — and note the standing rule
+that `Used For` values must not be renamed, since automations find templates by them); one
+automation that sends on approval, logs the note and stamps the date; and for step 4 sets
+`Closing Code` to "No Atty Response" with today's date — which drops the case out of the
+queue by itself, since the formula already excludes closed cases. Once proven, retire the two
+`Reminder Control` buttons, or there are two ways to send and they can disagree.
+
+**Still to decide before this can be built:**
+
+- **Does an attorney replying reset the ladder?** An attorney who answers on day 65 with
+  nothing useful and then goes quiet again — do they resume at the final warning, or start
+  over? Not resetting is simpler, and the paralegal reviews every case anyway so can hold one
+  back by hand. Recommended: **do not reset**. This is a policy question about how RIAC wants
+  to treat attorneys, not a technical one.
+- **Is the eligibility check really all the paralegal does**, or do they want to adjust
+  wording per case before it goes? The answer decides whether the draft fields are retired.
+
 ## Status: this is still a pilot
 
 Everything currently in the base is either **fake test data or information already in the
