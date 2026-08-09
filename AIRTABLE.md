@@ -1042,12 +1042,45 @@ reported to** was never specified. The older `Final chase before closing` row is
 but left in place, and — like `Standard chaser` — carries wording written in an earlier
 session that Dan may want to review now that copy is his to write.
 
-**Still to build:** an approval control, an automation that sends on approval and logs the
-note, closing behaviour at rung 4 (`Closing Code` = "No Atty Response" plus today's date,
-which drops the case out of the queue by itself), and the queue page — which must carry an
-obvious note explaining that the list includes cases where the attorney has communicated but
-not sent what we need. **The approval checkbox was deliberately NOT created yet**: a tick box
-that looks like it sends mail but does nothing is worse than no box at all.
+### The review-and-send front end — BUILT 9 August 2026
+
+**Two stages, not one — Dan's design, and better than the one-tick version originally
+proposed.** Approving and sending are separate acts, so a stray tick costs nothing until
+somebody deliberately sends. That keeps the safety property of the old batch model while
+still letting review happen case by case at leisure.
+
+| What | Where | Does |
+|---|---|---|
+| `Approved to Send` | Cases (checkbox) | The paralegal's confirmation. **Sends nothing by itself.** |
+| **Reminder Queue** page | Interface | The standing queue, grouped by rung, longest-waiting first |
+| `Send approved reminders` | Reminder Control (checkbox) | **Sends real mail. No undo.** |
+| `Approved reminders last sent` | Reminder Control (date) | Stamped by the automation |
+| **Send approved reminders** | Automation `wflms095u1rZ6sIWs` | Does the work |
+
+The automation picks the Email Templates row matching each case's rung, emails the
+requesting attorney, logs a note tagged `Email Chaser Sent`, stamps `Last Reminder Sent`,
+and unticks the approval — so a case cannot go out twice on the same rung. Rung 4 also sets
+`Closing Code` to "No Atty Response" with today's date, which drops the case out of the
+queue by itself because `Reminder Stage` already excludes closed cases.
+
+**Three things it depends on by NAME, all of which will break it silently if renamed:** the
+`Email Chaser Sent` option on `Note Type`, the `No Atty Response` option on `Closing Code`,
+and the `Used For` values in Email Templates. Templates are matched by `Used For` — which is
+exactly why wording can be rewritten freely but those values cannot.
+
+**Two limits of the API found here.** Dashboard pages have **no free-text element**, so the
+explanation of who appears on the queue had to go into the section and grid titles, which
+cap at **255 characters** each. A longer note has to be added by hand in the designer. And a
+new automation is always **saved switched off** — a human must review and enable it in the
+Airtable UI, which is a useful gate rather than an obstacle.
+
+**Testing.** All 50 attorney emails were `@example.com` — a reserved domain that cannot
+deliver — which is what made building the sending end safe at all. For a live proof of
+concept, **Tomasz Wielgus's address was changed to `dejackson@outlook.com`** on 9 August
+2026; he is the attorney on case 6010, which sits top of the queue. **Change it back before
+real data goes in.** Note that until the templates are written the email body will be nearly
+empty — a test proves the plumbing (right recipient, subject prefix, note logged, approval
+unticked, date stamped), not the wording.
 
 ### The original proposal, for reference
 

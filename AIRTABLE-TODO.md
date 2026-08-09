@@ -98,7 +98,34 @@ on the Case Viewer (verified 9 August 2026, correctly read-only).
 
 ---
 
-## 4. The Add Related Party popup
+## 4. Turn on the reminder queue
+
+Built 9 August 2026 and ready to try — see `AIRTABLE.md`, "The review-and-send front end".
+Nothing can send until you do step 2.
+
+- [ ] **Publish the interface** so the new **Reminder Queue** page goes live. Remember
+      publishing is all-or-nothing — check nothing else is half-finished first
+- [ ] **Turn the "Send approved reminders" automation ON.** Airtable saves every new
+      automation switched off; open it and enable it
+- [ ] **Write the four email wordings** in Email Templates — `Standard chaser` (rung 1) has
+      old text in it, and `Second chaser`, `Final warning` and `Closing notice` are empty
+      shells. Until then a test email arrives nearly blank
+- [ ] **Decide who an attorney is reported to**, so the rung 3 wording can be written
+- [ ] *Test:* tick `Approved to Send` on case 6010, then tick `Send approved reminders` on
+      Run Monthly Reminders. Tomasz Wielgus's address has been set to dejackson@outlook.com
+      for this. Check the mail arrives, a note appears tagged `Email Chaser Sent`, the
+      approval unticks itself and the case moves to rung 2
+- [ ] Add a longer explanatory note to the Reminder Queue page by hand if you want one —
+      the API can only write titles, capped at 255 characters
+- [ ] **Change Tomasz Wielgus's email back** before real data goes in
+- [ ] Once proven, retire the old batch machinery: `Reminder Due`, `In Reminder Batch`,
+      `Reminder Email Draft`, `Reminder Email Subject`, the two `Reminder Control` buttons
+      and the two `Monthly reminders` automations. **Not before** — until then there are two
+      ways to send and they can disagree
+
+---
+
+## 5. The Add Related Party popup
 
 Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup".
 
@@ -109,7 +136,7 @@ Full specification in `AIRTABLE.md` under "Spec for the Add Related Party popup"
 
 ---
 
-## 5. Check the attorney popup
+## 6. Check the attorney popup
 
 You built this already — worth confirming it covers:
 
