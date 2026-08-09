@@ -1052,7 +1052,7 @@ still letting review happen case by case at leisure.
 | What | Where | Does |
 |---|---|---|
 | `Approved to Send` | Cases (checkbox) | The paralegal's confirmation. **Sends nothing by itself.** |
-| **Reminder Queue** page `pagqiw6FvLwN6xy5e` | Interface | Review and approve at the top, send at the bottom — one screen |
+| **Reminder Queue** page `pagLFdxeOATz1syeZ` | Interface | Review, send, then check — three sections, one screen |
 | `Send approved reminders` | Reminder Control (checkbox) | **Sends real mail. No undo.** |
 | `Approved reminders last sent` | Reminder Control (date) | Stamped by the automation |
 | **Send approved reminders** | Automation `wflms095u1rZ6sIWs` | Does the work |
@@ -1180,6 +1180,43 @@ added — the tick already carries the information, and a second field could dis
 
 The one caveat: a case with a permanently dead address stays ticked and fails on every run,
 flagging each one as "Failed to run". Untick it and fix the address rather than leaving it.
+
+**That rule is now on the page itself**, as a third section headed *"3. Check afterwards"*:
+a live count of cases still ticked, with the explanation beneath it. **How to get text to
+render *below* something on a dashboard**, given there is no text element: a `number`
+element has a `description`, and that is the only slot that renders under its content — grid
+elements have a title and nothing else. Using a count rather than a static note also makes it
+self-checking: it should read zero after a clean run.
+
+### Sending from RIAC's own address instead of Airtable's
+
+**Yes, it is possible, and it is worth doing** — but it needs a step only Dan can take.
+
+Airtable has dedicated `microsoftOutlookSendEmail` and `gmailSendEmail` actions that send
+through a connected mailbox rather than Airtable's own mail server. Each needs an
+`externalAccountId`, which only exists once someone connects that account to Airtable.
+**Checked 9 August 2026: no external accounts are connected**, so the swap cannot be made
+from here yet.
+
+Once one is connected, each of the four `sendEmail` nodes in **Send approved reminders**
+changes to the Outlook action — and the same applies to the older "Monthly reminders 2"
+automation while it survives.
+
+Three things to get right, because they are easy to miss:
+
+- **Connect the shared RIAC mailbox, not a personal account.** These actions send *as* the
+  connected account. Connect a named person's mailbox and every chaser appears to come from
+  that individual, and all of it stops working the day they leave.
+- **Check the BCC survives the swap.** The audit copy that files itself against the case
+  depends on it.
+- **The real prize is replies.** Attorneys currently reply into Airtable's sending address,
+  where nothing is monitoring. Sending from a real mailbox means a reply lands somewhere a
+  human reads.
+
+**A cheaper interim step, if connecting a mailbox is not imminent:** add `replyTo` to the
+existing sends. Mail still shows as coming from Airtable, but replies route to a real RIAC
+address. It is a one-line change per send node and needs no account — it just needs someone
+to say which address replies should go to.
 
 ### The original proposal, for reference
 

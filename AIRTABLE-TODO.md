@@ -117,11 +117,12 @@ Nothing can send until you do step 2.
 - [x] Diagnosed the one failure: "No MX record found for saoirse.devaney@example.com" — the
       fake test domain. Confirmed from run history that a bad address does **not** halt the
       batch, and that a failed case keeps its approval and retries
-- [ ] **Untick `Approved to Send` on case 6022**, or every future send run will fail on it
-      and be flagged "Failed to run". Its address can never receive mail
-- [ ] Tell whoever works the queue the rule that needs no machinery: **after hitting send,
-      anything still ticked did not go.** A successful send unticks itself; a failed one
-      cannot
+- [x] Unticked case 6022, and changed Tomasz Wielgus's address back to the test one — done
+      9 August 2026
+- [x] The "still ticked means it did not send" rule is now on the page itself, as a live
+      count with the explanation beneath it
+- [ ] **Publish again** — the page was rebuilt a third time to add that section, so the live
+      version is still the two-section one
       for this. Expect **two** notes on the case — one tagged `Email Chaser Sent` (logged
       directly, and what the ladder counts) and one tagged `Email (filed)` (the BCC'd copy
       of the real email, filing itself as evidence). Also check the mail arrives, the
@@ -131,7 +132,11 @@ Nothing can send until you do step 2.
       warning that cases stay listed even when the attorney has been in touch. If you want
       a proper paragraph on the page instead, it has to be added by hand — dashboards have
       no text element and the API can only write titles, capped at 255 characters
-- [ ] **Change Tomasz Wielgus's email back** before real data goes in
+- [ ] *When you want mail to come from RIAC rather than Airtable:* connect the **shared RIAC
+      mailbox** to Airtable as an integration — not a personal account, or every chaser comes
+      from one named person and stops working when they leave. Tell me once it is connected
+      and I will swap the four send steps to the Outlook action. Cheaper interim: tell me
+      which address replies should go to and I will add `replyTo`, which needs no account
 - [ ] Once proven, retire the old batch machinery: `Reminder Due`, `In Reminder Batch`,
       `Reminder Email Draft`, `Reminder Email Subject`, the two `Reminder Control` buttons
       and the two `Monthly reminders` automations. **Not before** — until then there are two
