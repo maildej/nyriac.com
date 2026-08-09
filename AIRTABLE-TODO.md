@@ -114,12 +114,14 @@ Nothing can send until you do step 2.
 - [ ] **Decide who an attorney is reported to**, so the rung 3 wording can be written
 - [x] Tested end to end on case 6010, 9 August 2026 — email arrived, both notes logged, the
       BCC'd copy filed itself against the right case, approval cleared, ladder advanced
-- [ ] **Open the "Send approved reminders" automation's run history and look at the failed
-      case (6022).** It did not send — almost certainly because its attorney address is
-      `@example.com`, which cannot receive mail. Two things to read off: what the error
-      actually says, and **whether the cases after it in the run were skipped**. If one bad
-      address halts the whole batch, that matters in production, and `AIRTABLE.md` records
-      the fix. 6022 is still ticked as approved, so it will retry on the next send
+- [x] Diagnosed the one failure: "No MX record found for saoirse.devaney@example.com" — the
+      fake test domain. Confirmed from run history that a bad address does **not** halt the
+      batch, and that a failed case keeps its approval and retries
+- [ ] **Untick `Approved to Send` on case 6022**, or every future send run will fail on it
+      and be flagged "Failed to run". Its address can never receive mail
+- [ ] Tell whoever works the queue the rule that needs no machinery: **after hitting send,
+      anything still ticked did not go.** A successful send unticks itself; a failed one
+      cannot
       for this. Expect **two** notes on the case — one tagged `Email Chaser Sent` (logged
       directly, and what the ladder counts) and one tagged `Email (filed)` (the BCC'd copy
       of the real email, filing itself as evidence). Also check the mail arrives, the

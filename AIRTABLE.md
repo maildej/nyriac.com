@@ -1147,32 +1147,39 @@ number in the subject. `Chasers Sent` went to 1, `Last Reminder Sent` stamped, t
 cleared itself, and the case left the queue — it returns at rung 2 once the 21-day gap has
 passed. Every moving part did what it should.
 
-### A failed send is silent, and the case sits approved for ever
+### What happens when a send fails
 
-Found in the same test. Case 6022 was approved alongside 6010 and **did not send**: no note,
-no date, approval still ticked, `Chasers Sent` still 0. The automation certainly ran — it
-cleared the button and stamped `Approved reminders last sent` both times — so the failure is
-inside that case's branch. Its attorney address is `saoirse.devaney@example.com`, and
-**`example.com` has no mail exchanger**, so the send step almost certainly errored.
+Found in the same test, and confirmed from the run history on 9 August 2026. Case 6022 was
+approved alongside 6010 and did not send. The error:
 
-For the test data that is an artifact, not a defect. What matters is the shape of the
-failure, which will outlive the test data:
+> **No MX record found for saoirse.devaney@example.com**
 
-- **Nothing is lost.** Because the send errors *before* the log and update steps, the ladder
-  does not advance and the approval is not cleared, so the case is retried on the next run.
-  That is the right order to have put the nodes in, and worth preserving in any rebuild.
-- **But nothing says so either.** A case with a dead or mistyped address stays approved,
-  never advances, and is silently retried for ever. It looks identical on the queue to a case
-  waiting its turn. Same shape as the EOIR trap: an absence that reads as normal.
-- **Unknown, and worth checking in the run history: whether one bad address halts the rest
-  of the batch.** If the failure aborts the whole run rather than one iteration, every case
-  after it in the ordering is skipped too — which in production would be a single typo
-  quietly stopping that month's chasers.
+An artifact of the test data — `example.com` has no mail exchanger — but the run history
+answers two questions that matter well beyond it.
 
-If that proves to be the behaviour, the fix is to stop bad addresses reaching the send step
-rather than to catch the error: add an email-shaped test to `Reminder Stage` so a case with
-an implausible address never enters the queue, and surface those cases somewhere else so
-someone fixes the address.
+**One bad address does not halt the batch.** Both cases appear in the loop's iteration
+picker, and for 6022 the `Repeated for` row and the enclosing `If Reminder Stage is 1` row
+both read **Success**, with only the `Send an email` step marked Fail. Airtable contains a
+step failure inside its own iteration and carries on. The run as a whole is flagged
+"Failed to run", but the other cases still go out. So a single typo cannot quietly stop a
+month of chasers.
+
+**A failed case loses nothing and retries.** The send errors *before* the log and update
+steps, so the ladder does not advance and the approval is not cleared. The case simply comes
+round again on the next send. **Keep the nodes in that order in any rebuild** — send, then
+log, then update. Reordering them would mark a case as chased that was never reached.
+
+**How to see a failure without reading run history — no build needed.** A successful send
+unticks its own `Approved to Send`; a failed one cannot, because it never reaches that step.
+So:
+
+> **After hitting send, anything still ticked on the queue is a case that did not go.**
+
+That is worth telling whoever works the queue, and it is why no `Send Failed?` field was
+added — the tick already carries the information, and a second field could disagree with it.
+
+The one caveat: a case with a permanently dead address stays ticked and fails on every run,
+flagging each one as "Failed to run". Untick it and fix the address rather than leaving it.
 
 ### The original proposal, for reference
 
