@@ -529,6 +529,42 @@ Labels differ from the underlying field names, deliberately — they read as ins
 `Charge` is deliberately **not** on the form — it names itself from whichever catalogue
 entry is picked.
 
+## The offence catalogues and their loader scripts
+
+**NY Penal Law Offenses** (1,918 records) and **NY VTL Offenses** (36) are built and
+maintained by two scripts, `catalogue_penal_law.py` and `catalogue_vtl.py`, kept in
+`OneDrive - OCBA/RIAC - Documents/Admin/Database Design`. They upsert rather than replace,
+so re-running one repairs the catalogue in place. The jury-instruction links on these
+records are described under "Jury instruction links" above.
+
+### Never edit `Section` or `Subdivision` by hand
+
+Those two columns are how the loader recognises a record it has seen before. The `Citation`
+you see on screen is a **formula** built on top of them, and a formula cannot be used for
+matching — which is why the scripts key on the raw columns instead.
+
+Change one by hand and that record becomes invisible to the script: the next run will not
+update it, it will **create a second copy alongside it**. Treat those two columns as
+belonging to the script, the same way `Classification` belongs to Dan — the script never
+overwrites his hand-corrected classifications, and nobody should overwrite its section
+numbers. Everything else on those records is safe to edit.
+
+### Two Penal Law sections have moved on since the catalogue was loaded
+
+Loaded 5 August 2026. Sections **265.07** and **265.09** have since gained lettered and
+numbered branches that did not exist then, and the catalogue still holds the old
+branch-less versions.
+
+So the next full run of `catalogue_penal_law.py` will *add* `265.07(1)`, `265.07(2)(a)`,
+`265.07(2)(b)` and `265.09(1)(a)`, and leave the superseded rows sitting alongside them.
+Nothing breaks, but **those two sections want a look afterwards and the stale rows
+deleting**. Everything else in the catalogue still lines up exactly.
+
+### Neither catalogue has been re-run since the scripts were repointed
+
+The repoint was 10 August 2026, so both points above are **untested against a real load**.
+Expect to verify rather than trust the first run.
+
 ## Pickers can only search a table's primary field
 
 This is the single most important thing to know when designing anything that asks a user to
