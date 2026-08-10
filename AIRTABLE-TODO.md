@@ -130,9 +130,18 @@ Do not start these until testing is finished.
       result was set on 8 August 2026 to prove the automation works, not because anyone
       looked him up
 - [ ] Review who can see the base, the interfaces, and any shared links
+- [ ] **Confirm both chaser systems are meant to be there.** Two are deployed and both send
+      real email: `Send approved reminders` (the four-rung one behind the Reminder Queue
+      page) and `Monthly reminders 1 and 2` (the batch one behind Monthly Reminders and Run
+      Monthly Reminders). **This may well be deliberate** — Dan thinks a workflow was
+      designed around it — so do not retire either without checking. What needs confirming
+      is that it is clear which does what, because they are started by different tick-boxes
+      and ticking the wrong one would chase the same attorneys twice. If both are keepers,
+      say so on the Reminder Queue page so nobody wonders later
 - [ ] **Switch the reminder emails to Outlook.** They currently send from Airtable's own
       mail server; the "Send the chaser" step needs swapping to the Microsoft Outlook send
-      action so mail comes from the real RIAC address
+      action so mail comes from the real RIAC address. **Both** systems send, so both need
+      swapping if both survive the item above
 - [ ] **Link nyriac.com to the Airtable intake form.** Link to it — do not build a form on
       the website that posts into Airtable, or the conflict check silently stops running
       on every intake
