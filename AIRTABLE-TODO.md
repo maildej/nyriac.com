@@ -86,23 +86,50 @@ type more than once over time, so this is probably **its own table linked to Par
 simpler to build but cannot hold two visas. Note also that the information matters even with
 no document attached, so the document upload must be optional rather than the anchor.
 
-## 4. Two-step delete for case notes  **[Decide]**
+## 4. Two-step delete for case notes  **[Dan]** to look, then **[Decide]**
 
 Click delete → "are you sure?" → yes/no.
 
-*Notes.* Needs checking against what Airtable actually offers — interface record deletion may
-already prompt, in which case this is done. If it does not, Airtable has no way to insert a
-custom confirmation step, and the realistic substitute is a **`Marked for deletion` checkbox**
-plus a review view where deletions are actually carried out. That is a different shape from
-what was asked for, so it is worth looking at the real behaviour before building anything.
+*Notes.* **Airtable has no way to build a custom "are you sure?" dialog.** You cannot
+interpose a confirmation between a click and its effect in an interface. That constraint
+applies to items 4 and 5 alike, and it is the only thing they have in common — see item 5,
+which is otherwise a different problem.
 
-## 5. Two-step change of which case a note belongs to  **[Decide]**
+**This one may already be solved.** Deleting a record is a recognised destructive action, so
+Airtable generally prompts before it, and deleted records go to the base's trash and can be
+restored for a period that depends on the plan. **Go and look at what it already does before
+building anything** — this may be a checking job, not a building job.
+
+If it turns out there is no prompt, the substitute is the same two-deliberate-edits pattern
+described in item 5: a `Marked for deletion` checkbox plus a review view where deletions are
+actually carried out. That is a different shape from what was asked for, so it is worth seeing
+the real behaviour first.
+
+## 5. Two-step change of which case a note belongs to  **[Claude]**, once designed
 
 Same protection when moving a note from one case to another.
 
-*Notes.* Same investigation as item 4 — worth doing the two together. Note that
-**automation 2 only attaches notes that have no case**, so re-pointing a note by hand is not
-something the automations will fight or undo.
+*Notes.* **Unlike item 4, there is nothing built in here and there never will be.** Re-pointing
+a note is not a destructive action in Airtable's eyes — it is an ordinary edit to a
+linked-record field, no different from changing any other value, and Airtable has no concept of
+confirming a field edit anywhere in the product. So item 4 may come free; this one will not.
+
+The workable shape is **two deliberate edits**: a staging field (`Move to case:`) plus a
+`Confirm move` tick, with an automation doing the actual move and clearing both afterwards.
+
+⚠️ **The obvious implementation is unsafe. Do not clear the case link as step one.**
+Automation **2. Attach Case Note to its case** fires on any note that has a case number in its
+subject line **and no case attached** — so a note left momentarily unlinked would be
+re-attached to the case named in its subject, automatically, in the gap between the two steps.
+That hits precisely the notes most likely to need re-filing: the ones created from email, which
+are the reason the Needs Review queue exists at all.
+
+**The link must therefore never be empty mid-move.** The staging field is not merely tidier
+than clear-then-reset; it is the only safe shape. An automation that writes the new case and
+removes the old one in a single update is safe for the same reason.
+
+*(An earlier draft of this note said the automations would not fight a hand re-pointing. That
+is only true while the link stays populated — clearing it first does trigger automation 2.)*
 
 ## 6. EOIR printout visible on the case  **[Both]**
 
