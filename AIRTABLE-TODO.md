@@ -522,10 +522,24 @@ column saying *how* it was attributed.
       `REVIEW - remote, scope unclear` — 1193 grading "any such subdivision" of 1192 by
       back-reference, which no parser can resolve. The rest are `whole section`, where the
       declaration named no branch.
-- [ ] **The paragraph letter is where the grade sits, not where the offence is defined.**
-      511 is the pattern: paragraph (a) defines the offence, paragraph (b) grades it, and
-      the scan reports (b). Dan's catalogue cites (a). Decide which convention the records
-      should use before building them — probably (a), to match what is already there.
+- [ ] **[Dan]** **Three re-pointed rows want checking** — see below. `201.12(a)`,
+      `303.3(f)` and `1193.1(a)`, where the offence-defining paragraph came out as
+      something other than (a), or the grade sat in a roman-numeral subparagraph.
+
+### Citation convention — decided 10 Aug 2026: cite the offence-defining paragraph
+
+511 is the pattern: paragraph **(a)** defines the offence, paragraph **(b)** grades it.
+Dan's existing catalogue cites (a), so the scan now does too — an implied grade is
+attributed to the first paragraph of its subdivision rather than the one the sentence
+happens to sit in. 511 now comes out as `511.1(a)`, `511.2(a)`, `511.3(a)`, matching the
+records already in the base.
+
+Nothing is thrown away: a **`grade_stated_in`** column records the paragraph the grade was
+actually written in, so the reasoning stays auditable. It affected **9 rows**; six are the
+clean 511/415-A/1194 pattern, and the three flagged above are worth a glance.
+
+**This applies only to implied grades.** Where the statute says "a violation of *this
+paragraph* shall be a misdemeanor" it means that paragraph, and those rows are untouched.
 - [ ] **[Dan]** **Look over the 54 for anything obviously wrong**, in either direction. A
       few want a legal eye rather than a parser: 1170 (obedience to railroad signal) comes
       out as a class E felony, and 201 (custody of records), 207 (uniform traffic summons)
