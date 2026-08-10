@@ -559,6 +559,66 @@ This item is the specification of *what* to show; those two are *where*.
 
 ---
 
+## 21. Extend the VTL catalogue to every VTL crime  **[Claude]**, with one **[Dan]** check
+
+**Decided 10 Aug 2026: crimes only — misdemeanours and felonies, not traffic infractions.**
+Under VTL 155 an infraction is not a crime, so infractions carry no immigration consequence
+and would add thousands of analytically inert rows. The catalogue currently holds 36 records,
+all alcohol and driving.
+
+Dan's specific interest is **fraud** — fraudulent number plate and registration certificate
+offences. Those are crimes, so "crimes only" includes rather than excludes them. He will send
+a specific list. **If any provision on that list turns out to be an infraction, include it
+anyway** — the reason for wanting it is the fraud analysis, not the grade.
+
+*What a sample of 15 sections established (10 Aug 2026), before building anything:*
+
+- **Classification is derivable, but only at subdivision level.** VTL 375 is 114,000
+  characters, mostly infractions, with particular subdivisions carrying misdemeanours. A
+  section-level answer for it is meaningless. The statute scopes its own declarations —
+  "a violation of **this subdivision** shall be a misdemeanor" — so they are attributable.
+- **Require declaratory phrasing, never a bare mention.** Match "shall be a misdemeanor",
+  "shall constitute", "shall be punishable as", "guilty of a class E felony". Not the word
+  on its own.
+- **⚠ The 1192 trap, and why the bare-mention rule is dangerous.** The words "misdemeanor or
+  felony" appear in 1192 exactly twice, both in the passage about *out-of-state* prior
+  convictions. Neither grades anything — 1192's grades are in 1193. A rule keying on bare
+  mentions gets 1192 right **by accident**, and would silently file the most important
+  offence in the catalogue as a traffic infraction if those two incidental sentences were
+  ever reworded. Whatever is built must treat "no grade declared in-section" as a flag, not
+  as a default to infraction.
+
+**The one thing needing Dan:** the list of sections that declare no grade of their own. Each
+is either a genuine infraction or a 1192 — a serious offence whose penalty lives elsewhere —
+and the text cannot tell those apart. Claude generates the list; Dan answers crime or
+infraction, and names the penalty section where it is a crime. Should be a few dozen, not
+hundreds.
+
+**Escalation tiers stay Dan's**, as with 1192. Nothing in the statutory text models "one
+prior conviction within ten years"; that is legal judgment and was hand-built last time.
+
+---
+
+## 22. Add the NY Tax Law offences  **[Claude]**, scope **[Dan]**
+
+A small subset of Tax Law offences appears regularly in RIAC cases and should be a catalogue
+alongside the Penal Law and VTL.
+
+These matter disproportionately for immigration: tax fraud can reach the aggravated felony
+definition through the fraud-or-deceit limb and the tax-evasion limb, so the amount involved
+and the exact provision both matter. The obvious starting point is **Tax Law article 37**
+(criminal tax fraud and related offences) — to be confirmed against the statute rather than
+assumed, along with whichever cigarette and tobacco provisions actually turn up in practice.
+
+The NY Senate law ID is **TAX** (as PEN is the Penal Law and VAT the VTL), so the existing
+loader plumbing applies.
+
+**Needs from Dan:** which offences actually appear. "A small subset regularly appear" —
+better to catalogue the ones that arrive than the whole article. A handful of examples from
+real intakes would define the scope quickly.
+
+---
+
 # Before this goes live
 
 Do not start these until testing is finished. Several have no undo.
