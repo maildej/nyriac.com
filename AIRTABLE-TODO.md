@@ -40,8 +40,14 @@ Then:
       `Office Not Listed?` is ticked**
 - [ ] **Remove the old `Affiliation`** field from the form (do not delete the field yet —
       it still holds three test submissions)
-- [ ] Submit one test intake and check that **Possible Conflict Matches** fills in. That
-      confirms the conflict check still fires after the changes
+- [ ] **Check the form asks for first and last name in separate boxes.** The conflict
+      check matches on surname OR date of birth, and if `Client Last Name` arrives empty
+      then *every person on file* matches and the check becomes noise. Two of the three
+      intakes on file have both name boxes empty, which may just be how those test rows
+      were made
+- [ ] Submit one test intake and check that **Possible Conflict Matches** fills in, and
+      that the surname landed in **`Client Last Name`**. That confirms the conflict check
+      still fires after the changes, and that names are arriving split
 
 ---
 

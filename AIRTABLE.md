@@ -364,6 +364,23 @@ Worth keeping from the build, because it will apply to anything similar:
   actual link field — that distinction is what makes the whole case-to-person workflow
   possible, and it is easy to miss.
 
+**7. The Needs Review page needs rethinking.** As structured it is not clear how it will
+actually work in use. The rule it has to express is that a pending intake is **pushed**
+into a case from this page — never pulled from a case file, which is why the intake link
+was deliberately removed from the Case Viewer. The page currently just stacks two grids
+(intakes awaiting a decision, and case notes that arrived by email with no case attached)
+without making that push action obvious.
+
+**8. Two chaser systems are running side by side, and both send real email.**
+`Send approved reminders` (the four-rung one behind the Reminder Queue page) and
+`Monthly reminders 1 and 2` (the batch one behind Monthly Reminders and Run Monthly
+Reminders) are both deployed.
+
+**This may well be deliberate** — Dan believes a workflow was designed around it in
+another conversation — so **do not retire either without checking first**. What is worth
+confirming is which does what, because they are started by different tick-boxes, and
+someone ticking the wrong one would chase the same attorneys twice.
+
 ---
 
 ## The charge picker rebuild (August 2026)
@@ -933,6 +950,20 @@ If that is ever revisited — someone wanting the form styled to match the site,
 conflict check has to be rebuilt to trigger on record creation rather than form submission
 *before* the switch, not after. Otherwise every intake stops being checked and nothing says
 so.
+
+### The check needs a surname to arrive, or it turns into noise
+
+It matches on **surname OR date of birth**. That deliberate looseness is what lets it
+survive misspelt first names and initials — but it only works if a surname actually
+arrives. The automation's own description warns that when `Client Last Name` comes through
+empty, *every person on file* matches, and the check stops being a signal.
+
+So the public form must ask for **first and last name in separate boxes**. Of the three
+intake submissions currently on file, **two have both name boxes empty** — the `Client
+Name` formula renders as a single space. That may simply be how those test rows were made;
+the form could not be read from the API to confirm, because it is a view-based form rather
+than an interface form (see "Forms: two places" below). **Submit the live form once and
+check the surname lands in `Client Last Name`.**
 
 ## Forms: two places, one confusing overlap
 
