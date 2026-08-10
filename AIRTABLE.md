@@ -396,7 +396,7 @@ Fields added to **Case Charges** (already done):
 | `Classification (from catalogue)` | Lookup | Class of the completed Penal Law offence. |
 | `Attempt Class (from catalogue)` | Lookup | What the class becomes on an attempt. |
 | `Statutory Text (from catalogue)` | Lookup | Verbatim text, readable on the case. |
-| `NY Senate Link`, `CJI Link` | Lookup | Source links. |
+| `NY Senate Link`, `CJI Link` | Lookup | Source links. `CJI Link` is the specific jury instruction — see "Jury instruction links" below, there is a second link worth showing beside it. |
 | `VTL Classification (from catalogue)` | Lookup | Class of the linked VTL offence. |
 | `VTL Statutory Text (from catalogue)` | Lookup | Verbatim VTL text. |
 | `VTL Sentencing (from catalogue)` | Lookup | Sentencing exposure at the prior-conviction tier picked. |
@@ -405,6 +405,46 @@ Fields added to **Case Charges** (already done):
 
 VTL entries carry **no attempt class**, so ticking `Attempted?` on a VTL charge falls
 through to its ordinary class rather than going blank.
+
+### Jury instruction links (August 2026)
+
+Every record in **NY Penal Law Offenses** carries **two** links to the Criminal Jury
+Instructions, because they answer different questions:
+
+| Field | What it is |
+|---|---|
+| `CJI Link` | The specific instruction document for that subdivision. Blank where none exists. **1,396 of 1,918 records.** |
+| `CJI Article Page` | Formula. The court's page listing every instruction for the whole article. Built from `Article`, so it never needs maintaining. |
+| `CJI Match` | How good `CJI Link` is — see below. |
+
+`CJI Match` values, and what each means to an attorney:
+
+- **Exact subdivision** (780) — the instruction for precisely this branch.
+- **Broader document** (316) — one document covering this subdivision among others.
+- **Same section only** (300) — no document for this exact branch; this is the nearest one
+  in the same section. A convenience jump, *not* a precise match.
+- **No model jury instruction exists for this offense** (233) — the court positively says
+  none is prepared. This is an answer, not a gap; worth showing as such.
+- **Not listed** (227) — the article page does not mention this provision at all.
+- **No CJI page** (62) — the whole article has no CJI page. Both link fields are blank.
+
+**Articles 179, 185, 241, 242, 275 and 280 have no CJI page whatsoever.** The links that
+used to be stored for them were dead (404) and have been cleared.
+
+Two facts to save re-discovering, if these ever need rebuilding:
+
+- **The file names cannot be guessed from the citation.** The court uses at least eight
+  naming conventions, sometimes within one article (`240-30(1).pdf`, `240-30%282%29.pdf`,
+  `240-50-1.pdf`, `T-470.05(1)+470.10(1)(b).pdf`), and article 130 sits in a dated
+  subfolder. Guessing addresses recovered 18% on a test sample; reading the pages
+  recovered everything published.
+- **nycourts.gov serves its HTML pages behind Cloudflare** — scripted fetches get a 403.
+  A real browser loads them normally. `HEAD` returns 403 for *every* URL on the site
+  including live ones, so a HEAD-based link checker reports everything as dead; use GET.
+  The PDFs themselves fetch fine with an ordinary browser user-agent.
+
+**Article 130 exists in two versions**, pre and post 1 September 2024, on separate pages.
+The links stored are the current (post-9/1/24) set.
 
 **Deliberately not done with an automation.** An automation could fill `Charge` when it
 is empty, but that is the same two-fields-that-can-disagree pattern that produced the

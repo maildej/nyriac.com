@@ -82,6 +82,25 @@ You built this already — worth confirming it covers:
 
 ---
 
+## 5. Show both jury-instruction links in the crime viewer
+
+Every Penal Law offence now carries **two** CJI links, and they do different jobs. Show
+both wherever a charge or offence is displayed:
+
+- [ ] Add **`CJI Link`** — the specific instruction document, a one-click read
+- [ ] Add **`CJI Article Page`** — the court's page for the whole article, so the attorney
+      can look around it or find something the direct link missed
+- [ ] Add **`CJI Match`** as a small caption beside them. This matters: **"Same section
+      only"** is a nearest-neighbour jump rather than a precise match, and **"No model jury
+      instruction exists for this offense"** is the court confirming none is prepared —
+      which is a useful answer, not a blank
+
+Both link fields are deliberately blank for the six articles with no CJI page at all
+(179, 185, 241, 242, 275, 280). The reasoning and the full breakdown are in `AIRTABLE.md`
+under "Jury instruction links".
+
+---
+
 ## Optional — only if you want the test data to look realistic
 
 Three cases have two attorneys from two different offices, which would not happen in real
