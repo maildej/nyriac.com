@@ -920,7 +920,7 @@ Two toggles do exist on such a field, and they are separate things:
 
 The second being off is why a court could be swapped but not inspected.
 
-### Every court shows its county — decided 10 August 2026
+### Every court shows its county — done 10 August 2026
 
 The Courts picker searches `Name`, and 1,542 of the 1,551 names were unique. Nine were not,
 because New York genuinely has two Chesters, two Franklins, two Brightons and so on. **Eight
@@ -948,10 +948,20 @@ and `Richmond (Staten Island)` carry the borough, so naively appending " County"
 `(Kings (Brooklyn) County)` on every New York City court. The formula spots the bracket and
 rearranges to `(Kings County, Brooklyn)`, which keeps both `Kings` and `Brooklyn` searchable.
 
-The conversion itself is hand work — the API cannot change a field's type — and follows the
+The conversion itself was hand work — the API cannot change a field's type — and followed the
 same order as Parties and Attorneys did: **copy the names to safety first, then convert.**
-Here the copy is made by duplicating the `Name` field with its values, which is why no API
-write was needed for 1,551 records. Steps and formula are in `AIRTABLE-TODO.md`, item 11.
+Here the copy was made by duplicating the `Name` field with its values, which is why no API
+write was needed across 1,551 records — only an 18-record revert of the earlier hand-tagging.
+`Court Name (original)` holds the plain names. The formula is in `AIRTABLE-TODO.md`, item 11.
+
+Verified after conversion: **all 1,551 names distinct, none blank, every one carrying its
+county.** A cosmetic consequence was accepted knowingly — 337 courts now name their county
+twice (`Saratoga County Surrogate's Court (Saratoga County)`), and a few carry two brackets
+because the court's own name has one (`Genesee County Court (M-B) (Genesee County)`).
+Suppressing the suffix where the name already contains the county was rejected: it would make
+the labelling inconsistent, and the suffix earns its keep precisely by always being there.
+Names like `Broome Supreme Court` also carry the county without the word "County", so a
+suppression rule would misfire on them anyway.
 
 **Once converted, `Name` is a formula.** A loader script for Courts, if one is ever written,
 must write `Court Name (original)` instead — the same care the VTL `Short Name` column needs.

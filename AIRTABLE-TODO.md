@@ -323,7 +323,7 @@ Two things follow from turning it on:
   correct — court contact details genuinely are shared — but it is the same scope rule as
   agencies, and worth knowing before anyone corrects an address.
 
-### Show every court with its county  **[Dan]** — one conversion, then done
+### Show every court with its county  **DONE 10 Aug 2026**
 
 **Why this came up.** The Courts picker searches `Name`, and 1,542 of the 1,551 names are
 unique — but nine names belong to two courts each, and New York really does have two of each.
@@ -357,15 +357,11 @@ back to plain, ready for the conversion below.
 **Every one of the 1,551 courts has a county** (checked 10 Aug 2026), so no court will be left
 without a suffix.
 
-#### What Dan does
+#### Done, and verified
 
-**Table:** Courts · **Field:** `Name` (the first column)
-
-- [ ] Click the **`Name`** column header → **Duplicate field**, and choose to **copy the
-      values** with it. Rename that copy **`Court Name (original)`**. *This is the safety copy,
-      and it must exist before the next step — converting a text field to a formula destroys
-      what was typed in it.*
-- [ ] Now click **`Name`** → **Edit field** → change the type to **Formula**, and paste:
+Dan duplicated `Name` (with values) to **`Court Name (original)`**, then converted `Name` to
+the formula below. Verified across all 1,551 afterwards: **every name distinct, none blank,
+every one carrying its county**, and the borough counties rendering as intended.
 
 ```
 {Court Name (original)} &
@@ -381,10 +377,16 @@ IF(
 )
 ```
 
-- [ ] Accept the data-loss warning — the thing being lost is the typed name, which is already
-      safe in `Court Name (original)`
-- [ ] Spot-check three: an ordinary court, one of the nine duplicated names, and a New York
-      City court
+The nine duplicated names now separate themselves — `Chester Town Court (Orange County)` and
+`Chester Town Court (Warren County)` — with no hand-tagging to maintain.
+
+**Accepted cosmetic side effect: 337 of the 1,551 courts now name their county twice**, e.g.
+`Saratoga County Surrogate's Court (Saratoga County)`, and a few carry two brackets because
+the court's own name has one — `Genesee County Court (M-B) (Genesee County)`. Left alone
+deliberately. Suppressing the suffix where the name already contains the county would make
+the labelling inconsistent, and the value of the suffix is that it is **always** there and
+always says the same thing. Cases like `Broome Supreme Court` also name the county without
+the word "County", so a suppression rule would misfire on them.
 
 #### Why the formula looks more complicated than "add the county"
 
