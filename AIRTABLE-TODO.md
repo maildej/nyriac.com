@@ -43,9 +43,18 @@ other cases), which is straightforward. The "apply to all linked cases" option c
 formula, because **a formula cannot write into a link field** — it needs an automation that
 fires when a note is created with a checkbox ticked and copies the case's linked cases into
 `Also Relates To`. That is a stamp-once-at-creation automation, not a mirror, so it does not
-repeat the drift problem that killed the old `Status` field — but it does mean a note written
-before two cases were linked will not retrospectively appear on the new one. Worth deciding
-whether that matters.
+repeat the drift problem that killed the old `Status` field.
+
+**DECIDED, 9 Aug 2026 — it only ever works forwards, and the interface says so.** A note
+written before two cases were linked will not retrospectively appear on the newly linked
+case. Rather than engineer around that, the linking control carries a notice in Dan's words:
+
+> REMINDER: this only associates future case notes to all linked cases. If you want any prior
+> case notes to appear on all linked cases, please review and link them manually.
+
+Note what that is: an **interface label**, the same device as the "(MAKE SURE TO UPDATE THIS
+WHEN CHECKING)" caption on `EOIR Result`. It therefore appears only where it is placed, not
+everywhere the field is shown — so put it where the linking actually happens.
 
 ## 2. The Related Parties popup  **[Dan]**, spec ready
 
@@ -104,7 +113,7 @@ through `Client Code` brings it onto the case, the same way `EOIR Result` and
 `EOIR Last Checked` already arrive. Claude creates the lookup; Dan adds it to the layout.
 It will be **read-only on the case** — like every other client field — which is correct.
 
-## 7. Prior criminal history  **[Decide]** then **[Claude]**
+## 7. Prior criminal history  **[Claude]**
 
 Recorded on the **person** in Parties, because criminal history travels with the person, not
 the case. For each entry:
@@ -125,26 +134,69 @@ this date), the **incidents** it evidences, and the **charges and their disposit
 time** — because "all pleas or dispositions" and "resentencing" both mean a charge's outcome
 changes more than once, which a single row cannot hold.
 
-**One conflict to resolve first:** `RAP Sheet Upload` currently sits on the **case**, but the
-criminal history it evidences belongs to the **person**. Linking history to a RAP sheet held
-on a case would tie a fact about the person to one particular matter. Either the RAP sheet
-moves to Parties, or the history record links to the case the sheet arrived on and accepts
-that. This is exactly the "which office" question the base already resolved once, and the
-answer there was to record the fact where it is actually true.
+**DECIDED, 9 Aug 2026 — the history and its source sit on the person, carrying a link to the
+case the RAP sheet arrived on.** The criminal history travels with the human, so it is
+recorded on Parties; the case link is recorded as **provenance** — *this is where we got it
+from* — rather than as ownership. Both facts are then true at once, and a second case can
+reuse the same history without copying it.
 
-## 8. Generate a written advisal in Word  **[Decide]**
+This is the "which office" question answered the same way as before: record the fact where it
+is actually true, and keep the incidental context as context. It follows that
+`RAP Sheet Upload` on the case is **not** the right anchor for the history — the source
+record on Parties is. Whether the existing case-level upload field then moves, is duplicated,
+or simply stays as the place attorneys drop the file is a small implementation choice to make
+when building, not a further decision to take now.
+
+## 8. Generate a written advisal in Word  **[Dan]** to look, then **[Decide]**
 
 A button that produces a Word document containing all the case and client information in a
 standard format, which the RIAC attorney then adds the immigration analysis to. More advanced
 generation can come later.
 
-*Notes.* Be aware before starting: **Airtable cannot produce a .docx file on its own.** Its
-built-in Page Designer makes PDFs, not Word, and PDFs cannot be typed into afterwards — which
-defeats the purpose here. The realistic routes are a **third-party document add-on** (several
-exist that fill a Word template from Airtable; most are paid), or **generating the document
-outside Airtable** from exported case data. That second route fits how advisories are already
-worked on — they live in OneDrive and are edited in local sessions, per `CLAUDE.md`. Worth a
-conversation about which before any building.
+**Dan's preference, 9 Aug 2026: keep it inside the database if at all possible.** Generating
+outside Airtable is liveable but distinctly second best.
+
+*Notes.* **Airtable cannot produce a .docx on its own.** Its built-in Page Designer makes
+PDFs, and a PDF cannot be typed into afterwards — which defeats the whole point, since the
+attorney has to add the immigration analysis to whatever comes out.
+
+**Investigated 9 Aug 2026.** Two shapes of solution exist, and the difference between them
+matters far more here than price:
+
+| Route | Examples | The catch |
+|---|---|---|
+| **An Airtable extension**, running inside the base | *Word Document Auto-Fill* on the Airtable Marketplace | Requires a **Team plan or above** — extensions are not on the free plan |
+| **An external document service**, driven by automation | Documentero, Plumsail, Make, TypeFlow | **Case data leaves Airtable** and is processed on someone else's servers |
+
+**The privacy point decides this, not the price.** These documents will contain a named
+client, their date of birth, their A-Number, their immigration status and their criminal
+charges. Routing that through a third-party document service means a processor holding
+confidential client data, which is a question for RIAC's own obligations, not a technical
+choice — and `AIRTABLE.md` already records that everything becomes confidential the moment
+real data goes in. **The extension route keeps the data inside Airtable and should be tried
+first for that reason alone.**
+
+**Likely already available:** extensions need Team or above, and this base holds 1,918 Penal
+Law rows — well past the free plan's 1,000-record cap — so RIAC is almost certainly on a
+qualifying plan already. Worth confirming in the billing settings before assuming, but it
+suggests the extension route costs nothing extra.
+
+**Next step when this is picked up:** open the Airtable Marketplace and look at
+*Word Document Auto-Fill* directly. Claude cannot — `airtable.com` is blocked to it by the
+network proxy, so the marketplace listing, its pricing and its privacy terms could not be
+read. What is established is that it exists, fills a Word/Google Docs template from base data,
+outputs `.docx`, and preserves the template's fonts, paragraphs, pagination and colours. What
+is **not** established is who publishes it, what it costs, whether it processes anything
+off-device, and how well it copes with the linked and lookup fields this base leans on
+heavily — a case pulls its client details, charges and court through links, and a template
+filler that only reads plain fields would be little use here. **Test it against a real case
+before committing.**
+
+Sources: [Word Document Auto-Fill](https://airtable.com/marketplace/blkxzMlA4V5bcZh2w/word-document-auto-fill) ·
+[Documentero](https://documentero.com/integrations/app/airtable/) ·
+[Plumsail](https://medium.com/plumsail/auto-generate-documents-from-airtable-in-zapier-b6d9f2b340f7) ·
+[Make](https://www.make.com/en/integrations/airtable/docx-templater) ·
+[plan requirements](https://www.softr.io/blog/airtable-pricing)
 
 ## 9. The charge popup  **[Dan]**
 
@@ -165,23 +217,29 @@ work. One catch: **a true button field cannot be created through the API** — i
 and CJI links must be buttons rather than clickable URLs, Dan makes those by hand, the same
 way `Look up on EOIR` was made.
 
-## 10. Move the EOIR check onto the case, and delete the EOIR Checks page  **[Decide]**
+## 10. Make the EOIR check reachable from the case  **[Dan]**
 
 Checks are done case by case by the paralegal, just before generating the draft initial
-advisal — never in batches. So the same functionality should sit on the Case Viewer, and the
-EOIR Checks interface should go.
+advisal — never in batches. So the check should be reachable from the Case Viewer.
 
-*Notes.* **Read `AIRTABLE.md` → "EOIR checks" before touching this.** Two things constrain it:
+**DECIDED, 9 Aug 2026 — make the existing route obvious rather than build a new one.**
 
-- **The EOIR fields cannot be made editable on the case.** They arrive there as lookups
-  through `Client Code`, and no interface setting can make a lookup editable. The existing
-  route is clicking the client chip, which opens the client's record where the fields *are*
-  editable and already carry the "MAKE SURE TO UPDATE THIS WHEN CHECKING" warning. So this may
-  be less "build something new" and more "make that existing route obvious from the case".
-- **Deleting the EOIR Checks page removes the backstop.** Its purpose is catching people with
-  an A-Number nobody has looked up. If checks are always done at a fixed point in the workflow
-  that may genuinely be unnecessary — but it is a deliberate safety net, and `EOIR Check
-  Status` was built to feed it. Decide knowingly rather than as a tidy-up.
+*Notes.* **Read `AIRTABLE.md` → "EOIR checks" before touching this.**
+
+**The EOIR fields cannot be made editable on the case, and no amount of building changes
+that.** They arrive there as lookups through `Client Code`, and Airtable does not allow typing
+into a lookup at all. The editable fields — and the `Look up on EOIR` button, and the
+"(MAKE SURE TO UPDATE THIS WHEN CHECKING)" caption — already exist on the client's own record,
+which opens from the client chip. So the job is signposting: make it plain from the case that
+the check happens one click away, through the client.
+
+**Still open: whether the EOIR Checks page is then deleted.** Its purpose is catching people
+with an A-Number nobody has ever looked up, and `EOIR Check Status` exists solely to feed it.
+If the check genuinely always happens at a fixed point in the workflow the page is redundant —
+but it is a deliberate safety net against the case where it does not, and the failure it
+catches is silent (`⚠ Never checked` looks identical to "checked, nothing found" if nobody is
+looking). Worth deciding separately, once the signposting is in and it is clear whether the
+workflow really does catch everyone.
 
 ## 11. The Court field cannot be changed on the case  **[Dan]**
 
@@ -214,26 +272,36 @@ Nothing seems achievable there that the Case Viewer cannot do.
 *Notes.* Probably right, with one caveat worth checking before deleting: Find a Case is a
 **grid** — every case as sortable, filterable rows — whereas Case Viewer is a list with one
 record open at a time. The grid is better for "show me everything at once" and for spotting
-gaps across cases. If item 14 gives filtered Case Viewer variants, the case for keeping it
-weakens considerably.
+gaps across cases.
+
+**Do item 14 first and then look again.** Once an unfiltered "All cases" Case Viewer exists,
+the only thing Find a Case still offers is the grid layout itself. If nobody misses it, delete
+it then — the decision costs nothing to defer and gets easier with the answer in front of you.
 
 ## 14. Several Case Viewer pages with different pre-set filters  **[Dan]**
 
-Structurally identical pages the user would not notice were different, each pre-filtered —
-e.g. **Version 1**: only cases ready for advisal by the current user, oldest first;
-**Version 2**: all cases.
+Structurally identical pages the user would not notice were different, each pre-filtered.
 
-*Notes.* Yes, this works, and it is the standard answer to the "buttons cannot change filters"
-limitation. Two costs to accept going in:
+**DECIDED, 9 Aug 2026 — exactly two copies:**
 
-- **Every future layout change must be made on every copy, by hand.** Two pages means doing it
-  twice, forever. That is the real price, and it argues for keeping the number small.
-- The pages will appear separately in the interface's navigation, so they need names that make
-  sense to whoever is clicking — "My cases ready for advisal" and "All cases" read better than
-  "Case Viewer 1" and "Case Viewer 2", even if the layouts are identical.
+1. **The user's own cases that are ready for review**, oldest first
+2. **No filter** — every case
 
-"Ready for advisal by the user" is already available: filter on `Readiness (calc)` and
-`RIAC Atty`.
+*Notes.* This works, and it is the standard answer to the "buttons cannot change filters"
+limitation. Two costs, accepted going in:
+
+- **Every future layout change must be made on both copies, by hand, forever.** That is the
+  real price, and it is why the answer is two and not five.
+- The pages appear separately in the interface navigation, so they need names that mean
+  something to whoever is clicking — "My cases ready for advisal" and "All cases" read far
+  better than "Case Viewer 1" and "Case Viewer 2", even though the layouts are identical.
+
+Both filters already have fields to hang on: `Readiness (calc)` groups cases into ready / not
+ready, and `RIAC Atty` is the assigned attorney. Airtable can filter a page to the **current
+logged-in user**, which is what makes "the user's own cases" work without a page per person.
+
+Note the overlap with item 13: if these two pages exist, "Find a Case" has very little left to
+do.
 
 ---
 
