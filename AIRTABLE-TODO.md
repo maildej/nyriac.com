@@ -244,6 +244,11 @@ work. One catch: **a true button field cannot be created through the API** — i
 and CJI links must be buttons rather than clickable URLs, Dan makes those by hand, the same
 way `Look up on EOIR` was made.
 
+**(c) needs revisiting — there are now two CJI links, not one.** Item 20 explains why both
+matter, plus the `CJI Match` caption that says how good the match is. Only `CJI Link` is
+currently pulled through onto Case Charges, so `CJI Article Page` and `CJI Match` need lookups
+adding first — that part is **[Claude]** and quick.
+
 ## 10. Make the EOIR check reachable from the case  **[Dan]**
 
 Checks are done case by case by the paralegal, just before generating the draft initial
@@ -291,6 +296,9 @@ offence name and class, so the search half is largely solved. Worth deciding wha
 it — statutory text, classification, attempt class, the Senate and CJI links, sentencing, and
 possibly the IDP chart entry, though note the standing rule that **IDP content must only ever
 be readable in the context of an IDP record**.
+
+**Item 20 already specifies the jury-instruction half** — two CJI links and a match caption,
+not one link. Read it before designing this page.
 
 ## 13. Is "Find a Case" superfluous?  **[Decide]**
 
@@ -355,8 +363,13 @@ every intake stops being conflict-checked.
 - [ ] Add **`Office Not Listed - Details`**, shown **only when `Office Not Listed?` is ticked**
 - [ ] **Remove the old `Affiliation`** field from the form (do not delete the field yet — it
       still holds three test submissions)
-- [ ] Submit one test intake and check **Possible Conflict Matches** fills in. That confirms
-      the conflict check still fires
+- [ ] **Check the form asks for first and last name in separate boxes.** The conflict check
+      matches on surname OR date of birth, and if `Client Last Name` arrives empty then
+      *every person on file* matches and the check becomes noise. Two of the three intakes on
+      file have both name boxes empty, which may just be how those test rows were made
+- [ ] Submit one test intake and check that **Possible Conflict Matches** fills in, and that
+      the surname landed in **`Client Last Name`**. That confirms the conflict check still
+      fires after the changes, and that names are arriving split
 
 ## 16. Delete the superseded fields  **[Dan]**
 
@@ -389,6 +402,26 @@ Three cases carry two attorneys from two different offices, which does not happe
 life. The data is correct as recorded; this only matters if the test data should look
 realistic: 6017 Josefina Almonte-Vidal · 6024 Bekim Gjonbalaj · 6041 Leonel Ayestas.
 
+## 20. Show both jury-instruction links wherever a charge is displayed  **[Dan]**
+
+Every Penal Law offence now carries **two** CJI links, and they do different jobs:
+
+- [ ] Add **`CJI Link`** — the specific instruction document, a one-click read
+- [ ] Add **`CJI Article Page`** — the court's page for the whole article, so the attorney
+      can look around it or find something the direct link missed
+- [ ] Add **`CJI Match`** as a small caption beside them. This matters: **"Same section
+      only"** is a nearest-neighbour jump rather than a precise match, and **"No model jury
+      instruction exists for this offense"** is the court confirming none is prepared —
+      which is a useful answer, not a blank
+
+Both link fields are deliberately blank for the six articles with no CJI page at all
+(179, 185, 241, 242, 275, 280). The reasoning and the full breakdown are in `AIRTABLE.md`
+under "Jury instruction links".
+
+**Overlaps two other items — do them together.** Item 9 puts the Senate and CJI links on the
+charge popup, and item 12 builds the crime viewer; both are the places these links belong.
+This item is the specification of *what* to show; those two are *where*.
+
 ---
 
 # Before this goes live
@@ -407,12 +440,21 @@ Do not start these until testing is finished. Several have no undo.
 - [ ] **Remove `Fake Entry?` from the charge popup** — item 9(f) puts it there deliberately
       for the pilot only
 - [ ] Review who can see the base, the interfaces, and any shared links
-- [ ] **Switch the reminder emails to Outlook.** They currently send from Airtable's own mail
-      server; the "Send the chaser" step needs swapping to the Microsoft Outlook send action so
-      mail comes from the real RIAC address
-- [ ] **Link nyriac.com to the Airtable intake form.** Link to it — do not build a form on the
-      website that posts into Airtable, or the conflict check silently stops running on every
-      intake
+- [ ] **Confirm both chaser systems are meant to be there.** Two are deployed and both send
+      real email: `Send approved reminders` (the four-rung one behind the Reminder Queue
+      page) and `Monthly reminders 1 and 2` (the batch one behind Monthly Reminders and Run
+      Monthly Reminders). **This may well be deliberate** — Dan thinks a workflow was
+      designed around it — so do not retire either without checking. What needs confirming
+      is that it is clear which does what, because they are started by different tick-boxes
+      and ticking the wrong one would chase the same attorneys twice. If both are keepers,
+      say so on the Reminder Queue page so nobody wonders later
+- [ ] **Switch the reminder emails to Outlook.** They currently send from Airtable's own
+      mail server; the "Send the chaser" step needs swapping to the Microsoft Outlook send
+      action so mail comes from the real RIAC address. **Both** systems send, so both need
+      swapping if both survive the item above
+- [ ] **Link nyriac.com to the Airtable intake form.** Link to it — do not build a form on
+      the website that posts into Airtable, or the conflict check silently stops running
+      on every intake
 - [ ] From then on, treat everything in the base as confidential — see `AIRTABLE.md`
 
 The website has its own outstanding list — contact details to verify, advisory PDFs, DNS

@@ -12,7 +12,7 @@ It is a map, not a manual. The detailed reasoning for individual fields lives in
 descriptions are unusually full and are the primary documentation; this file exists to
 tell you where to look and to record the things a field description cannot say.
 
-Last verified against the live base: **9 August 2026.**
+Last verified against the live base: **10 August 2026.**
 
 ---
 
@@ -82,14 +82,15 @@ another. That separation is what makes the conflict check possible.
 | **Monthly Reminders** | List | Review the chasers before they go out. |
 | **Run Monthly Reminders** | List | The two buttons on the Reminder Control record. |
 | **EOIR Checks** | List | Backstop only — people with an A-Number nobody has looked up yet. See "EOIR checks" below. |
+| **Reminder Queue** | Dashboard | The four-rung chaser system: cases needing a chase, a tick to approve each, and the button that sends them. See gap 8. |
 
-Two pop-up forms: **Add a Charge** and **Add Case Note**.
+Two pop-up forms: **Add A New Charge** and **Add Case Note**.
 
 ---
 
 ## The automations
 
-All six are deployed and valid.
+All seven are deployed and valid. **Two of them send real email** — see gap 8.
 
 | Automation | Fires when | Does |
 |---|---|---|
@@ -98,6 +99,7 @@ All six are deployed and valid.
 | **2. Attach Case Note to its case** | A note has a case number in its subject but no case | Finds the case and links it. Failing to match is harmless — the note lands in Needs Review. |
 | **Monthly reminders 1 – Generate the list** | "Generate this month's list" ticked | Builds the batch and drafts each email. **Sends nothing.** |
 | **Monthly reminders 2 – Send the reminders** | "Send the reminders" ticked | **Actually emails attorneys. No undo.** |
+| **Send approved reminders** | "Send approved reminders" ticked | The four-rung system behind the Reminder Queue page: first chaser, second chaser, final warning, then a closing notice that also closes the case as "No Atty Response". **Actually emails attorneys. No undo.** Reads its reply-to and BCC addresses from the Reminder Control record. |
 | **Stamp EOIR check date** | EOIR Result changed on a person | Writes today's date into EOIR Last Checked. |
 
 ### Changing behaviour without touching an automation
@@ -364,6 +366,23 @@ Worth keeping from the build, because it will apply to anything similar:
   actual link field — that distinction is what makes the whole case-to-person workflow
   possible, and it is easy to miss.
 
+**7. The Needs Review page needs rethinking.** As structured it is not clear how it will
+actually work in use. The rule it has to express is that a pending intake is **pushed**
+into a case from this page — never pulled from a case file, which is why the intake link
+was deliberately removed from the Case Viewer. The page currently just stacks two grids
+(intakes awaiting a decision, and case notes that arrived by email with no case attached)
+without making that push action obvious.
+
+**8. Two chaser systems are running side by side, and both send real email.**
+`Send approved reminders` (the four-rung one behind the Reminder Queue page) and
+`Monthly reminders 1 and 2` (the batch one behind Monthly Reminders and Run Monthly
+Reminders) are both deployed.
+
+**This may well be deliberate** — Dan believes a workflow was designed around it in
+another conversation — so **do not retire either without checking first**. What is worth
+confirming is which does what, because they are started by different tick-boxes, and
+someone ticking the wrong one would chase the same attorneys twice.
+
 ---
 
 ## The charge picker rebuild (August 2026)
@@ -396,7 +415,7 @@ Fields added to **Case Charges** (already done):
 | `Classification (from catalogue)` | Lookup | Class of the completed Penal Law offence. |
 | `Attempt Class (from catalogue)` | Lookup | What the class becomes on an attempt. |
 | `Statutory Text (from catalogue)` | Lookup | Verbatim text, readable on the case. |
-| `NY Senate Link`, `CJI Link` | Lookup | Source links. |
+| `NY Senate Link`, `CJI Link` | Lookup | Source links. `CJI Link` is the specific jury instruction — see "Jury instruction links" below, there is a second link worth showing beside it. |
 | `VTL Classification (from catalogue)` | Lookup | Class of the linked VTL offence. |
 | `VTL Statutory Text (from catalogue)` | Lookup | Verbatim VTL text. |
 | `VTL Sentencing (from catalogue)` | Lookup | Sentencing exposure at the prior-conviction tier picked. |
@@ -405,6 +424,46 @@ Fields added to **Case Charges** (already done):
 
 VTL entries carry **no attempt class**, so ticking `Attempted?` on a VTL charge falls
 through to its ordinary class rather than going blank.
+
+### Jury instruction links (August 2026)
+
+Every record in **NY Penal Law Offenses** carries **two** links to the Criminal Jury
+Instructions, because they answer different questions:
+
+| Field | What it is |
+|---|---|
+| `CJI Link` | The specific instruction document for that subdivision. Blank where none exists. **1,396 of 1,918 records.** |
+| `CJI Article Page` | Formula. The court's page listing every instruction for the whole article. Built from `Article`, so it never needs maintaining. |
+| `CJI Match` | How good `CJI Link` is — see below. |
+
+`CJI Match` values, and what each means to an attorney:
+
+- **Exact subdivision** (780) — the instruction for precisely this branch.
+- **Broader document** (316) — one document covering this subdivision among others.
+- **Same section only** (300) — no document for this exact branch; this is the nearest one
+  in the same section. A convenience jump, *not* a precise match.
+- **No model jury instruction exists for this offense** (233) — the court positively says
+  none is prepared. This is an answer, not a gap; worth showing as such.
+- **Not listed** (227) — the article page does not mention this provision at all.
+- **No CJI page** (62) — the whole article has no CJI page. Both link fields are blank.
+
+**Articles 179, 185, 241, 242, 275 and 280 have no CJI page whatsoever.** The links that
+used to be stored for them were dead (404) and have been cleared.
+
+Two facts to save re-discovering, if these ever need rebuilding:
+
+- **The file names cannot be guessed from the citation.** The court uses at least eight
+  naming conventions, sometimes within one article (`240-30(1).pdf`, `240-30%282%29.pdf`,
+  `240-50-1.pdf`, `T-470.05(1)+470.10(1)(b).pdf`), and article 130 sits in a dated
+  subfolder. Guessing addresses recovered 18% on a test sample; reading the pages
+  recovered everything published.
+- **nycourts.gov serves its HTML pages behind Cloudflare** — scripted fetches get a 403.
+  A real browser loads them normally. `HEAD` returns 403 for *every* URL on the site
+  including live ones, so a HEAD-based link checker reports everything as dead; use GET.
+  The PDFs themselves fetch fine with an ordinary browser user-agent.
+
+**Article 130 exists in two versions**, pre and post 1 September 2024, on separate pages.
+The links stored are the current (post-9/1/24) set.
 
 **Deliberately not done with an automation.** An automation could fill `Charge` when it
 is empty, but that is the same two-fields-that-can-disagree pattern that produced the
@@ -617,6 +676,60 @@ the top and does not appear in the list of fields at all; in the grid it is the 
 leftmost column. Anyone told to "edit the Citation field" will look for a labelled box and
 not find one. Identify it by its values instead.
 
+## The offence catalogues and their loader scripts
+
+**NY Penal Law Offenses** (1,918 records) and **NY VTL Offenses** (36) are built and
+maintained by two scripts, `catalogue_penal_law.py` and `catalogue_vtl.py`, kept in
+`OneDrive - OCBA/RIAC - Documents/Admin/Database Design`. They upsert rather than replace,
+so re-running one repairs the catalogue in place. The jury-instruction links on these
+records are described under "Jury instruction links" above.
+
+### Never edit `Section` or `Subdivision` by hand
+
+Those two columns are how the loader recognises a record it has seen before. The `Citation`
+you see on screen is a **formula** built on top of them, and a formula cannot be used for
+matching — which is why the scripts key on the raw columns instead.
+
+Change one by hand and that record becomes invisible to the script: the next run will not
+update it, it will **create a second copy alongside it**. Treat those two columns as
+belonging to the script, the same way `Classification` belongs to Dan — the script never
+overwrites his hand-corrected classifications, and nobody should overwrite its section
+numbers. Everything else on those records is safe to edit.
+
+### Two Penal Law sections have moved on since the catalogue was loaded
+
+Loaded 5 August 2026. Sections **265.07** and **265.09** have since gained lettered and
+numbered branches that did not exist then, and the catalogue still holds the old
+branch-less versions.
+
+So the next full run of `catalogue_penal_law.py` will *add* `265.07(1)`, `265.07(2)(a)`,
+`265.07(2)(b)` and `265.09(1)(a)`, and leave the superseded rows sitting alongside them.
+Nothing breaks, but **those two sections want a look afterwards and the stale rows
+deleting**. Everything else in the catalogue still lines up exactly.
+
+### Neither catalogue has been re-run since the scripts were repointed
+
+The repoint was 10 August 2026, so both points above are **untested against a real load**.
+Expect to verify rather than trust the first run.
+
+### ⚠️ Check what a re-run does to `Short Name` on the VTL catalogue
+
+**Unverified, and worth establishing before the next VTL load.** `Short Name` on NY VTL
+Offenses is a **hand-edited** text column — it is the plain-English name shown in the charge
+picker and on every recorded charge, and it is the one column on that table Dan is meant to
+type into. See "Classes, attempts and short names" above.
+
+If `catalogue_vtl.py` writes a fixed set of columns on every upsert, whether it *clears*
+`Short Name` or simply leaves it alone decides whether a routine catalogue repair silently
+wipes 36 hand-written names. The script is in OneDrive rather than this repository, so this
+has not been checked from a cloud session.
+
+**Before the next run:** confirm the script does not write `Short Name`, or teach it to skip
+the column, in the same way it already leaves Dan's hand-corrected `Classification` values
+alone. Same question applies to the `Statute No.` and `Display Name` formulas on both
+catalogues — but those are formulas, so a loader cannot overwrite them, and only `Section`
+and `Subdivision` feed them. That is one more reason not to touch those two columns by hand.
+
 ## Pickers can only search a table's primary field
 
 This is the single most important thing to know when designing anything that asks a user to
@@ -824,10 +937,10 @@ in reality — it reads cleanly. Not worth engineering around.
 The API cannot delete fields, so these are by hand. Order matters, because each depends on
 the next:
 
-1. On the Case Viewer, display **`Attorney's Office`** instead of `Office on This Case`
-2. Delete **`Office on This Case`** (case table)
-3. Delete **`Attorney's Usual Office`** (case table)
-4. Delete **`Affiliation`** (Attorneys & Requestors)
+1. ~~On the Case Viewer, display **`Attorney's Office`** instead of `Office on This Case`~~ — **done**
+2. ~~Delete **`Office on This Case`** (case table)~~ — **done**
+3. ~~Delete **`Attorney's Usual Office`** (case table)~~ — **done**
+4. Delete **`Affiliation`** (Attorneys & Requestors) — **still outstanding**, tracked in `AIRTABLE-TODO.md`
 
 Every case already carries its own office, so nothing is lost at step 4.
 
@@ -869,9 +982,15 @@ with a formula instead, which has the advantage that it cannot drift:
 
 | Field | Role |
 |---|---|
-| `Attorney's Usual Office` | Lookup. The attorney's affiliation from their own record. |
-| `Attorney's Office (this case)` | The **override box**. Filled in by hand only when a panel attorney is acting for a different office than usual. Empty on almost every case. |
-| **`Office on This Case`** | Formula. Reads the override if set, otherwise the usual office. **This is the one to display.** |
+| ~~`Attorney's Usual Office`~~ | Lookup of the attorney's affiliation from their own record. **Deleted.** |
+| ~~`Attorney's Office (this case)`~~ | The override box. **Renamed `Attorney's Office`** — the single field that survives. |
+| ~~`Office on This Case`~~ | Formula reading the override if set, otherwise the usual office. **Deleted.** |
+
+**As built, this collapsed to one field.** The case table now carries only
+**`Attorney's Office`**, filled in per case — which is simpler than the design above and
+says the same thing, because every case records its own office anyway. The paragraph below
+explains why the formula approach was chosen at the time; it is kept because the reasoning
+still applies if a default-from-the-attorney is ever wanted again.
 
 So the right office always shows without anyone filling anything in, and setting the
 override changes it for that case alone. The alternative — an automation stamping the usual
@@ -985,6 +1104,20 @@ If that is ever revisited — someone wanting the form styled to match the site,
 conflict check has to be rebuilt to trigger on record creation rather than form submission
 *before* the switch, not after. Otherwise every intake stops being checked and nothing says
 so.
+
+### The check needs a surname to arrive, or it turns into noise
+
+It matches on **surname OR date of birth**. That deliberate looseness is what lets it
+survive misspelt first names and initials — but it only works if a surname actually
+arrives. The automation's own description warns that when `Client Last Name` comes through
+empty, *every person on file* matches, and the check stops being a signal.
+
+So the public form must ask for **first and last name in separate boxes**. Of the three
+intake submissions currently on file, **two have both name boxes empty** — the `Client
+Name` formula renders as a single space. That may simply be how those test rows were made;
+the form could not be read from the API to confirm, because it is a view-based form rather
+than an interface form (see "Forms: two places" below). **Submit the live form once and
+check the surname lands in `Client Last Name`.**
 
 ## Forms: two places, one confusing overlap
 
