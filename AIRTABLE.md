@@ -920,27 +920,41 @@ Two toggles do exist on such a field, and they are separate things:
 
 The second being off is why a court could be swapped but not inspected.
 
-### Nine court names were shared by two courts each — fixed 10 August 2026
+### Every court shows its county — decided 10 August 2026
 
 The Courts picker searches `Name`, and 1,542 of the 1,551 names were unique. Nine were not,
 because New York genuinely has two Chesters, two Franklins, two Brightons and so on. **Eight
 of those nine pairs sat in different RIAC regions**, so picking the wrong twin would have
 filed the case with the wrong centre — and the two entries were indistinguishable in a picker,
-which shows the primary field and nothing else.
+which shows the primary field and nothing else. It is the Parties same-name problem, with a
+worse consequence: misrouting rather than mislabelling.
 
-The 18 affected records now name both counties, the one they are in and the one they are not:
+**The answer is to show the county on every court, not just the ambiguous ones:**
 
-> `Chester Town Court (ORANGE COUNTY, NOT Warren County)`
-> `Chester Town Court (WARREN COUNTY, NOT Orange County)`
+> `Alabama Town Court (Genesee County)`
 
-Naming the *wrong* county as well as the right one is the point: it fails safe, because the
-glance that would have caused the near-miss is the one that catches it. The same idea as the
-date of birth on the Parties picker, pushed a step further because the consequence here is
-misrouting rather than mislabelling.
+That disambiguates the nine pairs as a side effect and pays for itself everywhere else —
+searching `Genesee` now finds every court in that county, which the picker could not do while
+names were bare. Every one of the 1,551 courts has a county, so none is left unlabelled.
 
-Only those 18 were touched; all 1,551 names are now distinct. **If a loader script is ever
-written for Courts, it must leave `Name` alone on these records** — the same care the VTL
-`Short Name` column needs.
+**A first attempt tagged only the 18 duplicates by hand** — `Chester Town Court (ORANGE
+COUNTY, NOT Warren County)` — which worked but was static, covered only nine names, and would
+not have labelled a court added later. It was **reverted** in favour of the formula. Recorded
+because the reasoning generalises: hand-tagging the exceptions is quicker, but a rule that
+applies to every row cannot fall out of date.
+
+**Three counties are not stored as bare names.** `Kings (Brooklyn)`, `New York (Manhattan)`
+and `Richmond (Staten Island)` carry the borough, so naively appending " County" would give
+`(Kings (Brooklyn) County)` on every New York City court. The formula spots the bracket and
+rearranges to `(Kings County, Brooklyn)`, which keeps both `Kings` and `Brooklyn` searchable.
+
+The conversion itself is hand work — the API cannot change a field's type — and follows the
+same order as Parties and Attorneys did: **copy the names to safety first, then convert.**
+Here the copy is made by duplicating the `Name` field with its values, which is why no API
+write was needed for 1,551 records. Steps and formula are in `AIRTABLE-TODO.md`, item 11.
+
+**Once converted, `Name` is a formula.** A loader script for Courts, if one is ever written,
+must write `Court Name (original)` instead — the same care the VTL `Short Name` column needs.
 
 ### The court decides which RIAC a case belongs to
 

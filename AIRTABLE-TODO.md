@@ -323,11 +323,11 @@ Two things follow from turning it on:
   correct — court contact details genuinely are shared — but it is the same scope rule as
   agencies, and worth knowing before anyone corrects an address.
 
-### ⚠️ Nine court names are shared by two courts each — and eight cross RIAC regions
+### Show every court with its county  **[Dan]** — one conversion, then done
 
-Found 10 Aug 2026 while checking the picker is usable. The Courts primary field is `Name`, so
-the picker searches court names, and **1,542 of the 1,551 names are unique** — fine. The
-other nine are not, and New York really does have two of each:
+**Why this came up.** The Courts picker searches `Name`, and 1,542 of the 1,551 names are
+unique — but nine names belong to two courts each, and New York really does have two of each.
+**Eight of those nine pairs sit in different RIAC regions:**
 
 | Name | One is in | The other is in |
 |---|---|---|
@@ -341,35 +341,75 @@ other nine are not, and New York really does have two of each:
 | Albion Town Court | Orleans (**R1**) | Oswego (**R2**) |
 | Greenville Town Court | Greene (R4) | Orange (R4) |
 
-**Eight of the nine straddle two different RIAC regions.** Since county and region are both
-lookups through the court, picking the wrong one of a pair does not merely mislabel the case —
-it files it with the wrong centre. And the two entries are *indistinguishable in the picker*,
-because a picker shows the primary field and nothing else. This is the Parties same-name
-problem exactly, which was solved there by putting the date of birth into the primary field.
+Since county and region are both lookups through the court, picking the wrong twin does not
+merely mislabel a case — it files it with the wrong centre, and the two were indistinguishable
+in a picker.
 
-**DONE, 10 August 2026.** The 18 affected records were renamed to name both counties — the
-one they are in, and the one they are not:
+**DECIDED, 10 Aug 2026 — show the county on every court, not just the ambiguous ones.**
 
-> `Chester Town Court (ORANGE COUNTY, NOT Warren County)`
-> `Chester Town Court (WARREN COUNTY, NOT Orange County)`
+> `Alabama Town Court (Genesee County)`
 
-Dan's wording, and better than the obvious `(Orange County)`: it **fails safe**. Someone
-skim-reading a picker sees the county they are trying to avoid as well as the one they want,
-so the near-miss is caught by the same glance that would otherwise cause it.
+That fixes the nine pairs as a side effect, and pays for itself everywhere else: searching
+`Genesee` now finds every court in that county, which the picker could not do before. An
+earlier fix that tagged only the 18 duplicates by hand has been **reverted** — the names are
+back to plain, ready for the conversion below.
 
-Only those 18 were touched; the other 1,533 courts are untouched. Verified afterwards: all
-1,551 names are now distinct, none blank, and **none of the 18 was linked to a case**, so no
-existing case's `Court Name`, `County` or `RIAC Region` changed.
+**Every one of the 1,551 courts has a county** (checked 10 Aug 2026), so no court will be left
+without a suffix.
 
-**Why renaming rather than a formula.** `Name` is plain text, so the API could do this
-directly with no field-type conversion and no work for Dan. Converting `Name` to a formula
-that appends the county to every court is tidier in principle, but needs a hand conversion,
-lengthens all 1,551 names, and would solve for 1,551 records a problem that 18 of them have.
+#### What Dan does
 
-**If courts are ever reloaded from a script, these 18 names will be overwritten.** No such
-script exists today — the loaders cover the Penal Law and VTL catalogues only — but if one is
-ever written, it needs to leave `Name` alone on these records, the same care the VTL
-`Short Name` column needs.
+**Table:** Courts · **Field:** `Name` (the first column)
+
+- [ ] Click the **`Name`** column header → **Duplicate field**, and choose to **copy the
+      values** with it. Rename that copy **`Court Name (original)`**. *This is the safety copy,
+      and it must exist before the next step — converting a text field to a formula destroys
+      what was typed in it.*
+- [ ] Now click **`Name`** → **Edit field** → change the type to **Formula**, and paste:
+
+```
+{Court Name (original)} &
+IF(
+  {County},
+  " (" &
+  IF(
+    FIND("(", ARRAYJOIN({County}, ", ")),
+    SUBSTITUTE(SUBSTITUTE(ARRAYJOIN({County}, ", "), " (", " County, "), ")", ""),
+    ARRAYJOIN({County}, ", ") & " County"
+  ) & ")",
+  ""
+)
+```
+
+- [ ] Accept the data-loss warning — the thing being lost is the typed name, which is already
+      safe in `Court Name (original)`
+- [ ] Spot-check three: an ordinary court, one of the nine duplicated names, and a New York
+      City court
+
+#### Why the formula looks more complicated than "add the county"
+
+Three counties are not stored as bare names — `Kings (Brooklyn)`, `New York (Manhattan)` and
+`Richmond (Staten Island)` carry the borough. Appending " County" naively would give
+`(Kings (Brooklyn) County)`, brackets inside brackets, on every New York City court. The inner
+`IF` spots the bracket and rearranges instead:
+
+| County as stored | Court reads |
+|---|---|
+| Genesee | `Alabama Town Court (Genesee County)` |
+| St. Lawrence | `Massena Town Court (St. Lawrence County)` |
+| Kings (Brooklyn) | `Kings Criminal Court (Kings County, Brooklyn)` |
+
+So both `Kings` and `Brooklyn` still find the court.
+
+#### Consequences worth knowing
+
+- **Every case's `Court Name` gains the county too**, since it is a lookup of this field. That
+  is an improvement, and no case had to be touched to get it.
+- **It is self-maintaining.** Correct a court's county and its name follows; add a new court
+  and it is labelled automatically. That is the advantage over the hand-tagging approach that
+  was reverted.
+- **If a loader script is ever written for Courts, it must not write `Name`** — it is a formula
+  now, and `Court Name (original)` is what would need loading instead.
 
 ## 12. A crime viewer  **[Claude]**
 
