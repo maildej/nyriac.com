@@ -273,85 +273,55 @@ catches is silent (`⚠ Never checked` looks identical to "checked, nothing foun
 looking). Worth deciding separately, once the signposting is in and it is clear whether the
 workflow really does catch everyone.
 
-## 11. The Court field cannot be changed on the case  **[Dan]**
+## 11. The Court field on the case  **RESOLVED 10 Aug 2026**, one small piece left
 
-On Case Viewer → State Case Info, `Court` is not editable and there is no obvious way to make
-it so.
+Originally: "On Case Viewer → State Case Info, `Court` is not editable and there is no obvious
+way to make it so."
 
-**DIAGNOSED, 10 Aug 2026 — it is a per-field editing setting that was never switched on, and
-it can be fixed.** Not an Airtable limitation, and nothing to do with the field's type.
+**It was editable the whole time.** Tested by hand in the published interface: click the **×**
+on the court's card to unlink it, which leaves a **+ Add record** button, and that opens the
+searchable list of courts. Clunky compared with a dropdown, but it works, and Dan is content
+with it. Nothing was changed to achieve this.
 
-*The evidence, since "check the setting" is easy to say and easy to doubt:*
+### The wrong turn, recorded so it is not repeated
 
-- **The same field is editable on one page and not another.** `County` on Pending Intakes —
-  a linked-record field, exactly like `Court` — is **editable** in the Needs Review grid and
-  **not editable** on the Pending Intakes page. One field, two pages, two answers.
-- **Two linked fields on the same page disagree.** On the case record-detail page,
-  `Client Code` is editable while `Court` is not. Same page, same field type.
+The diagnosis said this was a forgotten inline-editing toggle needing a Publish. That was
+wrong, and it was wrong for a reason worth knowing: **`isEditable` from the API does not mean
+what it appears to for linked-record fields.** `Court` reports `isEditable: false` on the
+Case Viewer, and so does every other linked field on every list page in this base. It is a
+description of how the API renders list pages, not a statement about permissions. The full
+note is in `AIRTABLE.md` under "`isEditable` from the API does NOT mean a linked field can be
+re-linked".
 
-So the capability plainly exists; on the Case Viewer it is simply off for every linked-record
-field — `Court`, `Attorney`, `Attorney's Office`, `Client Code`, `Case Charges`, `Case Parties`
-and `Notes From Other Cases` are all locked, while every text, date, select and attachment
-field on the page is editable. That pattern is what a forgotten toggle looks like.
+**The lesson: for a linked-record field, the only reliable test is to open the published
+interface and try it.** Not the designer preview, and not the API.
 
-**How to fix it:**
+Two other guesses along the way were also wrong, both corrected by looking:
 
-- [ ] Open the **Case Viewer** page in the interface designer and click the **`Court`** field
-- [ ] Turn **on** its editing option (wording is usually "Allow editing" or "Editable")
-- [ ] ⚠️ **Turn OFF the option that lets users create new records from the picker** — usually
-      "Allow linking to new records". This is the important half; see below
-- [ ] Publish, then correct a test case's court and check `Court Name`, `County` and
-      `RIAC Region` all follow
+- The field is shown as a **Field**, not a linked-record View, so there was never an element
+  to swap out.
+- **There is no inline-creation risk here.** Typing a name matching no court returns nothing;
+  it does not offer to create one. That is governed by the **"Add records through a form"**
+  toggle, which is off — a *different* toggle from "Link / unlink records", whose gear offers
+  only `All records` / `Specific records` and no creation option at all.
 
-**If there is no editing option on it,** the field is being displayed as a *linked-record list
-element* rather than as a field. That element shows related records and cannot re-link.
-The fix is then to add `Court` as a **field** instead of, or alongside, that element. The API
-cannot see which of the two is in use, so this has to be checked by eye.
+### Still outstanding: you cannot click through to a court  **[Dan]**
 
-### What the designer actually showed, 10 Aug 2026
+The one real gap. A court's card cannot be clicked to open the court and read its address,
+phone, website, judicial district or county — useful things an attorney may well want.
 
-Checked on screen, because two of the guesses above were wrong:
+- [ ] On the Case Viewer, select the **`Court`** field and turn **on** **"Click into record
+      details"** under **User actions**. It was off in the designer on 10 Aug 2026, which is
+      exactly why swapping a court works but inspecting one does not
 
-- **`Court` is shown as a Field, not a View.** Appearance → Show as → `Field` is selected, so
-  there is no linked-record list element to swap out. That worry does not apply.
-- **"Link / unlink records" is already ON** in the draft. The API still reports the field as
-  locked because **it only ever sees published layouts** — so this is a pending change waiting
-  on a Publish, not a missing setting.
-- **The gear beside it offers only `All records` / `Specific records`** — which existing courts
-  a user may pick from. **There is no "allow creating new records" option in that panel**,
-  contrary to what was assumed below. Leave it on `All records`: "Specific records" would
-  narrow the list, but there is nothing on a case to narrow it *by*, since the county comes
-  *from* the court and the filter would be circular.
+Two things follow from turning it on:
 
-**Still to confirm at runtime:** whether the picker offers to create a court when a user types
-a name that matches nothing. Ten-second test — click into `Court` in preview, type nonsense,
-and see whether it offers to create it or simply finds nothing. If it offers, the warning
-below is live and needs somewhere to be turned off; if it only filters, the risk does not
-arise on this element.
-
-**Publishing is all-or-nothing.** As of 10 Aug 2026 the interface has other pending drafts —
-**All Cases**, **Cases by request date** and **Cases by next date** exist in the designer but
-are not published, and look like work towards item 14. A Publish pushes those live too.
-
-### ⚠️ Turn off inline record creation, or this fix creates a worse problem
-
-`Court` drives more than it appears to. **`Court Name`, `County` and `RIAC Region` are all
-lookups through it** — verified 10 Aug 2026 — so the court is the only thing that decides
-which RIAC a case belongs to. Nothing else on the case carries that information.
-
-With inline creation left on, a user who types a court name that does not quite match an
-existing record will **mint a brand-new Court record** rather than picking the real one. That
-new court has no county attached, so the case silently loses its county *and* its region, and
-looks like it belongs to no RIAC at all. **The API cannot delete the invented court.**
-
-This is the same trap that the intake form's Agencies picker was deliberately protected
-against — see "The intake form: office as a picker" in `AIRTABLE.md`. The same reasoning
-applies here, and more sharply, because a wrong court misroutes the case rather than merely
-mislabelling it.
-
-**Not urgent on the data as it stands:** every case in the base currently has a court
-(checked 10 Aug 2026), so nothing is broken today. What is missing is the ability to correct
-one that is wrong.
+- Clicking a court will open a **Courts record detail page**, which does not exist yet — so
+  expect to choose which fields it shows. `Name`, `Address & Contact`, `Website`,
+  `Judicial District` and `County` are the useful ones.
+- **Editing a court from there changes it for every case linked to that court.** That is
+  correct — court contact details genuinely are shared — but it is the same scope rule as
+  agencies, and worth knowing before anyone corrects an address.
 
 ### ⚠️ Nine court names are shared by two courts each — and eight cross RIAC regions
 

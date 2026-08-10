@@ -888,27 +888,37 @@ Two of those matter more than the rest:
 **The general lesson: adding a field to a record page is only half the job.** If inline
 editing is off, a field that must be filled in is still unfillable.
 
-### Editability is per field, per page — and the API can prove it
+### ⚠️ `isEditable` from the API does NOT mean a linked field can be re-linked
 
-Worth knowing before anyone concludes "Airtable will not let you edit that kind of field",
-which is the natural assumption and is wrong. Established 10 August 2026 while diagnosing why
-`Court` could not be changed on a case:
+**This cost a wrong diagnosis on 10 August 2026 and will cost another if it is not written
+down.** `list_pages_for_base` reports an `isEditable` flag per field per page. For ordinary
+fields it means what it says. **For linked-record fields on a list or record page it does
+not.**
 
-- **The same field can be editable on one page and locked on another.** `County` on Pending
-  Intakes is editable in the Needs Review grid and not editable on the Pending Intakes page.
-- **Two fields of the same type on one page can disagree.** On the case record-detail page,
-  `Client Code` is editable while `Court` is not — both linked-record fields.
+`Court` on the Case Viewer reports `isEditable: false`, and on that basis it was diagnosed as
+a forgotten toggle needing a Publish. It was neither. Tested by hand in the published
+interface: the court **can** be changed. It just does not work the way a picker does — you
+click the **×** on the court's card to unlink it, which leaves a **+ Add record** button, and
+that opens the searchable list. Clunky, but fully functional, and it had been working all
+along.
 
-So a locked field is nearly always a setting nobody switched on, not a limitation. The
-exception is genuinely computed fields — **lookups, formulas and rollups can never be edited
-anywhere**, and that is the one case where no toggle exists to find. Whenever `isEditable` is
-false on a field that is none of those three, suspect the toggle.
+Every linked-record field on every list page in this base reports `false` — `Court`,
+`Attorney`, `Attorney's Office`, `Client Code`, `Case Charges`, `Case Parties`. That is a
+description of how the API renders list pages, not a statement about permissions.
 
-`list_pages_for_base` reports `isEditable` per field per page, so this can be checked from
-outside the designer. What it **cannot** see is whether a linked field is drawn as a *field*
-or as a *linked-record list element* — the latter cannot re-link no matter what, so if a
-field appears to have no editing option at all, that is the likely reason. That distinction
-has to be checked by eye.
+**So: never conclude a linked-record field is locked from the API.** The only reliable test
+is to open the published interface and try it. What the flag *is* still good for is genuinely
+computed fields — **lookups, formulas and rollups can never be edited anywhere**, and there
+the `false` is real and no toggle exists to find.
+
+Two toggles do exist on such a field, and they are separate things:
+
+| Toggle | Controls |
+|---|---|
+| **Link / unlink records** | Whether the × and **+ Add record** appear at all — i.e. whether the link can be changed |
+| **Click into record details** | Whether clicking the card opens the linked record to read it |
+
+The second being off is why a court could be swapped but not inspected.
 
 ### Nine court names were shared by two courts each — fixed 10 August 2026
 
@@ -938,11 +948,18 @@ written for Courts, it must leave `Name` alone on these records** — the same c
 case. Nothing else on the case records the region. Two consequences:
 
 - Correcting a case's court corrects all three at once, which is the design working.
-- **Any picker that writes `Court` must have inline record creation turned off.** A typo that
-  mints a new court gives that case a court with no county, so it silently belongs to no
+- **Any picker that writes `Court` must not allow inline record creation.** A typo that mints
+  a new court would give that case a court with no county, so it would silently belong to no
   region — and the API cannot delete the invented record. Same trap as the intake form's
   Agencies picker, with worse consequences, because this misroutes the case rather than
   mislabelling it.
+
+**The Case Viewer is safe on that count — tested 10 August 2026.** Typing a name that matches
+no court simply returns nothing; it does not offer to create one. The relevant setting is the
+**"Add records through a form"** toggle on the field, which is off. Note that this is a
+*different* toggle from "Link / unlink records" — the record-selection gear beside the latter
+offers only `All records` / `Specific records` and has no creation option at all, so that is
+not where to look for it.
 
 ## Which office: a fact about a case, not about a person
 
