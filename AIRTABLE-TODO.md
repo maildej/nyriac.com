@@ -418,9 +418,12 @@ Both link fields are deliberately blank for the six articles with no CJI page at
 (179, 185, 241, 242, 275, 280). The reasoning and the full breakdown are in `AIRTABLE.md`
 under "Jury instruction links".
 
-**All three are already on Case Charges as lookups**, so nothing needs building first —
-this is placement work only. `CJI Match` arrives as a coloured single-select chip rather
-than plain text, so it reads as a caption without any styling effort.
+**The VTL has its own set** — `VTL CJI Link`, `VTL CJI Article Page`, `VTL CJI Match` —
+so a VTL charge gets the same treatment. 30 of the 36 VTL offences have an instruction.
+
+**All six are already on Case Charges as lookups**, so nothing needs building first —
+this is placement work only. Both `CJI Match` fields arrive as coloured single-select
+chips rather than plain text, so they read as captions without any styling effort.
 
 **Overlaps two other items — do them together.** Item 9 puts the Senate and CJI links on the
 charge popup, and item 12 builds the crime viewer; both are the places these links belong.
