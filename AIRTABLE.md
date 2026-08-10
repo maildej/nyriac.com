@@ -342,9 +342,9 @@ Once an Outlook account is connected, the "Send the chaser" step should be swapp
 the Microsoft Outlook send action so mail comes from the real RIAC address. Noted in the
 automation's own description.
 
-**4. A dead field.** `CrimeTime` on NY VTL Offenses is disabled and safe to delete —
-CrimeTime covers Penal Law sentencing only. The API cannot delete fields, so it needs
-doing by hand.
+**4. ~~A dead field~~ — RESOLVED, deleted 10 August 2026.** `CrimeTime` on NY VTL Offenses
+was disabled — CrimeTime covers Penal Law sentencing only — and Dan deleted it by hand.
+The Penal Law `CrimeTime` field is untouched and still working.
 
 **5. Naming drift.** Several field descriptions refer to "the All Cases page". The page
 is now called **Find a Case**.
@@ -415,11 +415,13 @@ Fields added to **Case Charges** (already done):
 | `Classification (from catalogue)` | Lookup | Class of the completed Penal Law offence. |
 | `Attempt Class (from catalogue)` | Lookup | What the class becomes on an attempt. |
 | `Statutory Text (from catalogue)` | Lookup | Verbatim text, readable on the case. |
-| `NY Senate Link`, `CJI Link` | Lookup | Source links. `CJI Link` is the specific jury instruction — see "Jury instruction links" below, there is a second link worth showing beside it. |
+| `NY Senate Link`, `CJI Link` | Lookup | Source links. `CJI Link` is the specific jury instruction. |
+| `CJI Article Page`, `CJI Match` | Lookup | The other half of the jury-instruction picture — the article page to fall back on, and how good the direct link is. `CJI Match` arrives as a coloured chip. See "Jury instruction links" below; show all three together. |
 | `VTL Classification (from catalogue)` | Lookup | Class of the linked VTL offence. |
 | `VTL Statutory Text (from catalogue)` | Lookup | Verbatim VTL text. |
 | `VTL Sentencing (from catalogue)` | Lookup | Sentencing exposure at the prior-conviction tier picked. |
-| `VTL Source Link` | Lookup | NY Senate link. There is no CJI equivalent for VTL. |
+| `VTL Source Link` | Lookup | NY Senate link. |
+| `VTL CJI Link`, `VTL CJI Article Page`, `VTL CJI Match` | Lookup | The VTL jury-instruction set, mirroring the Penal Law fields. See "Jury instruction links" below. |
 | `VTL Practice Note (from catalogue)` | Lookup | Points not part of the offence definition, e.g. VTL 1192(12) notation duties. |
 
 VTL entries carry **no attempt class**, so ticking `Attempted?` on a VTL charge falls
@@ -464,6 +466,31 @@ Two facts to save re-discovering, if these ever need rebuilding:
 
 **Article 130 exists in two versions**, pre and post 1 September 2024, on separate pages.
 The links stored are the current (post-9/1/24) set.
+
+#### The VTL has jury instructions too
+
+An earlier note in this file said there was no CJI equivalent for the VTL. **That was
+wrong** — the CJI has a "Vehicle & Traffic Law" section, and **NY VTL Offenses** now
+carries the same three fields as the Penal Law catalogue:
+
+| | |
+|---|---|
+| `CJI Link` | 30 of the 36 records. |
+| `CJI Article Page` | Formula. **One page for the entire VTL**, not one per article as with the Penal Law, so the value is the same on every record. |
+| `CJI Match` | Exact subdivision 28 · Broader document 2 · Not listed 6. |
+
+Two things specific to the VTL:
+
+- **The instruction is about the elements of the offence, not the sentence**, so every
+  prior-conviction tier of a subdivision shares one document. All five tiers of 1192(2)
+  point at the same PDF, which is correct — the tier changes the grade, not the elements.
+- **The six unmatched records are genuinely absent from the CJI**, not a matching failure:
+  1192(5) and 1192(6) (commercial-vehicle DWI) and 1192-a (zero tolerance, under 21).
+  Two more are "Broader document" — the table holds 511(2)(a) and 511(3)(a), while the
+  CJI splits each into `(i)` and `(ii)`, so the link goes to the `(i)` instruction.
+
+Note this is **not** the same situation as `CrimeTime`, which really is Penal Law only.
+The dead VTL `CrimeTime` field was deleted on 10 August 2026.
 
 **Deliberately not done with an automation.** An automation could fill `Charge` when it
 is empty, but that is the same two-fields-that-can-disagree pattern that produced the

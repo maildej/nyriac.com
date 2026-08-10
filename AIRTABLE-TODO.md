@@ -244,10 +244,10 @@ work. One catch: **a true button field cannot be created through the API** — i
 and CJI links must be buttons rather than clickable URLs, Dan makes those by hand, the same
 way `Look up on EOIR` was made.
 
-**(c) needs revisiting — there are now two CJI links, not one.** Item 20 explains why both
-matter, plus the `CJI Match` caption that says how good the match is. Only `CJI Link` is
-currently pulled through onto Case Charges, so `CJI Article Page` and `CJI Match` need lookups
-adding first — that part is **[Claude]** and quick.
+**(c) covers two CJI links, not one.** Item 20 explains why both matter, plus the
+`CJI Match` caption that says how good the match is. The lookups now exist on Case Charges
+— `CJI Link`, `CJI Article Page` and `CJI Match` — so all three can be placed straight onto
+the popup. `CJI Match` comes through as a coloured chip, not plain text.
 
 ## 10. Make the EOIR check reachable from the case  **[Dan]**
 
@@ -497,7 +497,7 @@ The API cannot delete fields. Each of these is safe — every case now carries i
       **NEVER convert this field to a linked record.** Airtable would create a new agency for
       every value it cannot match — including "Test Submission Two - Genesee PD (test)" — and
       the API cannot delete them
-- [ ] `CrimeTime` on **NY VTL Offenses** — dead field; CrimeTime covers Penal Law only
+- [x] ~~`CrimeTime` on **NY VTL Offenses**~~ — done 10 Aug 2026
 
 ## 17. Check the attorney popup  **[Dan]**
 
@@ -533,6 +533,13 @@ Every Penal Law offence now carries **two** CJI links, and they do different job
 Both link fields are deliberately blank for the six articles with no CJI page at all
 (179, 185, 241, 242, 275, 280). The reasoning and the full breakdown are in `AIRTABLE.md`
 under "Jury instruction links".
+
+**The VTL has its own set** — `VTL CJI Link`, `VTL CJI Article Page`, `VTL CJI Match` —
+so a VTL charge gets the same treatment. 30 of the 36 VTL offences have an instruction.
+
+**All six are already on Case Charges as lookups**, so nothing needs building first —
+this is placement work only. Both `CJI Match` fields arrive as coloured single-select
+chips rather than plain text, so they read as captions without any styling effort.
 
 **Overlaps two other items — do them together.** Item 9 puts the Senate and CJI links on the
 charge popup, and item 12 builds the crime viewer; both are the places these links belong.
