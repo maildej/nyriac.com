@@ -12,7 +12,7 @@ It is a map, not a manual. The detailed reasoning for individual fields lives in
 descriptions are unusually full and are the primary documentation; this file exists to
 tell you where to look and to record the things a field description cannot say.
 
-Last verified against the live base: **8 August 2026.**
+Last verified against the live base: **10 August 2026.**
 
 ---
 
@@ -82,14 +82,15 @@ another. That separation is what makes the conflict check possible.
 | **Monthly Reminders** | List | Review the chasers before they go out. |
 | **Run Monthly Reminders** | List | The two buttons on the Reminder Control record. |
 | **EOIR Checks** | List | Backstop only — people with an A-Number nobody has looked up yet. See "EOIR checks" below. |
+| **Reminder Queue** | Dashboard | The four-rung chaser system: cases needing a chase, a tick to approve each, and the button that sends them. See gap 8. |
 
-Two pop-up forms: **Add a Charge** and **Add Case Note**.
+Two pop-up forms: **Add A New Charge** and **Add Case Note**.
 
 ---
 
 ## The automations
 
-All six are deployed and valid.
+All seven are deployed and valid. **Two of them send real email** — see gap 8.
 
 | Automation | Fires when | Does |
 |---|---|---|
@@ -98,6 +99,7 @@ All six are deployed and valid.
 | **2. Attach Case Note to its case** | A note has a case number in its subject but no case | Finds the case and links it. Failing to match is harmless — the note lands in Needs Review. |
 | **Monthly reminders 1 – Generate the list** | "Generate this month's list" ticked | Builds the batch and drafts each email. **Sends nothing.** |
 | **Monthly reminders 2 – Send the reminders** | "Send the reminders" ticked | **Actually emails attorneys. No undo.** |
+| **Send approved reminders** | "Send approved reminders" ticked | The four-rung system behind the Reminder Queue page: first chaser, second chaser, final warning, then a closing notice that also closes the case as "No Atty Response". **Actually emails attorneys. No undo.** Reads its reply-to and BCC addresses from the Reminder Control record. |
 | **Stamp EOIR check date** | EOIR Result changed on a person | Writes today's date into EOIR Last Checked. |
 
 ### Changing behaviour without touching an automation
@@ -789,10 +791,10 @@ in reality — it reads cleanly. Not worth engineering around.
 The API cannot delete fields, so these are by hand. Order matters, because each depends on
 the next:
 
-1. On the Case Viewer, display **`Attorney's Office`** instead of `Office on This Case`
-2. Delete **`Office on This Case`** (case table)
-3. Delete **`Attorney's Usual Office`** (case table)
-4. Delete **`Affiliation`** (Attorneys & Requestors)
+1. ~~On the Case Viewer, display **`Attorney's Office`** instead of `Office on This Case`~~ — **done**
+2. ~~Delete **`Office on This Case`** (case table)~~ — **done**
+3. ~~Delete **`Attorney's Usual Office`** (case table)~~ — **done**
+4. Delete **`Affiliation`** (Attorneys & Requestors) — **still outstanding**, tracked in `AIRTABLE-TODO.md`
 
 Every case already carries its own office, so nothing is lost at step 4.
 
@@ -834,9 +836,15 @@ with a formula instead, which has the advantage that it cannot drift:
 
 | Field | Role |
 |---|---|
-| `Attorney's Usual Office` | Lookup. The attorney's affiliation from their own record. |
-| `Attorney's Office (this case)` | The **override box**. Filled in by hand only when a panel attorney is acting for a different office than usual. Empty on almost every case. |
-| **`Office on This Case`** | Formula. Reads the override if set, otherwise the usual office. **This is the one to display.** |
+| ~~`Attorney's Usual Office`~~ | Lookup of the attorney's affiliation from their own record. **Deleted.** |
+| ~~`Attorney's Office (this case)`~~ | The override box. **Renamed `Attorney's Office`** — the single field that survives. |
+| ~~`Office on This Case`~~ | Formula reading the override if set, otherwise the usual office. **Deleted.** |
+
+**As built, this collapsed to one field.** The case table now carries only
+**`Attorney's Office`**, filled in per case — which is simpler than the design above and
+says the same thing, because every case records its own office anyway. The paragraph below
+explains why the formula approach was chosen at the time; it is kept because the reasoning
+still applies if a default-from-the-attorney is ever wanted again.
 
 So the right office always shows without anyone filling anything in, and setting the
 override changes it for that case alone. The alternative — an automation stamping the usual
