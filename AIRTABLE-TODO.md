@@ -460,11 +460,49 @@ anyway** — the reason for wanting it is the fraud analysis, not the grade.
   ever reworded. Whatever is built must treat "no grade declared in-section" as a flag, not
   as a default to infraction.
 
-**The one thing needing Dan:** the list of sections that declare no grade of their own. Each
-is either a genuine infraction or a 1192 — a serious offence whose penalty lives elsewhere —
-and the text cannot tell those apart. Claude generates the list; Dan answers crime or
-infraction, and names the penalty section where it is a crime. Should be a few dozen, not
-hundreds.
+### Progress, 10 Aug 2026 — first pass done
+
+**54 candidate crime sections found**, out of 981 sections in the VTL. Files in the
+Database Design folder:
+
+| File | What it is |
+|---|---|
+| `fetch_vtl.py` | Pulls the whole VTL with text from the Senate API in one call. Needs `NYSENATE_API_KEY`. |
+| `scan_vtl_crimes.py` | Finds every provision graded as a crime, locally or from another section. |
+| `vtl-crimes-candidates-2026-08-10.csv` | The 54, with the grade and the sentence that proves it. |
+
+**All of Dan's fraud interests came through**: 392 (false statements and altered records),
+392-A (stolen, false or fraudulent plates and registrations), 403 (number plates), 421
+(altered vehicle ID numbers), 426 (false statements, stolen vehicles), 429 (junk and
+salvage), 2130 (offences relating to certificates of title).
+
+The scan was regression-checked **both ways** — 17 known crimes must appear, and the
+known false positives must not. Both held.
+
+**Two bugs worth remembering, because both failed silently:**
+
+- **The API escapes its line breaks** as literal `\n` characters, so `\s+` does not collapse
+  them and any phrase straddling one is invisible. This hid reckless driving and about a
+  third of the crimes. Written up in `AIRTABLE.md`.
+- **Blunt exclusion windows cut both ways.** Checking 200 characters for negation dropped
+  reckless driving; not checking at all pulled in every red-light-camera owner-liability
+  section, which the statute expressly says are *not* crimes. Negation has to be adjacent to
+  the grade; hypothetical wording ("would, if occurring in this state, constitute a
+  misdemeanor") can be matched anywhere in the sentence.
+
+### Still to do
+
+- [ ] **Decompose to subdivision level.** The 54 are *sections*. VTL 375 is 114,000
+      characters and mostly infractions, with only particular subdivisions criminal — so a
+      section-level row would be wrong. This is the bulk of the remaining work.
+- [ ] **[Dan]** **Look over the 54 for anything obviously wrong**, in either direction. A
+      few want a legal eye rather than a parser: 1170 (obedience to railroad signal) comes
+      out as a class E felony, and 201 (custody of records), 207 (uniform traffic summons)
+      and 1194 (arrest and testing) are all worth a glance.
+- [ ] **[Dan]** Send the specific fraud list, as a cross-check that nothing is missing.
+- [ ] **[Claude]** Build the records once the above settles, following the existing
+      `catalogue_vtl.py` shape — and note that script currently cannot run at all, see the
+      Citation-became-a-formula problem.
 
 **Escalation tiers stay Dan's**, as with 1192. Nothing in the statutory text models "one
 prior conviction within ten years"; that is legal judgment and was hand-built last time.

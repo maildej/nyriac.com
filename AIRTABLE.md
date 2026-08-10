@@ -748,6 +748,13 @@ established by sampling 15 sections on 10 August 2026:
 - **Only declaratory phrasing counts.** "shall be a misdemeanor", "shall constitute",
   "shall be punishable as", "guilty of a class E felony" — never the bare word.
 
+**⚠ The Open Legislation API escapes its line breaks.** Section text comes back with the
+two characters `\` and `n` where a line break belongs, **not** a real newline. So
+`re.sub(r'\s+', ' ', text)` does not collapse them, and any phrase straddling a line break
+is invisible to a regex — `shall be\nguilty of a misdemeanor` simply never matches. This
+silently hid reckless driving (1212) and a third of the VTL crimes until it was spotted.
+**Always `text.replace('\\n', ' ')` before matching anything.**
+
 **The trap, worth knowing before anyone tries this:** the words "misdemeanor or felony"
 appear in **1192** exactly twice, both inside the passage about *out-of-state* prior
 convictions. Neither grades anything; 1192's grades live in **1193**. So a rule keying on
