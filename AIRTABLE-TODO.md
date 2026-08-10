@@ -381,7 +381,7 @@ The API cannot delete fields. Each of these is safe — every case now carries i
       **NEVER convert this field to a linked record.** Airtable would create a new agency for
       every value it cannot match — including "Test Submission Two - Genesee PD (test)" — and
       the API cannot delete them
-- [ ] `CrimeTime` on **NY VTL Offenses** — dead field; CrimeTime covers Penal Law only
+- [x] ~~`CrimeTime` on **NY VTL Offenses**~~ — done 10 Aug 2026
 
 ## 17. Check the attorney popup  **[Dan]**
 

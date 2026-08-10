@@ -342,9 +342,9 @@ Once an Outlook account is connected, the "Send the chaser" step should be swapp
 the Microsoft Outlook send action so mail comes from the real RIAC address. Noted in the
 automation's own description.
 
-**4. A dead field.** `CrimeTime` on NY VTL Offenses is disabled and safe to delete —
-CrimeTime covers Penal Law sentencing only. The API cannot delete fields, so it needs
-doing by hand.
+**4. ~~A dead field~~ — RESOLVED, deleted 10 August 2026.** `CrimeTime` on NY VTL Offenses
+was disabled — CrimeTime covers Penal Law sentencing only — and Dan deleted it by hand.
+The Penal Law `CrimeTime` field is untouched and still working.
 
 **5. Naming drift.** Several field descriptions refer to "the All Cases page". The page
 is now called **Find a Case**.
@@ -489,8 +489,8 @@ Two things specific to the VTL:
   Two more are "Broader document" — the table holds 511(2)(a) and 511(3)(a), while the
   CJI splits each into `(i)` and `(ii)`, so the link goes to the `(i)` instruction.
 
-Note this is **not** the same situation as `CrimeTime`, which really is Penal Law only —
-that dead VTL field is still safe to delete.
+Note this is **not** the same situation as `CrimeTime`, which really is Penal Law only.
+The dead VTL `CrimeTime` field was deleted on 10 August 2026.
 
 **Deliberately not done with an automation.** An automation could fill `Charge` when it
 is empty, but that is the same two-fields-that-can-disagree pattern that produced the
