@@ -861,6 +861,40 @@ Two of those matter more than the rest:
 **The general lesson: adding a field to a record page is only half the job.** If inline
 editing is off, a field that must be filled in is still unfillable.
 
+### Editability is per field, per page — and the API can prove it
+
+Worth knowing before anyone concludes "Airtable will not let you edit that kind of field",
+which is the natural assumption and is wrong. Established 10 August 2026 while diagnosing why
+`Court` could not be changed on a case:
+
+- **The same field can be editable on one page and locked on another.** `County` on Pending
+  Intakes is editable in the Needs Review grid and not editable on the Pending Intakes page.
+- **Two fields of the same type on one page can disagree.** On the case record-detail page,
+  `Client Code` is editable while `Court` is not — both linked-record fields.
+
+So a locked field is nearly always a setting nobody switched on, not a limitation. The
+exception is genuinely computed fields — **lookups, formulas and rollups can never be edited
+anywhere**, and that is the one case where no toggle exists to find. Whenever `isEditable` is
+false on a field that is none of those three, suspect the toggle.
+
+`list_pages_for_base` reports `isEditable` per field per page, so this can be checked from
+outside the designer. What it **cannot** see is whether a linked field is drawn as a *field*
+or as a *linked-record list element* — the latter cannot re-link no matter what, so if a
+field appears to have no editing option at all, that is the likely reason. That distinction
+has to be checked by eye.
+
+### The court decides which RIAC a case belongs to
+
+`Court Name`, `County` and `RIAC Region` are **all lookups through the `Court` link** on the
+case. Nothing else on the case records the region. Two consequences:
+
+- Correcting a case's court corrects all three at once, which is the design working.
+- **Any picker that writes `Court` must have inline record creation turned off.** A typo that
+  mints a new court gives that case a court with no county, so it silently belongs to no
+  region — and the API cannot delete the invented record. Same trap as the intake form's
+  Agencies picker, with worse consequences, because this misroutes the case rather than
+  mislabelling it.
+
 ## Which office: a fact about a case, not about a person
 
 **An attorney has no office in this database.** The office is recorded on the case, and
