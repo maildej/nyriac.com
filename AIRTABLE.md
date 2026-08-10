@@ -415,7 +415,8 @@ Fields added to **Case Charges** (already done):
 | `Classification (from catalogue)` | Lookup | Class of the completed Penal Law offence. |
 | `Attempt Class (from catalogue)` | Lookup | What the class becomes on an attempt. |
 | `Statutory Text (from catalogue)` | Lookup | Verbatim text, readable on the case. |
-| `NY Senate Link`, `CJI Link` | Lookup | Source links. `CJI Link` is the specific jury instruction — see "Jury instruction links" below, there is a second link worth showing beside it. |
+| `NY Senate Link`, `CJI Link` | Lookup | Source links. `CJI Link` is the specific jury instruction. |
+| `CJI Article Page`, `CJI Match` | Lookup | The other half of the jury-instruction picture — the article page to fall back on, and how good the direct link is. `CJI Match` arrives as a coloured chip. See "Jury instruction links" below; show all three together. |
 | `VTL Classification (from catalogue)` | Lookup | Class of the linked VTL offence. |
 | `VTL Statutory Text (from catalogue)` | Lookup | Verbatim VTL text. |
 | `VTL Sentencing (from catalogue)` | Lookup | Sentencing exposure at the prior-conviction tier picked. |

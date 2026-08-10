@@ -244,10 +244,10 @@ work. One catch: **a true button field cannot be created through the API** — i
 and CJI links must be buttons rather than clickable URLs, Dan makes those by hand, the same
 way `Look up on EOIR` was made.
 
-**(c) needs revisiting — there are now two CJI links, not one.** Item 20 explains why both
-matter, plus the `CJI Match` caption that says how good the match is. Only `CJI Link` is
-currently pulled through onto Case Charges, so `CJI Article Page` and `CJI Match` need lookups
-adding first — that part is **[Claude]** and quick.
+**(c) covers two CJI links, not one.** Item 20 explains why both matter, plus the
+`CJI Match` caption that says how good the match is. The lookups now exist on Case Charges
+— `CJI Link`, `CJI Article Page` and `CJI Match` — so all three can be placed straight onto
+the popup. `CJI Match` comes through as a coloured chip, not plain text.
 
 ## 10. Make the EOIR check reachable from the case  **[Dan]**
 
@@ -417,6 +417,10 @@ Every Penal Law offence now carries **two** CJI links, and they do different job
 Both link fields are deliberately blank for the six articles with no CJI page at all
 (179, 185, 241, 242, 275, 280). The reasoning and the full breakdown are in `AIRTABLE.md`
 under "Jury instruction links".
+
+**All three are already on Case Charges as lookups**, so nothing needs building first —
+this is placement work only. `CJI Match` arrives as a coloured single-select chip rather
+than plain text, so it reads as a caption without any styling effort.
 
 **Overlaps two other items — do them together.** Item 9 puts the Senate and CJI links on the
 charge popup, and item 12 builds the crime viewer; both are the places these links belong.
