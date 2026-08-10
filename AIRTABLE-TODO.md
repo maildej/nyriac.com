@@ -308,6 +308,31 @@ element* rather than as a field. That element shows related records and cannot r
 The fix is then to add `Court` as a **field** instead of, or alongside, that element. The API
 cannot see which of the two is in use, so this has to be checked by eye.
 
+### What the designer actually showed, 10 Aug 2026
+
+Checked on screen, because two of the guesses above were wrong:
+
+- **`Court` is shown as a Field, not a View.** Appearance → Show as → `Field` is selected, so
+  there is no linked-record list element to swap out. That worry does not apply.
+- **"Link / unlink records" is already ON** in the draft. The API still reports the field as
+  locked because **it only ever sees published layouts** — so this is a pending change waiting
+  on a Publish, not a missing setting.
+- **The gear beside it offers only `All records` / `Specific records`** — which existing courts
+  a user may pick from. **There is no "allow creating new records" option in that panel**,
+  contrary to what was assumed below. Leave it on `All records`: "Specific records" would
+  narrow the list, but there is nothing on a case to narrow it *by*, since the county comes
+  *from* the court and the filter would be circular.
+
+**Still to confirm at runtime:** whether the picker offers to create a court when a user types
+a name that matches nothing. Ten-second test — click into `Court` in preview, type nonsense,
+and see whether it offers to create it or simply finds nothing. If it offers, the warning
+below is live and needs somewhere to be turned off; if it only filters, the risk does not
+arise on this element.
+
+**Publishing is all-or-nothing.** As of 10 Aug 2026 the interface has other pending drafts —
+**All Cases**, **Cases by request date** and **Cases by next date** exist in the designer but
+are not published, and look like work towards item 14. A Publish pushes those live too.
+
 ### ⚠️ Turn off inline record creation, or this fix creates a worse problem
 
 `Court` drives more than it appears to. **`Court Name`, `County` and `RIAC Region` are all
@@ -327,6 +352,38 @@ mislabelling it.
 **Not urgent on the data as it stands:** every case in the base currently has a court
 (checked 10 Aug 2026), so nothing is broken today. What is missing is the ability to correct
 one that is wrong.
+
+### ⚠️ Nine court names are shared by two courts each — and eight cross RIAC regions
+
+Found 10 Aug 2026 while checking the picker is usable. The Courts primary field is `Name`, so
+the picker searches court names, and **1,542 of the 1,551 names are unique** — fine. The
+other nine are not, and New York really does have two of each:
+
+| Name | One is in | The other is in |
+|---|---|---|
+| Chester Town Court | Orange (**R4**) | Warren (**R3**) |
+| Lewis Town Court | Essex (**R3**) | Lewis (**R2**) |
+| Fremont Town Court | Sullivan (**R4**) | Steuben (**R1**) |
+| Dickinson Town Court | Franklin (**R3**) | Broome (**R2**) |
+| Ashland Town Court | Greene (**R4**) | Chemung (**R2**) |
+| Franklin Town Court | Franklin (**R3**) | Delaware (**R2**) |
+| Brighton Town Court | Franklin (**R3**) | Monroe (**R1**) |
+| Albion Town Court | Orleans (**R1**) | Oswego (**R2**) |
+| Greenville Town Court | Greene (R4) | Orange (R4) |
+
+**Eight of the nine straddle two different RIAC regions.** Since county and region are both
+lookups through the court, picking the wrong one of a pair does not merely mislabel the case —
+it files it with the wrong centre. And the two entries are *indistinguishable in the picker*,
+because a picker shows the primary field and nothing else. This is the Parties same-name
+problem exactly, which was solved there by putting the date of birth into the primary field.
+
+**Suggested fix — 18 records, no field-type change, reversible:** rename only the duplicated
+ones to carry their county, e.g. `Chester Town Court (Orange County)`. `Name` is plain text,
+so Claude can do this through the API; the other 1,533 courts are left alone. The alternative —
+making `Name` a formula that appends the county to every court — is tidier in principle but
+needs a hand conversion, lengthens all 1,551 names, and solves a problem only 18 of them have.
+
+**Not yet done — awaiting Dan's say-so on the wording.**
 
 ## 12. A crime viewer  **[Claude]**
 
