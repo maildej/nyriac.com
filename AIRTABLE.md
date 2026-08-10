@@ -734,6 +734,28 @@ So the next full run of `catalogue_penal_law.py` will *add* `265.07(1)`, `265.07
 Nothing breaks, but **those two sections want a look afterwards and the stale rows
 deleting**. Everything else in the catalogue still lines up exactly.
 
+### Reading a classification out of the VTL is not like the Penal Law
+
+The Penal Law states the grade at the end of every offence. **The VTL does not.** Its rule is
+different: the default is a traffic infraction, and anything that is a crime says so
+explicitly somewhere in the text. That is still machine-readable, with two conditions
+established by sampling 15 sections on 10 August 2026:
+
+- **Subdivision level, not section level.** VTL 375 runs to 114,000 characters, mostly
+  infractions, with individual subdivisions carrying misdemeanours. The statute scopes its
+  own declarations — "a violation of *this subdivision* shall be a misdemeanor" — so they
+  can be attributed to the right branch.
+- **Only declaratory phrasing counts.** "shall be a misdemeanor", "shall constitute",
+  "shall be punishable as", "guilty of a class E felony" — never the bare word.
+
+**The trap, worth knowing before anyone tries this:** the words "misdemeanor or felony"
+appear in **1192** exactly twice, both inside the passage about *out-of-state* prior
+convictions. Neither grades anything; 1192's grades live in **1193**. So a rule keying on
+bare mentions gets 1192 right by accident, and would silently classify the single most
+important offence in the catalogue as a traffic infraction if that incidental wording ever
+changed. **Treat "no grade declared in this section" as a flag for review, never as a
+default to infraction.**
+
 ### Neither catalogue has been re-run since the scripts were repointed
 
 The repoint was 10 August 2026, so both points above are **untested against a real load**.
