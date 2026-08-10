@@ -490,11 +490,42 @@ known false positives must not. Both held.
   the grade; hypothetical wording ("would, if occurring in this state, constitute a
   misdemeanor") can be matched anywhere in the sentence.
 
+### Subdivision decomposition, 10 Aug 2026 — done, with caveats
+
+**113 criminal provisions across 57 sections**, in
+`vtl-crime-provisions-2026-08-10.csv` (built by `scan_vtl_subdivisions.py`). Each row is
+section + subdivision + paragraph + grade, with the sentence that proves it and a `basis`
+column saying *how* it was attributed.
+
+**It reproduces the hand-built catalogue exactly**, which is the reason to trust it:
+
+- All 8 criminal subdivisions of 1192 found, with their misdemeanour and felony tiers
+- **1192(5) and 1192-a correctly excluded** — Dan graded them traffic infraction and
+  non-criminal respectively, and the scan independently agrees
+- 511 comes out as AUO 3rd and 2nd misdemeanours and AUO 1st a class E felony
+
+**Three scoping bugs found on the way, all silent:**
+
+- Structural markers vs cross-references — "pursuant to paragraph (a) of this subdivision"
+  is not the start of paragraph (a). Treating it as one mis-attributed s.375.
+- **Context must stop at the sentence boundary.** Looking further back picks up the previous
+  sentence's cross-references, which is how "…of section five hundred ten of this chapter.
+  (b) Aggravated unlicensed operation … is a misdemeanor" was attributed to s.510 rather
+  than s.511, losing two of the three AUO offences.
+- Enclosing structure is meaningless for a remote target. When 1193 grades 1192, the
+  surrounding subdivisions belong to 1193 — using them invented 1192 subdivisions that
+  do not exist.
+
 ### Still to do
 
-- [ ] **Decompose to subdivision level.** The 54 are *sections*. VTL 375 is 114,000
-      characters and mostly infractions, with only particular subdivisions criminal — so a
-      section-level row would be wrong. This is the bulk of the remaining work.
+- [ ] **[Dan]** **30 rows want a legal eye**, marked in the `basis` column. Six are
+      `REVIEW - remote, scope unclear` — 1193 grading "any such subdivision" of 1192 by
+      back-reference, which no parser can resolve. The rest are `whole section`, where the
+      declaration named no branch.
+- [ ] **The paragraph letter is where the grade sits, not where the offence is defined.**
+      511 is the pattern: paragraph (a) defines the offence, paragraph (b) grades it, and
+      the scan reports (b). Dan's catalogue cites (a). Decide which convention the records
+      should use before building them — probably (a), to match what is already there.
 - [ ] **[Dan]** **Look over the 54 for anything obviously wrong**, in either direction. A
       few want a legal eye rather than a parser: 1170 (obedience to railroad signal) comes
       out as a class E felony, and 201 (custody of records), 207 (uniform traffic summons)
