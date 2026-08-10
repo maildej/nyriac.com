@@ -377,13 +377,29 @@ it files it with the wrong centre. And the two entries are *indistinguishable in
 because a picker shows the primary field and nothing else. This is the Parties same-name
 problem exactly, which was solved there by putting the date of birth into the primary field.
 
-**Suggested fix — 18 records, no field-type change, reversible:** rename only the duplicated
-ones to carry their county, e.g. `Chester Town Court (Orange County)`. `Name` is plain text,
-so Claude can do this through the API; the other 1,533 courts are left alone. The alternative —
-making `Name` a formula that appends the county to every court — is tidier in principle but
-needs a hand conversion, lengthens all 1,551 names, and solves a problem only 18 of them have.
+**DONE, 10 August 2026.** The 18 affected records were renamed to name both counties — the
+one they are in, and the one they are not:
 
-**Not yet done — awaiting Dan's say-so on the wording.**
+> `Chester Town Court (ORANGE COUNTY, NOT Warren County)`
+> `Chester Town Court (WARREN COUNTY, NOT Orange County)`
+
+Dan's wording, and better than the obvious `(Orange County)`: it **fails safe**. Someone
+skim-reading a picker sees the county they are trying to avoid as well as the one they want,
+so the near-miss is caught by the same glance that would otherwise cause it.
+
+Only those 18 were touched; the other 1,533 courts are untouched. Verified afterwards: all
+1,551 names are now distinct, none blank, and **none of the 18 was linked to a case**, so no
+existing case's `Court Name`, `County` or `RIAC Region` changed.
+
+**Why renaming rather than a formula.** `Name` is plain text, so the API could do this
+directly with no field-type conversion and no work for Dan. Converting `Name` to a formula
+that appends the county to every court is tidier in principle, but needs a hand conversion,
+lengthens all 1,551 names, and would solve for 1,551 records a problem that 18 of them have.
+
+**If courts are ever reloaded from a script, these 18 names will be overwritten.** No such
+script exists today — the loaders cover the Penal Law and VTL catalogues only — but if one is
+ever written, it needs to leave `Name` alone on these records, the same care the VTL
+`Short Name` column needs.
 
 ## 12. A crime viewer  **[Claude]**
 

@@ -883,6 +883,28 @@ or as a *linked-record list element* — the latter cannot re-link no matter wha
 field appears to have no editing option at all, that is the likely reason. That distinction
 has to be checked by eye.
 
+### Nine court names were shared by two courts each — fixed 10 August 2026
+
+The Courts picker searches `Name`, and 1,542 of the 1,551 names were unique. Nine were not,
+because New York genuinely has two Chesters, two Franklins, two Brightons and so on. **Eight
+of those nine pairs sat in different RIAC regions**, so picking the wrong twin would have
+filed the case with the wrong centre — and the two entries were indistinguishable in a picker,
+which shows the primary field and nothing else.
+
+The 18 affected records now name both counties, the one they are in and the one they are not:
+
+> `Chester Town Court (ORANGE COUNTY, NOT Warren County)`
+> `Chester Town Court (WARREN COUNTY, NOT Orange County)`
+
+Naming the *wrong* county as well as the right one is the point: it fails safe, because the
+glance that would have caused the near-miss is the one that catches it. The same idea as the
+date of birth on the Parties picker, pushed a step further because the consequence here is
+misrouting rather than mislabelling.
+
+Only those 18 were touched; all 1,551 names are now distinct. **If a loader script is ever
+written for Courts, it must leave `Name` alone on these records** — the same care the VTL
+`Short Name` column needs.
+
 ### The court decides which RIAC a case belongs to
 
 `Court Name`, `County` and `RIAC Region` are **all lookups through the `Court` link** on the
