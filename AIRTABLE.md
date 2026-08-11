@@ -86,6 +86,7 @@ another. That separation is what makes the conflict check possible.
 | **Case Viewer** | List | The main case file. |
 | **Monthly Reminders** | List | Review the chasers before they go out. |
 | **Run Monthly Reminders** | List | The two buttons on the Reminder Control record. |
+| **People** | Grid | Everyone in Parties, in any capacity. **The place a person is added**, because they cannot be created from a picker — see below. Clicking one opens the existing editable Parties detail page. Created 11 Aug 2026. |
 | **EOIR Checks** | List | Backstop only — people with an A-Number nobody has looked up yet. See "EOIR checks" below. |
 | **Reminder Queue** | Dashboard | The four-rung chaser system: cases needing a chase, a tick to approve each, and the button that sends them. See gap 8. |
 
@@ -95,16 +96,24 @@ Two pop-up forms: **Add A New Charge** and **Add Case Note**.
 
 ## The automations
 
-All seven are deployed and valid. **Two of them send real email** — see gap 8.
+Six are deployed and valid; the seventh (`4. Add a case note to all linked cases`) was built
+on 11 Aug 2026 and is **still switched off**. **One of them sends real email** — see gap 8.
+(There were seven, and two senders, until `Monthly reminders 1` and `2` were deleted on
+10 Aug 2026 and `3. Filed advisal closes the case` was added on 11 Aug.)
+
+> **An automation created through the API arrives as an off draft.** It is saved and
+> validated but does nothing until someone opens it in the UI and turns it on. This is the
+> sibling of the trap already recorded below — that an *edit* made through the API stays an
+> unapplied draft while the automation is on.
 
 | Automation | Fires when | Does |
 |---|---|---|
 | **Conflict Check on New Intake** | Intake form submitted | Flags anyone in Parties with a matching **surname**, or a matching **date of birth** regardless of name. Deliberately over-returns — a few names to flick through beats a missed conflict. |
 | **1. Email to Case Note** | Email arrives at the `riac-case-file` address | Creates a note holding subject, body, sender, attachments. Does not attach it to a case. |
 | **2. Attach Case Note to its case** | A note has a case number in its subject but no case | Finds the case and links it. Failing to match is harmless — the note lands in Needs Review. |
-| **Monthly reminders 1 – Generate the list** | "Generate this month's list" ticked | Builds the batch and drafts each email. **Sends nothing.** |
-| **Monthly reminders 2 – Send the reminders** | "Send the reminders" ticked | **Actually emails attorneys. No undo.** |
-| **Send approved reminders** | "Send approved reminders" ticked | The four-rung system behind the Reminder Queue page: first chaser, second chaser, final warning, then a closing notice that also closes the case as "No Atty Response". **Actually emails attorneys. No undo.** Reads its reply-to and BCC addresses from the Reminder Control record. |
+| **3. Filed advisal closes the case** | A note has an advisal subject *and* a case link | Tags the note, sets the case to Closed, writes the closing code, stamps Date Closed. See "The reminder ladder" below. |
+| **Send approved reminders** | "Send approved reminders" ticked | The **three-rung** system behind the Reminder Queue page: first reminder, second reminder, then a closing notice that also closes the case as "No Atty Response". **Actually emails attorneys. No undo.** Reads its reply-to and BCC addresses from the Reminder Control record. |
+| **4. Add a case note to all linked cases** | A note has "Add To All Linked Cases" ticked, a case attached, and "Also Relates To" still empty | Fills in `Also Relates To` with every other case linked to this one, from **either** side of the self-link. **Built 11 Aug 2026 and still OFF** — a new automation is created as a draft and has to be turned on by hand. See "Linked cases" below. |
 | **Stamp EOIR check date** | EOIR Result changed on a person | Writes today's date into EOIR Last Checked. |
 
 ### Changing behaviour without touching an automation
@@ -113,12 +122,101 @@ This was a deliberate design goal. Each of these is a single edit in one place:
 
 | To change | Edit |
 |---|---|
-| Who gets chased (statuses, the 30-day threshold) | The **`Reminder Due`** formula on the case table |
+| Who gets chased, and when (30 / 60 / 90 days) | The **`Reminder Stage`** formula on the case table |
+| How long a case must be quiet before it is flagged dormant (45 days) | The **`Dormant Case Flag`** formula on the case table |
+| What the reminder queue *says* — the rung labels | The **`Review Queue Reason`** formula. **Not `Reminder Stage`** — see below |
 | The wording of reminder emails | The **Email Templates** table |
 | The subject-line caption, court, docket | The **`Reminder Subject Prefix`** formula on the case table |
 | What counts as an EOIR check still outstanding | The **`EOIR Check Status`** formula on Parties |
 | Which statuses count as "ready for advisal" | The **`Readiness (calc)`** formula on the case table |
-| What shows on the second line of the Case Viewer list | The **`Case List Line`** formula |
+| What shows in the Case Viewer list | The **`Case List Title`** formula — case number, client, attorney, attorney's office. The second line is the element's own "Field 1", currently `Top Charge`. ⚠️ **Not `Case List Line`**, which despite the name is displayed nowhere — an earlier draft of the second line, orphaned once the attorney moved into the title |
+
+---
+
+## The reminder ladder (August 2026)
+
+Two separate routes feed one review queue. Nothing is ever sent without a person approving it.
+
+**Route A — the chaser ladder.** For cases at *Intake Sent / Awaiting Contact* only, i.e. the
+attorney has never engaged. `Reminder Stage` puts a case on rung 1, 2 or 3 at **30 / 60 / 90
+days since the request date** — not since last contact. A rung only steps up once the previous
+reminder has actually been sent and logged (`Chasers Sent (calc)`, which sums). A case leaves
+the ladder if it has no request date, no attorney email, a closing code, a closing date, a
+disposal note, a status without the word "awaiting", or a reminder sent in the last 21 days.
+
+> **The 21-day suppression catches people out.** A blank rung on an old case usually means
+> "chased recently", not "not due".
+
+**Route B — dormancy.** For cases at *Atty Has Been In Contact* only. `Dormant Case Flag`
+fires when **no case note of any kind** has been added for 45 days. It counts *any* note,
+including internal ones, because the question is "has this been forgotten", not "has the
+attorney replied". Nothing is ever sent for these — a chaser would be the wrong letter.
+
+**`Review Queue Reason` merges the two, and is what the queue page filters on.**
+
+> ⚠️ **Do not filter on `Reminder Stage` and `Dormant Case Flag` together.** A case can never
+> be both, so an AND of the two returns **zero rows**. This has caught two people out.
+
+It is also the **display** field — it rewrites rungs as "1 - Eligible for First Reminder" and
+so on. Reword the queue *there*. **Never reword `Reminder Stage`**: the send automation matches
+its three values as exact text, and changing them stops every reminder silently.
+
+**Sending.** Tick `Approve` on each case, then tick `Send approved reminders` on the single
+Reminder Control record. Step order inside the automation is deliberate — **send, then log,
+then update** — so a failed send never marks a case as chased.
+
+**Advisals close cases.** `Advisal Type From Subject` reads a filed email's subject. Beginning
+"RIAC ADVISAL 1234" or "RIAC EMAIL ADVISAL 1234" — optionally behind one or two `Fw:`/`Fwd:`
+prefixes, never behind `Re:` — makes automation 3 close the case. Forwards count so an attorney
+who forgot to BCC can forward from their sent items; replies do not, so a reply cannot re-close
+a case someone has reopened.
+
+### The word-matching rule
+
+Seven formulas drive all of this, and every one matches on a **word** rather than an exact
+option name, so select options can be renamed freely. The trap is the reverse: **naming a new
+option with a reserved word**.
+
+| Field | Table | Reserved words |
+|---|---|---|
+| `Readiness (calc)` | cases | "needs immediate", "ready for advisal", "draft advisal" |
+| `Reminder Stage` | cases | "awaiting" |
+| `Dormant Case Flag` | cases | "been in contact" |
+| `Attorney Contact Date` | notes | "interaction", "documents received", "email received", "phone call", "substantive" |
+| is-a-chaser | notes | "chaser" |
+| is-a-disposal-note | notes | "case disposed" |
+| `Closed Case Banner` | cases | "closed" in `RIAC Next Steps`; "other" in `Closing Code` |
+
+The last row is not part of the reminder ladder — it is the closed-case banner (August 2026,
+TODO item 27) — but it carries the same trap, so it belongs in the same list. Its "other"
+word is the one most likely to be tripped by accident: a closing code named "Closed For Other
+Reasons" would make the banner start demanding a reason that nobody meant to ask for.
+
+Rung timing uses **`Days Since Referral (calc)`**, *not* the contact chain. The contact chain
+(`Attorney Contact Date` → two rollups → `Last Attorney Contact` → `Days Since Attorney
+Contact`) and the dormancy chain (`Note Date (any)` → two rollups → `Last Case Note (any)` →
+`Days Since Any Case Note`) are separate; trace the right one.
+
+### Things that cost a day to learn
+
+- **Airtable's mail server rejects reserved domains such as `example.com`.** A test send to a
+  fake address fails at the send step and leaves the case untouched with its approval still
+  ticked — silently. This produced three wrong diagnoses on 11 Aug before anyone tested against
+  a real address. **Test against a real address.**
+- **An automation edited through the API stays an unapplied draft while the automation is on.**
+  Live behaviour does not change until someone clicks **Update** in the UI. This bit us three
+  separate times in two days.
+- **Deleting a select option silently clears that value on every record.** Restructuring
+  `RIAC Next Steps` wiped the status and closing code on all 44 cases. Renaming preserves data
+  but rewrites history. On live data: export first, and prefer add-new → migrate → delete-old.
+- **`update_field` can return success and keep the old formula.** Seen with a regex containing
+  a quantified group. Always read a formula back, or test it against real records.
+- **Check the Record source on every delete button.** It does not reliably bind to the record
+  whose page you are on — on the Case Note page it bound to the *case*. See TODO item 4.
+- **Buttons do not render on dashboard pages.** They can be placed in the editor and even work,
+  but are invisible once published. Blank canvas pages render them properly.
+- **Script steps cannot be created through the API** (`readOnlyNodeType`). Anything needing
+  string manipulation has to live in a formula field.
 
 ---
 
@@ -557,6 +655,11 @@ and `Attempted?`. Remove `Charge` from the form once it is a formula.
 - **A form cannot display information back about what you picked.** Statutory text and
   the Senate/CJI links therefore cannot appear inside the add popup. They are instead on
   the charge row on the case page, via the lookups above.
+- **A form cannot host a button or a link either** (checked 11 August 2026 — the form
+  editor's element menu offers none). So a popup cannot send anyone anywhere: no "not on
+  the list? add them here" button, no jump to another page. The only place to put that kind
+  of instruction is the form's own **description**, the slot under its title. That is how
+  the Add a Related Party popup points at the People page.
 - **Interface layouts have no version history.** Record *data* has revision history;
   page layouts do not. An unwanted layout change that has been published cannot be rolled
   back — it has to be undone by hand. Nor can the API revert it: the revert tool only
@@ -819,7 +922,7 @@ person" picker offered `29`, `7`, `26` and could not be searched by name at all.
 
 | Table | Primary field now reads |
 |---|---|
-| **Parties** | `Fatoumata Sissoko (D.o.B. 29 Oct 2005)` |
+| **Parties** | `Fatoumata Sissoko (D.o.B. 10/29/2005)` |
 | **Attorneys & Requestors** | The attorney's name |
 
 The date of birth on the Parties picker is there for safety, not decoration: two people can
@@ -845,8 +948,18 @@ drop it from chips:
 *Parties → `Client Key Code`:*
 ```
 IF({Client Full Name}, {Client Full Name}, "Client " & {Client Key Code (original)})
-  & IF({DoB}, " (D.o.B. " & DATETIME_FORMAT({DoB}, "D MMM YYYY") & ")", "")
+  & IF({DoB}, " (D.o.B. " & DATETIME_FORMAT({DoB}, "MM/DD/YYYY") & ")", "")
 ```
+
+**The date format is US month-first, and that is a search decision as much as a reading one**
+(changed from `D MMM YYYY` on 11 August 2026). Everyone using this base will type a date the
+American way, and a picker search is a **substring match on this text** — so the text has to
+look like what people type. Two details follow from that and are easy to undo by accident:
+
+- **Four-digit year, not two.** `11/02/1994` is found by typing either `94` or `1994`;
+  `11/02/94` is not found by typing `1994` at all. Two extra characters buy a strictly larger
+  set of successful searches.
+- **Zero-padded**, so the width is fixed and it matches what a US date box expects.
 
 *Attorneys & Requestors → `Attorney Code`:*
 ```
@@ -862,6 +975,28 @@ ID remains the real identity, so nothing breaks. If codes must continue, add a f
 autoNumber afterwards and fold it into the formula — but be aware its numbering starts from
 row order and can collide with the historic codes.
 
+### The second consequence, found 11 August 2026: a person can no longer be created from a picker
+
+**A formula primary field cannot be typed into, so Airtable does not offer "create new record"
+in any picker pointing at Parties or Attorneys & Requestors.** Creating a record from a picker
+works by putting the typed text into the new record's primary field; where that field is
+computed there is nowhere to put it, so the option simply does not appear. Tested on the Add a
+Related Party popup — searching for a name that is not on file returns nothing and offers
+nothing.
+
+It is not a setting anyone has missed. No toggle on the form, the field or the page turns it
+on, and hunting for one wastes an afternoon.
+
+**On balance the trade is still right**, because the alternative was a picker offering `29`,
+`7`, `26` that could not be searched by name at all. But it changes the workflow: a person is
+added on the **People** page first — with a date of birth — and *then* linked. That is the
+better order anyway. A person minted in a hurry from a picker gets a name and nothing else,
+and the conflict check matches on date of birth regardless of name, so every DoB-less person
+quietly blunts it. As of 11 Aug the only three people on file without one are the three legacy
+imported rows.
+
+**Anyone rebuilding this in another region's base needs to know both halves before choosing.**
+
 ## Two people with the same name
 
 The database always tells them apart — separate records, separate internal IDs, and linking
@@ -874,7 +1009,7 @@ of misidentification rather than a cosmetic annoyance.
 
 So the Parties primary field carries **date of birth** as well as name:
 
-> `Josefina Almonte-Vidal (D.o.B. 19 Aug 1972)`
+> `Josefina Almonte-Vidal (D.o.B. 08/19/1972)`
 
 The old `Client Key Code` is deliberately **not** shown. It was an autoNumber generated
 when this base was built, it means nothing outside it, and — because an autoNumber cannot
@@ -920,9 +1055,10 @@ page. Remove that route and there is no way to edit a client from the Case Viewe
 
 This page used to expose only `First`, `Last Name`, `Current immigration status`,
 `Date of current immigration status`, `Client Flags`, `Immigration Docs Received` and
-`Case Info` — which left `DoB`, `A Number`, `Country`, `Address`,
-`Notes on Imm Status or History`, `Immigration Docs Upload`, `EOIR Result` and
-`EOIR Results PDF` reachable only by opening the Parties table directly.
+`Case Info` (renamed `Client On These RIAC Cases` on 11 August 2026) — which left `DoB`,
+`A Number`, `Country`, `Address`, `Notes on Imm Status or History`,
+`Immigration Docs Upload`, `EOIR Result` and `EOIR Results PDF` reachable only by opening
+the Parties table directly.
 
 All of them were added when the EOIR workflow was built, and **inline editing was switched
 on**, which it had not been — without that the fields displayed but could not be changed,
@@ -1038,6 +1174,38 @@ SUBSTITUTE( <the ARRAYJOIN expression> , '"', '')
 Watch for this in any new formula that joins linked records whose names may contain commas —
 agencies and courts especially.
 
+## Linked cases: a self-link is NOT symmetric (11 August 2026)
+
+`Linked Cases` (`fldTb4nPchAA61yAU`) on the case table links a case to other cases. **Airtable
+made a second field alongside it** — `Linked Cases (from the other side)`
+(`fldb1poJCuo4CaFhH`) — and the two are opposite ends of one relationship, not two
+relationships.
+
+**Tested, because it decides the whole design.** Linking case 6022 to 6043 from 6022's side
+put 6043 in 6022's `Linked Cases` and put 6022 in **6043's second field**. 6043's own
+`Linked Cases` box stayed **empty**.
+
+Two consequences, and the first is the dangerous one:
+
+- **Reading one box gives a silently incomplete answer.** A case that somebody linked *to*
+  shows an empty `Linked Cases` and reads as unlinked. Anywhere the interface displays linked
+  cases must display **both** fields.
+- **Anything that computes over linked cases must OR across both.** The automation
+  `4. Add a case note to all linked cases` does exactly that, which is why it does not matter
+  which side of a pair somebody linked from. If either field is renamed or rebuilt, that OR
+  is the thing to re-check.
+
+The API cannot delete the second field, and cannot make the pair symmetric. Whether Airtable
+will let the field be its own inverse from inside the designer is **untested** — worth two
+minutes before accepting the two-box layout, because if it works the second field disappears
+and everything collapses to one.
+
+**A mirroring automation was considered and not built.** It would make linking A to B write B
+into A's box too, giving one box — but *unlinking* would not mirror back, so removing a link
+from one side would leave it in place on the other, silently. That is the drift pattern that
+killed the old `Status` field, and it is the reason the note-tagging automation stamps once
+rather than mirroring.
+
 ## Case Parties is a junction table
 
 One row = **one person + one case + the role they played on it**. "Adding a related party"
@@ -1075,33 +1243,70 @@ office into the override box on creation — was rejected: it makes every case c
 that only differs on a handful, and a later correction to the attorney's record would not
 reach cases already stamped.
 
-### Spec for the "Add Related Party" popup
+### The "Add a Related Party" popup, as built (11 August 2026)
 
-The data side supports this fully. `Name` on Case Parties is already a formula reading
-`{Party Full Name} — {Role}`, so a row names itself and the blank-row problem that affected
-Case Charges cannot recur here — **provided `Party` is filled**. With it empty the row reads
-` — Witness`, so make `Party` a **required** field on the form.
+It hangs off the **Related Parties** element on Case Viewer → State Case Info. The element's
+`+ Add record` button is what opens it, and that only works because
+**User actions → "Add records through a form" is ON**. Left off — which is how it was found —
+the same button opens a link/unlink picker instead, which is the wrong thing and a dangerous
+one; see below.
 
-The popup should collect exactly four things:
+`Name` on Case Parties is a formula reading `{Party Full Name} — {Role}`, so a row names
+itself and the blank-row problem that affected Case Charges cannot recur here — **provided
+both parts are filled**, which is why both are required.
 
-| Box | Field | Notes |
+The popup collects exactly three things:
+
+| Box on the popup | Field | Settings that matter |
 |---|---|---|
-| The person | `Party` | Link to Parties. **Required.** Searchable by name and date of birth since the primary-field fix. New people can be created inline. |
-| Their role on this case | `Role` | Client, Witness, Victim, Co-Defendant, Complainant, Other, Referred Out - Client |
+| Party | `Party` | Link to Parties. **Required.** Searchable by name *and* date of birth since the primary-field fix |
+| What Is The Person's Role On This Case? | `Role` | **Required.** Client, Witness, Victim, Co-Defendant, Complainant, Other, Referred Out - Client |
 | Notes | `Notes` | Optional |
-| *(hidden)* | `Case` | Fills itself from the case the popup was opened on |
 
-Creating a person inline gives them a name only — the immigration fields stay empty, which
-is correct: those are filled in only for people we actually act for.
+**Deliberately NOT on the form**, and each for its own reason:
+
+- **`Case`** — it fills itself from the case the popup was opened on, exactly as the case
+  link does on the Add a Charge popup. It was briefly on the form as "Add Any Additional
+  Case This Person Is Linked To", which reads like a convenience and is not one: `Case` is a
+  **single** link, so adding a second case does not add, it **replaces** — silently moving
+  the person off the case in front of you. And even if it allowed two, one row cannot say
+  that someone is a co-defendant on 6022 and a witness on 6043. **One row = one person + one
+  case + one role.** To put the same person on another case, open that case and add them
+  there, where their role there can also be recorded.
+- **`Legacy Case No.`** — holds real values on the three imported rows and should never be
+  set on a new one.
+- **`Fake Entry?`** — a pilot artefact for the test-data sweep, not something a user
+  filling this in should see.
+
+**"Selection: All clients" is correct — do not narrow it.** Airtable calls records in the
+Parties table "clients" throughout this panel (it is also why the button reads
+`+ Add client` rather than `+ Add party`, which appears to be unchangeable, like
+`+ Add case`). It has nothing to do with the `Client` role: verified 11 Aug 2026, the
+tooltip's "53 clients in Parties" is exactly the record count of the whole table, witnesses
+and co-defendants included. The option to avoid is **"Specific clients"**, which restricts
+the picker to a hand-picked subset.
+
+**Inline creation of a new person could not be found**, and the field's Rules panel offers
+only Visibility, Selection, Default value, Required field, Limit selection and Validation —
+no create-records toggle. Judged **not worth chasing**: a person created from a popup gets a
+name and nothing else, and the only three people on file without a date of birth are the
+three legacy rows. The conflict check matches on date of birth regardless of name, so every
+DoB-less person blunts it. Adding the person on the Parties page first, with a date of birth,
+then linking them here, is the better habit anyway.
 
 **`Role` includes "Client" even though the client is not held in this table.** That option
 is for legacy imported rows, which carry a `Legacy Case No.` instead of a `Case` link. Do
 not use it on new rows.
 
-**The API cannot build this form.** `create_page` supports only visualization and dashboard
+**`Domestically Related To Client`** (`fldY82Q9M7P7ogJ6d`) was added on 11 Aug as a separate
+checkbox rather than a `Role` option. `Role` is a single select and its options are
+*procedural*; a domestic relationship is a different kind of fact that sits alongside them.
+A complainant who is the client's ex-partner is both, and folding it into `Role` would force
+whoever records it to discard one. What the relationship actually is goes in `Notes`.
+
+**The API cannot build any of this.** `create_page` supports only visualization and dashboard
 pages, not forms — so the popup, the button and the list beneath it are all hand work in
-the interface designer. Expect the button's own label to be unchangeable, as with
-"+ Add case".
+the interface designer.
 
 ## Status: this is still a pilot
 

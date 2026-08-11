@@ -975,40 +975,104 @@ layouts, which is all the API can see:
 3. **`Case Parties` on Case Viewer is read-only too**, so nothing can be added to the list
    from the case either
 
-**Also worth knowing before touching it:** the page is still called **"Record Detail"** in
-the published layout, not "Case Party". Item 25 records it as renamed on 11 Aug and given a
-"Remove this person from the case" button — but `Case Charges Detail` *did* publish its new
-name that day and this one did not. **The likeliest explanation is that the Case Party work
-is sitting as an unpublished draft**, which would on its own explain "does not appear to be
-working". Check that first; it may be one click.
+**An unpublished draft was suspected and ruled out.** The page is still called
+**"Record Detail"** in the published layout, not "Case Party", even though
+`Case Charges Detail` published its new name on the same day. Dan confirmed everything was
+published and it read the same afterwards — so item 25's record of that rename does not match
+what is live, and the "Remove this person from the case" button wants confirming too.
 
-- [ ] **[Dan]** Check whether the Case Party page changes from 11 Aug are still an
-      unpublished draft, and publish if so — remembering publishing pushes **every** page's
-      draft live at once
-- [ ] **[Dan]** Turn **inline editing on** for `Party`, `Role` and `Notes` on that page. The
-      general lesson in `AIRTABLE.md` applies exactly: adding a field to a record page is
-      only half the job
-- [ ] **[Dan]** Build the popup and button of item 2(a) — still genuinely outstanding, and
-      still impossible through the API, which cannot create forms.
+### ⚠️ The one thing still not done, re-checked live after publishing on 11 Aug
 
-      **Copy `Add A New Charge`.** It is the same shape of problem — a button on the case that
-      opens a form creating a row in a junction-ish table with the case pre-filled — and it
-      already works in this base, so it is a better guide than any set of menu instructions.
-      Four boxes, per the spec in `AIRTABLE.md` → "Spec for the Add Related Party popup":
+- [ ] **[Dan]** **The Case Parties popup is still entirely read-only** — `Party`, `Role`,
+      `Notes` and `Case` all non-editable, confirmed against the published layout *after* the
+      publish. So a person can now be added but **not corrected**: pick the wrong role and the
+      only route back is the raw Data tab. Add the fields to that page **and switch inline
+      editing on** — the general lesson in `AIRTABLE.md` applies exactly, that adding a field
+      to a record page is only half the job
+- [ ] **[Dan]** **Rename that page** from "Record Detail" — four pages share that name, which
+      makes them impossible to tell apart when picking a click-through target (item 25)
+### The cause, found 11 Aug 2026 — one toggle
 
-      | Box | Field | Setting that matters |
-      |---|---|---|
-      | The person | `Party` | **Required.** Inline record creation **ON** |
-      | Their role on this case | `Role` | |
-      | Notes | `Notes` | optional |
-      | *(hidden)* | `Case` | fills itself from the case the popup was opened on |
+On the **Related Parties** element, **User actions → "Add records through a form" was OFF**.
+So `+ Add record` was opening a **link/unlink picker** instead of a form.
 
-      **`Party` required and inline creation ON are the two that bite.** Not required, and a
-      row with no person reads " — Witness". Inline creation off, and a co-defendant who is
-      not yet in Parties cannot be added at all — note this is the **opposite** of the public
-      intake form, where inline creation must be OFF so attorneys cannot invent agencies.
+That is worse than merely unhelpful. The records in that list are `Case Parties` junction
+rows, not people, and each row's `Case` is a **single** link — so the picker was offering
+rows belonging to *other* cases, and choosing one would have **moved** that person off their
+own case rather than copying them here. `Link / unlink records` was turned off for that
+reason.
 
-      Expect the button's own label to be unchangeable, as with "+ Add case".
+### Built the same day, and now essentially done
+
+The popup exists and is called **"Add a Related Party"**: `Party` (required) · `Role`
+(required, labelled "What Is The Person's Role On This Case?") · `Notes`. `Case`,
+`Legacy Case No.` and `Fake Entry?` were all taken off it. **The full as-built record,
+including why each of those three is off and why "Selection: All clients" must not be
+narrowed, is in `AIRTABLE.md` → "The 'Add a Related Party' popup, as built".**
+
+`Domestically Related To Client` (`fldY82Q9M7P7ogJ6d`) was added to Case Parties as a
+separate checkbox rather than a `Role` option — `Role` is a single select and its options
+are procedural, so a complainant who is also the client's ex-partner would otherwise lose
+one of the two facts.
+
+**Two fields on Parties were renamed on 11 Aug** so that the pair reads as a pair. They are
+the two halves of "where does this person appear", and either one alone is half an answer:
+
+| Was | Now |
+|---|---|
+| `Case Info` | **`Client On These RIAC Cases`** — the other end of `Client Code` on the case table |
+| `Roles on other cases` | **`Other Roles On RIAC Cases (Witness, Co-Defendant Etc.)`** — the other end of `Party` on Case Parties |
+
+Safe: Airtable references fields by internal ID, so nothing that reads them cares. Note that
+two other tables still have a field called `Case Info` (Attorneys & Requestors, Courts) —
+different fields, left alone.
+
+- [x] ~~Convert `Domestically Related To Client` from a checkbox to a three-way answer~~ —
+      **done 11 Aug 2026.** It is now a single select — **Yes / No / Maybe - Unknown** — and
+      **required on the Add a Related Party popup**, with no default. A checkbox was the wrong
+      shape: an unticked box cannot be told apart from a box nobody looked at, the same silent
+      nil that `Office Not Listed?` and `EOIR Result` both exist to avoid.
+
+      **Worth knowing for next time: converting a checkbox to a single select did NOT need the
+      field emptying first.** The advice here said to untick the one populated row before
+      converting, in case the conversion minted a stray option. It did not — the field came out
+      with exactly the three intended options, and the ticked row (Ximena Chocano — Witness)
+      carried across as "Yes" by itself. All four Case Parties rows now hold a real value.
+
+### Inline creation is impossible, and it is not a missed setting (11 Aug 2026)
+
+Tested: searching the `Party` picker for a name that is not on file returns nothing and offers
+no way to create it. **The cause is that the Parties primary field is a formula.** Creating a
+record from a picker works by typing into the new record's primary field, and a computed field
+cannot be typed into — so Airtable does not offer the option at all. No toggle turns it on.
+Full write-up in `AIRTABLE.md` under "The second consequence, found 11 August 2026".
+
+**Answered with a new page instead.** There was no People page anywhere in the interface —
+every page was cases, intakes, templates or the queue, and the only Parties-sourced page was
+EOIR Checks, which is purpose-built for A-Number lookups. So a person is now added on
+**People** (`paglJrX9Q9ySBdjlE`) and then linked here, which is the better order anyway
+because it is what gets a date of birth recorded.
+
+- [x] ~~Switch on adding records on the People page, and signpost it from the popup~~ —
+      **done and published 11 Aug 2026.** Verified live: People carries an "Add Client" form
+      and opens each person into the existing editable Parties detail page. **A form cannot
+      host a button** — checked, the form editor's element menu offers none — so the signpost
+      is the description text under the popup's title
+- [ ] **[Dan]** **Confirm `DoB` is on the "Add Client" form**, along with `First`,
+      `Last Name` and `Country`. A form's field list cannot be read through the API. This is
+      the whole point of the page: if a person can be added there without a date of birth,
+      the problem has moved rather than been solved. `Country` matters too — ACIS will not run
+      an EOIR search without it
+- [ ] **[Dan]** **Test the popup end to end** on a fake case before trusting it: add an
+      existing person as a Witness, check the row reads "Name — Witness", and check they do
+      **not** appear on any other case
+- [ ] **[Dan]** **Put `Domestically Related To Client` on the Case Party record page**, next
+      to `Role`. It is on the popup already, so it can be *set* but not *seen or corrected*
+      afterwards. Do it in the same sitting as turning inline editing on above — same page,
+      same fix
+- [ ] **[Dan]** **Publish.** The interface has been carrying unpublished changes throughout
+      this work — check nothing else is half-finished first, because publishing pushes every
+      page's draft live at once and layouts have no undo
 
 ---
 
