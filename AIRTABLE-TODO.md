@@ -522,9 +522,9 @@ column saying *how* it was attributed.
       `REVIEW - remote, scope unclear` — 1193 grading "any such subdivision" of 1192 by
       back-reference, which no parser can resolve. The rest are `whole section`, where the
       declaration named no branch.
-- [ ] **[Dan]** **Three re-pointed rows want checking** — see below. `201.12(a)`,
-      `303.3(f)` and `1193.1(a)`, where the offence-defining paragraph came out as
-      something other than (a), or the grade sat in a roman-numeral subparagraph.
+- [ ] **[Dan]** **Two re-pointed rows want checking** — `201.12(a)` and `1193.1(a)`, where
+      the grade sat in a roman-numeral subparagraph rather than a lettered one.
+      (`303.3(f)` was a parser bug, since fixed — see below.)
 
 ### Citation convention — decided 10 Aug 2026: cite the offence-defining paragraph
 
@@ -540,6 +540,24 @@ clean 511/415-A/1194 pattern, and the three flagged above are worth a glance.
 
 **This applies only to implied grades.** Where the statute says "a violation of *this
 paragraph* shall be a misdemeanor" it means that paragraph, and those rows are untouched.
+
+### Not every VTL section is numbered at the top level (fixed 10 Aug 2026)
+
+`303.3(f)` looked like a citation and was a parser fault. **VTL 303 has no subdivisions at
+all** — its top level runs `(a)` to `(j)`, and the stray "2." and "3." in its text are
+numbered provisos *inside* those lettered paragraphs. The scan read them as subdivisions,
+produced **two "subdivision 2"s** — impossible in one section — and hung the grade on a
+subdivision that does not exist.
+
+Two rules now guard this, and they are worth keeping in anything similar:
+
+- **Subdivisions must start at 1 and ascend.** A numbered run that opens at "2" is not
+  top-level numbering, it is a list inside something else.
+- **A section with no subdivisions can still be lettered.** Those grades attach to the
+  paragraph (303 now reads `303.(g)`, which is where the grade actually sits) rather
+  than being flattened to the whole section.
+
+Checked against the validated cases: 1192 and 511 come through unchanged.
 - [ ] **[Dan]** **Look over the 54 for anything obviously wrong**, in either direction. A
       few want a legal eye rather than a parser: 1170 (obedience to railroad signal) comes
       out as a class E felony, and 201 (custody of records), 207 (uniform traffic summons)
