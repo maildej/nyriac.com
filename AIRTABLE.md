@@ -68,6 +68,11 @@ another. That separation is what makes the conflict check possible.
   text field, which is correct.
 - **Anything ending "(calc)" or described as a helper** exists to feed something else.
   Editing it by hand will be overwritten.
+- **`Counts` on Case Charges is a single select, not a number** (1–5 and "6 or more",
+  changed 11 August 2026). That is deliberate. Its only job is to flag to the RIAC attorney
+  that there is more than one count when they do the advisal — nothing calculates with it
+  and nothing aggregates on it, so a picker that cannot be typed inconsistently is worth
+  more than arithmetic nobody performs. **Don't convert it back to a number to tidy it up.**
 
 ---
 
