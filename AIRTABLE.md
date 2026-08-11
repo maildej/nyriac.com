@@ -763,6 +763,22 @@ important offence in the catalogue as a traffic infraction if that incidental wo
 changed. **Treat "no grade declared in this section" as a flag for review, never as a
 default to infraction.**
 
+### The loaders are NOT broken by the Citation formula (checked 11 Aug 2026)
+
+An earlier note claimed both scripts "fail outright" because they write `Citation` and
+merge on it, and `Citation` is now a formula. **That note was stale** — it described the
+state before the 10 August repoint and was never updated. Checked against the actual files:
+
+- `catalogue_vtl.py` — `MERGE_FIELDS = ["Section", "Subdivision", "Prior Tier"]`,
+  `Citation` absent from `TABLE_FIELDS`, with a comment in the file saying exactly why.
+- `catalogue_penal_law.py` — `MERGE_FIELDS = ["Section", "Subdivision"]`, and `push()`
+  passes `performUpsert.fieldsToMergeOn: merge_fields`, never `Citation`.
+- A dry run of `catalogue_vtl.py` builds all 36 records cleanly.
+
+**What has not been proved:** a real write. The dry run stops before the Airtable call, and
+running a live one needs a token and would touch the live table. The merge fields are all
+plain text, so a write should be accepted — but the first real run still wants watching.
+
 ### Neither catalogue has been re-run since the scripts were repointed
 
 The repoint was 10 August 2026, so both points above are **untested against a real load**.

@@ -593,8 +593,7 @@ section shall constitute a misdemeanor". A section-wide grade is what the statut
       and 1194 (arrest and testing) are all worth a glance.
 - [ ] **[Dan]** Send the specific fraud list, as a cross-check that nothing is missing.
 - [ ] **[Claude]** Build the records once the above settles, following the existing
-      `catalogue_vtl.py` shape — and note that script currently cannot run at all, see the
-      Citation-became-a-formula problem.
+      `catalogue_vtl.py` shape. **That script runs fine** — checked 11 Aug 2026, see below.
 
 **Escalation tiers stay Dan's**, as with 1192. Nothing in the statutory text models "one
 prior conviction within ten years"; that is legal judgment and was hand-built last time.
