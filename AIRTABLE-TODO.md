@@ -558,6 +558,29 @@ Two rules now guard this, and they are worth keeping in anything similar:
   than being flattened to the whole section.
 
 Checked against the validated cases: 1192 and 511 come through unchanged.
+
+### Audit of the loose attributions, 10 Aug 2026
+
+`audit_vtl_attributions.py` re-checks every row not pinned to a specific branch, asking the
+two questions a human would. It found one more bug and cleared most of the rest.
+
+**The bug: the governing scope is the LAST one named, not the first.** 415-A reads
+"…registered pursuant to this **section** as required by this **paragraph** shall be a
+class A misdemeanor". Reading the first match called it a section-wide offence. It is now
+**14 properly scoped provisions** instead of one wrong one.
+
+**Three more sections are lettered at the top level, like 303** — 605, 1146 and 1170 all
+open at `(a)` with numbering nested inside. The start-at-1 rule already rejects their
+numeric markers, so they attribute to paragraphs correctly.
+
+**Nine "whole section" rows are genuine** and need no review: 375, 377, 382, 392, 394, 395,
+429, 1182 and 382-A each say, in terms, "a violation of any of the provisions of this
+section shall constitute a misdemeanor". A section-wide grade is what the statute means.
+
+- [ ] **[Dan]** **Three qualified whole-section rows** — `313`, `370` and `2257-A`. Each
+      grades a described act rather than the section at large ("…to a person not entitled
+      to receive it shall be guilty of a misdemeanor"), so the citation wants narrowing to
+      the right branch. These are the only whole-section rows left needing judgment.
 - [ ] **[Dan]** **Look over the 54 for anything obviously wrong**, in either direction. A
       few want a legal eye rather than a parser: 1170 (obedience to railroad signal) comes
       out as a class E felony, and 201 (custody of records), 207 (uniform traffic summons)
