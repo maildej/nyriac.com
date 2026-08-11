@@ -543,12 +543,36 @@ candidates. **Eight were added** to the staging table, all ticked "Needs review"
 | **515** | wilfully erasing a conviction endorsed on a licence — grade not stated |
 | **507-A, 509-L** | consuming a drug or controlled substance while on duty (for-hire and commercial drivers) — grade not stated |
 
-- [ ] **[Dan]** **Seven weaker candidates were NOT added** — 385, 401, 402, 411, 498, 509,
-      514. Each matched only on "knowingly permit" or "wilfully fails to", in a regulatory
-      sense: knowingly permitting an unregistered or overweight vehicle to be moved, or an
-      official neglecting to certify a conviction. My read is that none carries the kind of
-      intent that matters to an immigration analysis, but that is your call, not mine —
-      say the word and I will add them.
+The seven weaker "knowingly permit" candidates — 385, 401, 402, 411, 498, 509, 514 — were
+added too, at Dan's direction, 11 Aug 2026. **Staging table now holds 127 rows.**
+
+### What accuracy actually means here (Dan, 11 Aug 2026)
+
+**This table is not used to give criminal legal advice.** Getting the sentence right is not
+the point. What matters is **exactly what the elements of the offence are** — what the
+prosecution must prove — because that is what the immigration analysis turns on. The
+classification and sentencing are useful background, and Dan is content for those to be
+imperfect provided the elements are sound.
+
+**This inverts the review list.** The flags raised so far are about *classification* —
+roman-numeral subparagraphs, qualified whole-section grades. On the criterion above those
+barely matter. What matters is whether we can isolate the right slice of statute.
+
+**The draft cannot be moved into `NY VTL Offenses` as it stands, because it holds no
+statutory text at all.** `Evidence` is a ~200-character fragment around the *grading*
+sentence, often starting mid-word — it is proof of the classification, not the offence
+definition. Moving it now would produce records that look complete while missing the one
+thing that matters.
+
+- [ ] **[Claude]** **Attach the verbatim provision text before migrating.** The whole VTL
+      is already held locally and the slicing works: **90 of the 112 crime rows can be
+      isolated to their own provision** (median ~800 characters, about right for a set of
+      elements). Also needs an offence name per record.
+- [ ] **[Dan]** **~37 rows can only resolve to a whole section**, so they cannot state
+      elements precisely: 21 crime rows, 1 that cannot be located at all, and all 15
+      immigration-relevant additions, which are section-level by nature. Some are harmless
+      (a short section *is* the offence). Some are not — **375 is 114,000 characters**.
+      These are the rows worth your time now, in place of the classification flags.
 
 **Loaded into a staging table — `VTL Crimes (draft)` (`tblKjnkNeN278RYVE`)** so the review
 can happen in Airtable rather than a spreadsheet. **8 rows are ticked "Needs review"**;
