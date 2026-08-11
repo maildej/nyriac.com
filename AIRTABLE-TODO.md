@@ -497,8 +497,36 @@ known false positives must not. Both held.
 section + subdivision + paragraph + grade, with the sentence that proves it and a `basis`
 column saying *how* it was attributed.
 
+### Checked against ypdcrime.com, 11 Aug 2026
+
+Used for **one purpose only — completeness**: does our list miss anything that guide treats
+as commonly charged? It carries no grade and is mostly traffic infractions, so it is not
+evidence about classification. The statute decides that.
+
+Of its 251 provisions, 83 sit in sections we hold no crimes for. **Exactly one of those
+sections contains criminal language: VTL 318** — and that exposed a real bug.
+
+**The 312/318 mis-citation.** VTL 318(7) reads "Failure … to deliver a certificate of
+registration, number plates or driver's license to the commissioner after revocation
+thereof **or as otherwise provided in section three hundred twelve** shall constitute a
+misdemeanor." The scan took the section reference as the target, so it recorded a crime in
+**312 — which has no criminal language at all** — and lost 318 entirely. A section is only
+the target when the sentence grades it ("a violation of section X shall be…"); a bare
+mention is a manner or definition reference.
+
+Fixing that exposed a second one: "subdivision seven of section twelve hundred twenty-four"
+names a subdivision of *that* section, and the scan was applying it locally, inventing
+`2130.7` and `392.7`. Both rules are now in `scan_vtl_subdivisions.py`.
+
+Net effect: **114 rows → 112**, and REVIEW rows **6 → 3**. Four sections that never existed
+as crimes are gone (148, 312, 401.7, 1224.7), and 318(7) is properly captured.
+
+Also confirmed, since it bears on the fraud interest: **403-A (falsifying temporary indicia
+of registration), 530 (restricted use licences) and 1225-C (mobile phones) contain no
+criminal language** — they are infractions, correctly outside a crimes-only catalogue.
+
 **Loaded into a staging table — `VTL Crimes (draft)` (`tblKjnkNeN278RYVE`)** so the review
-can happen in Airtable rather than a spreadsheet. **11 rows are ticked "Needs review"**;
+can happen in Airtable rather than a spreadsheet. **8 rows are ticked "Needs review"**;
 filter on that to see only what wants a decision. `Dan's decision` and `Reviewed` columns
 are there to work through them. Nothing links to anything else and nothing reads from it —
 `NY VTL Offenses` is untouched at 36 records. Delete the table once the real records exist.
