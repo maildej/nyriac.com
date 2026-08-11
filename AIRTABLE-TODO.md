@@ -433,10 +433,16 @@ This item is the specification of *what* to show; those two are *where*.
 
 ## 21. Extend the VTL catalogue to every VTL crime  **[Claude]**, with one **[Dan]** check
 
-**Decided 10 Aug 2026: crimes only — misdemeanours and felonies, not traffic infractions.**
-Under VTL 155 an infraction is not a crime, so infractions carry no immigration consequence
-and would add thousands of analytically inert rows. The catalogue currently holds 36 records,
-all alcohol and driving.
+**Inclusion rule, corrected 11 Aug 2026. "Crimes only" was wrong.** The rule is: every VTL
+**crime**, plus anything involving **drugs or controlled substances**, and anything
+**fraudulent or intentional** — whatever New York calls it.
+
+The correction came from VTL **403-a**: "Falsifying any temporary indicia of registration …
+shall be a **traffic infraction**." A falsification offence, and the immigration analysis
+does not turn on the state-law crime/infraction label. Dan: *"we definitely need to include
+it because it can have immigration consequences."* Bulk traffic infractions are still out —
+speeding and equipment faults carry nothing — but the filter is immigration relevance, not
+the New York grade.
 
 Dan's specific interest is **fraud** — fraudulent number plate and registration certificate
 offences. Those are crimes, so "crimes only" includes rather than excludes them. He will send
@@ -521,9 +527,28 @@ names a subdivision of *that* section, and the scan was applying it locally, inv
 Net effect: **114 rows → 112**, and REVIEW rows **6 → 3**. Four sections that never existed
 as crimes are gone (148, 312, 401.7, 1224.7), and 318(7) is properly captured.
 
-Also confirmed, since it bears on the fraud interest: **403-A (falsifying temporary indicia
-of registration), 530 (restricted use licences) and 1225-C (mobile phones) contain no
-criminal language** — they are infractions, correctly outside a crimes-only catalogue.
+**403-A, 530 and 1225-C carry no criminal language.** 530 and 1225-C are ordinary
+infractions and stay out. **403-A does not** — see the corrected inclusion rule above.
+
+### Non-crimes added for immigration relevance, 11 Aug 2026
+
+Scanning the whole VTL for drugs, fraud and intent language outside the crimes gave 15
+candidates. **Eight were added** to the staging table, all ticked "Needs review" and marked
+`not a crime - included for immigration relevance`:
+
+| | |
+|---|---|
+| **403-A** | falsifying temporary indicia of registration — traffic infraction |
+| **417, 417-A, 417-B, 417-C** | delivering a certificate or disclosure instrument containing false or misleading information — "violation" |
+| **515** | wilfully erasing a conviction endorsed on a licence — grade not stated |
+| **507-A, 509-L** | consuming a drug or controlled substance while on duty (for-hire and commercial drivers) — grade not stated |
+
+- [ ] **[Dan]** **Seven weaker candidates were NOT added** — 385, 401, 402, 411, 498, 509,
+      514. Each matched only on "knowingly permit" or "wilfully fails to", in a regulatory
+      sense: knowingly permitting an unregistered or overweight vehicle to be moved, or an
+      official neglecting to certify a conviction. My read is that none carries the kind of
+      intent that matters to an immigration analysis, but that is your call, not mine —
+      say the word and I will add them.
 
 **Loaded into a staging table — `VTL Crimes (draft)` (`tblKjnkNeN278RYVE`)** so the review
 can happen in Airtable rather than a spreadsheet. **8 rows are ticked "Needs review"**;
