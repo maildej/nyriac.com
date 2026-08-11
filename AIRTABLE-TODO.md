@@ -86,24 +86,34 @@ type more than once over time, so this is probably **its own table linked to Par
 simpler to build but cannot hold two visas. Note also that the information matters even with
 no document attached, so the document upload must be optional rather than the anchor.
 
-## 4. Two-step delete for case notes  **[Dan]** to look, then **[Decide]**
+## 4. Two-step delete for case notes  **[Decide]** — half answered, half blocked
 
 Click delete → "are you sure?" → yes/no.
 
-*Notes.* **Airtable has no way to build a custom "are you sure?" dialog.** You cannot
-interpose a confirmation between a click and its effect in an interface. That constraint
-applies to items 4 and 5 alike, and it is the only thing they have in common — see item 5,
-which is otherwise a different problem.
+**ANSWERED, 11 Aug 2026 — the confirmation half comes free.** A **Delete record** button in
+an interface always prompts, and Airtable will not let you switch the prompt off: the
+"Require confirmation" toggle is forced on and greyed out. Dialog text is editable
+("Are you sure?" / "This will delete the record." / "Yes, delete"). Deleted records also go
+to the base trash. So no custom dialog needs building — for anything that can host a delete
+button at all.
 
-**This one may already be solved.** Deleting a record is a recognised destructive action, so
-Airtable generally prompts before it, and deleted records go to the base's trash and can be
-restored for a period that depends on the plan. **Go and look at what it already does before
-building anything** — this may be a checking job, not a building job.
+⚠️ **BLOCKED, 11 Aug 2026 — a case note cannot host one, and the failure is dangerous.**
+Adding a Delete button to the **Case Note** record page binds it to the wrong record:
+its **Record source** comes up locked to **Case Detail**, and Airtable auto-labels the button
+**"Delete case"**. Pressed, it would delete the whole case — notes, charges and all. The
+source cannot be repointed. The button was added, spotted and removed the same day; nothing
+was published.
 
-If it turns out there is no prompt, the substitute is the same two-deliberate-edits pattern
-described in item 5: a `Marked for deletion` checkbox plus a review view where deletions are
-actually carried out. That is a different shape from what was asked for, so it is worth seeing
-the real behaviour first.
+**The rule this leaves behind, for every delete button anywhere in this base: check the
+Record source before trusting it.** It does not reliably default to the record whose page you
+are on, and the failure is silent and catastrophic. Two pages were checked the same day —
+**Case Charges Detail** and **Case Party** both bind correctly to themselves, and the tell is
+visible in the panel: correct pages read "Delete record", the dangerous one read "Delete case".
+
+- [ ] **[Decide]** So notes still cannot be deleted from the interface. Three automations
+      create notes automatically, so wrong ones will accumulate. The likely route is a delete
+      button on a **notes list element** rather than on the note's own popup — untested, and
+      it wants proving with a disposable record before it goes anywhere near real use.
 
 ## 5. Two-step change of which case a note belongs to  **[Claude]**, once designed
 
@@ -233,8 +243,13 @@ Clicking a recorded charge in the Case Viewer should open a popup showing:
 - **(b)** The excerpted statutory text
 - **(c)** Links to NY Senate and CJI, preferably as **two buttons**
 - **(d)** Number of counts, and whether it is the top charge
-- **(e)** Notes on issues relevant for immigration purposes — this is the existing
-  `Charge Notes` field; only its visible description on the popup needs to change
+- [x] ~~**(e)** Notes on issues relevant for immigration purposes~~ — **done 11 Aug 2026.**
+  The popup label now reads "Charge Notes - Include Statutory Text If Offense Not Listed In
+  Catalogue", and the field itself was renamed **`Charge Notes and Statutory Text`** to match.
+  Its description now spells out the split: catalogue offences carry their text on the linked
+  Penal Law or VTL record, so text is pasted here **only** for out-of-state, federal or
+  other-statute charges, which have no catalogue record to hold it. Pasting it for a linked
+  offence creates a second copy that drifts
 - **(f)** `Fake Entry?` — for now; to be removed at go-live
 
 *Notes.* Every field already exists on Case Charges: `Charge`, `Statutory Text (from
@@ -381,6 +396,12 @@ The API cannot delete fields. Each of these is safe — every case now carries i
       **NEVER convert this field to a linked record.** Airtable would create a new agency for
       every value it cannot match — including "Test Submission Two - Genesee PD (test)" — and
       the API cannot delete them
+- [ ] **`Case List Line`** on **State Case Info & RIAC Progress** (`fldvaVSnvTAmdmzBP`).
+      Confirmed orphaned 11 Aug 2026: it returns only `"Attorney: …"`, and the Case Viewer
+      list uses `Case List Title` as its Title and `Top Charge` as its second line, so this
+      field is displayed nowhere. It was an earlier draft of the second line, superseded when
+      the attorney moved into the title. **Do not confuse the two** — `Case List Title` is the
+      live one and controls what the list reads
 - [x] ~~`CrimeTime` on **NY VTL Offenses**~~ — done 10 Aug 2026
 
 ## 17. Check the attorney popup  **[Dan]**
@@ -564,15 +585,43 @@ sentence, often starting mid-word — it is proof of the classification, not the
 definition. Moving it now would produce records that look complete while missing the one
 thing that matters.
 
-- [ ] **[Claude]** **Attach the verbatim provision text before migrating.** The whole VTL
-      is already held locally and the slicing works: **90 of the 112 crime rows can be
-      isolated to their own provision** (median ~800 characters, about right for a set of
-      elements). Also needs an offence name per record.
-- [ ] **[Dan]** **~37 rows can only resolve to a whole section**, so they cannot state
-      elements precisely: 21 crime rows, 1 that cannot be located at all, and all 15
-      immigration-relevant additions, which are section-level by nature. Some are harmless
-      (a short section *is* the offence). Some are not — **375 is 114,000 characters**.
-      These are the rows worth your time now, in place of the classification flags.
+### Statutory text attached, 11 Aug 2026 — `vtl-records-for-import-2026-08-11.csv`
+
+All 127 rows now carry the slice of statute that defines them, built by
+`build_vtl_records.py`. A `Text Scope` column records how precise each slice is, so nothing
+has to be taken on trust.
+
+| Slice | Rows |
+|---|---|
+| paragraph | 37 |
+| subdivision | 51 |
+| subdivision (paragraph not found) | 2 |
+| **whole section** | **36** |
+| whole section (subdivision not found) | 1 |
+
+**88 rows are provision-level — median 634 characters**, which is about right for a set of
+elements. Those are ready.
+
+**Offence names are deliberately not invented.** The file carries `Section Title` verbatim
+from the statute as a starting point. The existing 36 records use curated names ("AUO 3rd"),
+and inventing legal names for 127 provisions is not something to do silently.
+
+- [ ] **[Dan]** **Twelve rows have text too long to be "the elements"** — the section is a
+      whole regulatory scheme, not one offence. These are the ones worth your time:
+      **375** Equipment, **385** dimensions and weights, and **401** registration (all three
+      over 50,000 characters, truncated); **313** notice of termination (23k); **498**
+      interjurisdictional for-hire (16k); **394** drivers' schools (16k); **1192** ×3 (16k
+      each — these are the three 1193 back-reference rows); **370** indemnity bonds (15k);
+      **429** junk and salvage (12k); **514** certifying convictions (11k).
+      For each: either name the subdivision that actually carries the offence, or say the
+      section-level text is good enough.
+- The other 25 section-level rows are fine as they are — the section *is* the offence and
+  the text is short (515 is 239 characters, 392-A is 465, 382 is 716).
+
+- [ ] **[Claude]** **Migrate into `NY VTL Offenses` once the twelve are settled.** Needs an
+      Airtable token, since 127 records with full statutory text is far too much to push
+      through the connector. Also needs the classification values mapping onto the
+      catalogue's existing `Classification` choices.
 
 **Loaded into a staging table — `VTL Crimes (draft)` (`tblKjnkNeN278RYVE`)** so the review
 can happen in Airtable rather than a spreadsheet. **8 rows are ticked "Needs review"**;
@@ -697,6 +746,272 @@ real intakes would define the scope quickly.
 
 ---
 
+# Added 11 August 2026
+
+## 23. Finish the Case Detail page  **[Dan]**, or **[Both]** with a handover
+
+`Case Detail` (`pagpU8GLwLeHz83Mo`) is the record page that opens on click-through from
+**everywhere** — the reminder queue, Find a Case, and every linked-record chip in the
+interface. It had drifted badly and was found on 11 Aug with **no charges on it at all**.
+
+Done that day: the empty **Misc** tab removed (it held only `Pending Intakes`), and **two
+broken "Field deleted" placeholders** cleared, left behind when `Advisal & RIAC Uploads` was
+deleted.
+
+- [ ] Still missing, and all present on Case Viewer: **Case Charges**, Case Type, Top Charge,
+      Disposed?, Case Parties, Notes From Other Cases, This Client's Cases, Attorney,
+      Attorney's Office, EOIR Result, EOIR Last Checked — plus everything built this week
+      (Review Queue Reason, Chasers Sent, Last Reminder Sent, Date Closed, RIAC Summary Of
+      Allegations)
+
+⚠️ **Field order within a group is the order fields were added and cannot be rearranged.**
+Matching Case Viewer's *order* therefore means emptying and rebuilding a group, not appending
+to it. Decide whether order matters before starting.
+
+## 24. Case Viewer and Case Detail must be kept in step by hand  **[Dan]**, standing
+
+**DECIDED, 11 Aug 2026 — two independent layouts, deliberately.** Airtable interface pages
+cannot share or inherit a layout: Case Viewer is a record-*review* page, Case Detail is a
+record-*detail* page, and an edit to one never carries to the other. Case Viewer was kept
+separate because its **left-hand record selector** is worth the duplication cost.
+
+The cost is real and permanent: **every future layout change must be made twice.** That drift
+is exactly what produced item 23. Whoever changes one should change the other in the same
+sitting.
+
+Note also that **Case Viewer cannot be a click-through target** — click-into-record-details
+can only open a record *detail* page, which is why Case Detail is the one that matters.
+
+## 25. The other pop-ups  **[Dan]**
+
+Seven record-detail pages exist. Two were sorted on 11 Aug: **Case Charges Detail** gained a
+red "Delete this charge" button — tested end to end with a disposable charge, which confirmed
+it removes the charge and leaves the case intact — and **Case Party** (formerly "Record
+Detail") gained "Remove this person from the case".
+
+- [ ] **Four still carry Airtable's default names** — the pages behind Courts, Agencies,
+      Parties and Pending Intakes are all called "Record Detail", which makes them impossible
+      to tell apart when picking a click-through target. Rename them
+- [ ] **Several are entirely read-only.** Worth deciding per page whether that is intended
+- [ ] No delete route exists on any of the rest. Before adding one, read item 4 — the record
+      source check is not optional
+
+## 26. RIAC Summary Of Allegations — placement  **[Dan]**, optional
+
+Created 11 Aug on the case table and added to **Case Viewer → State Case Info**. Free-text
+narrative of what the client is alleged to have done, written by the attorney or paralegal,
+drawing out what matters for immigration: value of loss, age of complainant, weapon or
+controlled substance, relationship between parties, anything touching intent.
+
+- [ ] It sits at the **bottom** of State Case Info, below Related Parties. It reads more
+      naturally directly under Case Charges — but see item 23's warning: moving it means
+      rebuilding the group
+- [ ] It is not yet on **Case Detail** — part of item 23
+
+## 27. Make a closed case obvious on the Case Viewer  — **field built, placement is [Dan]**
+
+When a case is closed, that should be **prominent** — something at the top of the RIAC Case
+Info tab, in large text, that appears only when the case is closed.
+
+### Built 11 Aug 2026: `Closed Case Banner` (`fldYSE88Qfg95XZ10`) on the case table
+
+A formula field that is **blank on every open case** and otherwise reads, in one line:
+
+> ⚠ THIS CASE IS CLOSED — Email Advisal Sent — 15 July 2026
+
+The formula-field route was chosen over a static text element because it can name the
+closing code and the date, and because it is one field to edit later rather than a caption
+duplicated across two pages.
+
+**It keys on `Closing Code` not empty OR the status reading Closed — deliberately both**,
+because the two can disagree. Verified against all five closed cases in the base, including
+case 6015, which carries a closing code and closing date while its status still reads
+*Intake Sent / Awaiting Contact* (the rung-4 automation wrote the code but not the status;
+that automation is fixed, but historic records still show the split). A banner keyed on the
+status alone would have called 6015 open. Where the two disagree the banner says so:
+
+> ⚠ THIS CASE IS CLOSED — No Atty Response — 11 August 2026  (status still reads: Intake Sent / Awaiting Contact)
+
+### The "Other" closing code, 11 Aug 2026
+
+Dan asked for a closing category of **Other**. **Nothing needed relinking** — which is worth
+recording, because it is the design paying off rather than luck. The two calculations that
+care about closures both test for **any code at all**, never for a named list:
+
+- **`Reminder Stage`** drops a case off the chaser ladder the moment `Closing Code` is not empty
+- **`Dormant Case Flag`** requires `Closing Code` to be empty before flagging a case as gone quiet
+
+So a case closed as Other leaves both automatically. The two automations that involve closing
+codes only ever **write** them, and both write by internal ID, so a new option cannot disturb
+them. `Readiness (calc)` never reads closing codes at all.
+
+**What did need building is the other half of the problem: "Other" on its own records
+nothing.** Six months on, nobody could say why the case shut. So it follows the pattern
+already established by `Office Not Listed?` / `Office Not Listed - Details` on the intake —
+the option is a deliberate *answer*, and a companion box carries the substance:
+
+- **`Closing Code - Other Details`** (`fldFVPrwVQytbrJJ7`), long text — built
+- **`Closed Case Banner` prints it after the date** when the code is Other, and when the box
+  is empty says `(⚠ 'Other' selected but no reason recorded)` on the case instead. A
+  half-finished closure should be visible, not silent
+
+⚠️ **Two reserved words now, both in this one formula:** **"closed"** in `RIAC Next Steps`,
+and **"other"** in `Closing Code` — a future option called something like "Closed For Other
+Reasons" would trigger the details logic by accident. See the word-matching rule in
+`AIRTABLE.md`.
+
+### What is left, all by hand in the designer
+
+- [ ] **[Dan]** **Add `Other` to the `Closing Code` options**, at the **bottom** of the list.
+      The API cannot add a select option, and — more to the point — it cannot set or change
+      an option's **colour** afterwards. The existing five run blue → cyan → teal → green →
+      yellow, so **orange** continues the sequence. Get the colour right first time.
+      *(Adding an option is safe. It is **deleting** one that silently clears that value on
+      every record.)*
+- [ ] **[Dan]** **Test it once the option exists** — this branch has never run. On a fake
+      case: tick `Other`, leave the details box empty, and check the banner reads
+      `(⚠ 'Other' selected but no reason recorded)`. Then type a reason and check it appears
+      after the date. Then clear both
+- [ ] **[Dan]** **Check no interface filter keys on specific closing codes.** The API can see
+      dashboard elements but not their filter settings, so Reminder Queue and Find a Case want
+      an eye — anything listing codes by name needs `Other` adding to it
+- [ ] **[Dan]** Put `Closing Code - Other Details` on **Case Viewer** and **Case Detail**,
+      next to `Closing Code`
+- [x] ~~Place the banner on **Case Viewer** — top of RIAC Case Info, label hidden, large text,
+      Visibility rule *`Closed Case Banner` is not empty*~~ — **done 11 Aug 2026**
+- [x] ~~Do the same on **Case Detail**~~ — **done 11 Aug 2026**
+
+## 28. Linked cases — Dan's fuller specification, 11 Aug 2026
+
+Supersedes and expands **item 1**. What is wanted, in three parts:
+
+- **(a)** An easy way to designate one case as linked to one or more others
+- **(b)** Whenever that link is active, case notes on one are **visible on the other** —
+  either copied across, or marked as applicable and surfaced through
+  `Notes From Other Cases Tagged To This Case`
+- **(c)** An **obvious place** to see the list of all other cases linked to this case
+
+*Status, 11 Aug 2026 — the data side is built; the display half is an open decision.*
+Item 1 holds the design thinking, and its central constraint still governs: **a formula
+cannot write into a link field**, so (b) is an automation that stamps at note-creation time,
+not a mirror. Item 1 also records the decision that it only ever works **forwards** — notes
+written before two cases were linked will not appear retrospectively — and the exact wording
+of the interface notice that says so.
+
+`Notes From Other Cases` and `Also Relates To` already existed and already did (b) manually,
+one note at a time. So (b) was never a new mechanism, only *automating the tagging*.
+
+### Built 11 Aug 2026
+
+| | |
+|---|---|
+| `Linked Cases` (`fldTb4nPchAA61yAU`) | Self-link on the case table. **(a)** |
+| `Linked Cases (from the other side)` (`fldb1poJCuo4CaFhH`) | Airtable's automatic other end of the same link — see below |
+| `Add To All Linked Cases` (`fld3BLF33OGOcl52y`) | Checkbox on RIAC Case Notes |
+| `4. Add a case note to all linked cases` (`wflipNRnaWp1FTeap`) | The automation. **(b)** |
+
+The automation fires on a note that has the box ticked, a case attached, and `Also Relates To`
+still **empty** — that last condition is what stops it overwriting a note somebody has already
+tagged by hand, and what stops it firing twice on the same note.
+
+### ⚠️ The finding that shapes everything: a self-link is NOT symmetric
+
+Tested, not assumed. Linking case 6022 to 6043 from 6022's side put 6043 in **6022's**
+`Linked Cases` and put 6022 in the **second field** on 6043. 6043's own `Linked Cases` box
+stayed empty. Full write-up in `AIRTABLE.md` under "Linked cases".
+
+**(b) is unaffected** — the automation ORs across both fields, so it does not matter which
+side anyone linked from. **(c) is the open question**, because a case linked *to* shows an
+empty box and reads as unlinked.
+
+- [ ] **[Decide]** How linked cases are displayed. Three routes, put to Dan on 11 Aug and
+      **not yet answered**:
+      **(i)** show both boxes under one heading — nothing can drift, but two lists;
+      **(ii)** first check whether Airtable will let `Linked Cases` be its own inverse from
+      inside the designer, which would collapse it to one box (untestable through the API,
+      two minutes by hand, and worth trying before settling for anything else);
+      **(iii)** a mirroring automation — one box, but **unlinking would not mirror back**,
+      leaving a link in place on one side silently. That is the drift pattern that killed the
+      old `Status` field, and the reason it was not built
+- [x] ~~Turn the automation on~~ — **done 11 Aug 2026.** Note for next time: an automation
+      created through the API arrives as an **off draft**, saved and valid but doing nothing
+- [x] ~~Test it end to end~~ — **done 11 Aug 2026, and it works in both directions.** Cases
+      6022 and 6043 were linked from 6022's side, then a disposable note was written on each
+      in turn with the box ticked. **Both** notes tagged themselves onto the other case. The
+      second is the one that mattered: 6043's own `Linked Cases` box is empty — its half of
+      the link lives in `Linked Cases (from the other side)` — and the note still found 6022,
+      which is the OR across both fields doing its job. Both test notes were deleted
+- [ ] **[Dan]** Place the fields on **Case Viewer** and **Case Detail**, once (i)/(ii)/(iii)
+      is decided — with the notice from item 1 beside the linking control:
+      > REMINDER: this only associates future case notes to all linked cases. If you want any
+      > prior case notes to appear on all linked cases, please review and link them manually.
+
+## 29. The Related Parties popup is not working  **[Dan]** to diagnose
+
+Dan, 11 Aug 2026: *"the current setup does not appear to be working."*
+
+*Status.* **Item 2 holds the full specification** and records that the data side was finished
+some time ago — `Case Parties` is a junction table, `Name` builds itself, the Parties picker
+is searchable by name and date of birth. What was outstanding was designer work.
+
+### Diagnosed 11 Aug 2026 — it is not broken, it was never built
+
+**The data is healthy.** Every row in Case Parties has a person, a role and either a case or
+a legacy case number. The " — Witness" symptom of a half-completed add is **not present**:
+the only three rows without a `Case` link are the legacy imports, which carry
+`Legacy Case No.` instead and are meant to look like that. So neither of the two traps in
+item 2 is what is wrong.
+
+**The interface is the problem, in three separate ways.** Read against the *published*
+layouts, which is all the API can see:
+
+1. **There is no "Add Related Party" popup at all.** The base has exactly two embedded
+   forms — `Add A New Charge` and `Add Case Note`. Item 2(a) has never been built, so there
+   is no button and no popup to be misbehaving
+2. **The Case Parties record page is entirely read-only.** Every field on it —
+   `Party`, `Role`, `Notes`, `Case` — comes back non-editable. So even reaching it by
+   clicking an existing person, nothing can be changed. This is item 25's "several are
+   entirely read-only", and here it is not intended
+3. **`Case Parties` on Case Viewer is read-only too**, so nothing can be added to the list
+   from the case either
+
+**Also worth knowing before touching it:** the page is still called **"Record Detail"** in
+the published layout, not "Case Party". Item 25 records it as renamed on 11 Aug and given a
+"Remove this person from the case" button — but `Case Charges Detail` *did* publish its new
+name that day and this one did not. **The likeliest explanation is that the Case Party work
+is sitting as an unpublished draft**, which would on its own explain "does not appear to be
+working". Check that first; it may be one click.
+
+- [ ] **[Dan]** Check whether the Case Party page changes from 11 Aug are still an
+      unpublished draft, and publish if so — remembering publishing pushes **every** page's
+      draft live at once
+- [ ] **[Dan]** Turn **inline editing on** for `Party`, `Role` and `Notes` on that page. The
+      general lesson in `AIRTABLE.md` applies exactly: adding a field to a record page is
+      only half the job
+- [ ] **[Dan]** Build the popup and button of item 2(a) — still genuinely outstanding, and
+      still impossible through the API, which cannot create forms.
+
+      **Copy `Add A New Charge`.** It is the same shape of problem — a button on the case that
+      opens a form creating a row in a junction-ish table with the case pre-filled — and it
+      already works in this base, so it is a better guide than any set of menu instructions.
+      Four boxes, per the spec in `AIRTABLE.md` → "Spec for the Add Related Party popup":
+
+      | Box | Field | Setting that matters |
+      |---|---|---|
+      | The person | `Party` | **Required.** Inline record creation **ON** |
+      | Their role on this case | `Role` | |
+      | Notes | `Notes` | optional |
+      | *(hidden)* | `Case` | fills itself from the case the popup was opened on |
+
+      **`Party` required and inline creation ON are the two that bite.** Not required, and a
+      row with no person reads " — Witness". Inline creation off, and a co-defendant who is
+      not yet in Parties cannot be added at all — note this is the **opposite** of the public
+      intake form, where inline creation must be OFF so attorneys cannot invent agencies.
+
+      Expect the button's own label to be unchangeable, as with "+ Add case".
+
+---
+
 # Before this goes live
 
 Do not start these until testing is finished. Several have no undo.
@@ -713,18 +1028,32 @@ Do not start these until testing is finished. Several have no undo.
 - [ ] **Remove `Fake Entry?` from the charge popup** — item 9(f) puts it there deliberately
       for the pilot only
 - [ ] Review who can see the base, the interfaces, and any shared links
-- [ ] **Confirm both chaser systems are meant to be there.** Two are deployed and both send
-      real email: `Send approved reminders` (the four-rung one behind the Reminder Queue
-      page) and `Monthly reminders 1 and 2` (the batch one behind Monthly Reminders and Run
-      Monthly Reminders). **This may well be deliberate** — Dan thinks a workflow was
-      designed around it — so do not retire either without checking. What needs confirming
-      is that it is clear which does what, because they are started by different tick-boxes
-      and ticking the wrong one would chase the same attorneys twice. If both are keepers,
-      say so on the Reminder Queue page so nobody wonders later
-- [ ] **Switch the reminder emails to Outlook.** They currently send from Airtable's own
-      mail server; the "Send the chaser" step needs swapping to the Microsoft Outlook send
-      action so mail comes from the real RIAC address. **Both** systems send, so both need
-      swapping if both survive the item above
+- [x] ~~Confirm both chaser systems are meant to be there~~ — **settled 10 Aug 2026. There is
+      now only one.** `Monthly reminders 1` and `2` were deleted, along with the Monthly
+      Reminders and Run Monthly Reminders pages and the fields only they used. **`Send
+      approved reminders` is the only sender**, and the ladder is **three rungs**, not four:
+      first reminder at 30 days from the referral, second at 60, closure for non-response at
+      90. The separate final-warning rung was removed on 11 Aug
+- [ ] **Switch the reminder emails to Outlook.** Still the real blocker before any of this
+      touches a live attorney. All three rungs currently send from **Airtable's own mail
+      server**; each of the three `Send` steps in `Send approved reminders` needs swapping to
+      the Microsoft Outlook action, and the **BCC and Reply-To must be re-checked afterwards**
+      — the BCC is what files each sent chaser back as a case note
+- [ ] **Approve the reminder wording.** All three templates in **Email Templates** now have
+      text, but the Second Reminder and Closeout are **unapproved drafts written on 11 Aug**.
+      One open question inside them: Dan's original sketch for the old final-warning rung said
+      "we will close this case **and report you**", and who the attorney would be reported *to*
+      was never settled. That sentence has deliberately been left out of both drafts rather
+      than guessed at. If reporting is real, it belongs in the Second Reminder, and the
+      Closeout then needs a line saying it has happened
+- [ ] **Test that rich-text formatting survives into a sent email.** Opening Paragraph,
+      Closing Paragraph and Sign-off were converted to Rich text on 11 Aug. Airtable stores
+      rich text as Markdown and the send step renders Markdown, so bold and bullets *should*
+      come through — but nobody has seen it work. Send one first reminder to a real address
+      and look at what arrives
+- [ ] **Put Gennaro Apicella's email back.** It was pointed at `dejackson@outlook.com` on
+      11 Aug to test the closure branch end to end, and left there. Harmless while the data is
+      fake; confusing if anyone mistakes it for real
 - [ ] **Link nyriac.com to the Airtable intake form.** Link to it — do not build a form on
       the website that posts into Airtable, or the conflict check silently stops running
       on every intake
