@@ -492,10 +492,16 @@ known false positives must not. Both held.
 
 ### Subdivision decomposition, 10 Aug 2026 — done, with caveats
 
-**113 criminal provisions across 57 sections**, in
+**114 criminal provisions across 57 sections**, in
 `vtl-crime-provisions-2026-08-10.csv` (built by `scan_vtl_subdivisions.py`). Each row is
 section + subdivision + paragraph + grade, with the sentence that proves it and a `basis`
 column saying *how* it was attributed.
+
+**Loaded into a staging table — `VTL Crimes (draft)` (`tblKjnkNeN278RYVE`)** so the review
+can happen in Airtable rather than a spreadsheet. **11 rows are ticked "Needs review"**;
+filter on that to see only what wants a decision. `Dan's decision` and `Reviewed` columns
+are there to work through them. Nothing links to anything else and nothing reads from it —
+`NY VTL Offenses` is untouched at 36 records. Delete the table once the real records exist.
 
 **It reproduces the hand-built catalogue exactly**, which is the reason to trust it:
 
