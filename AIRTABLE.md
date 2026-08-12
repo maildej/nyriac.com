@@ -1427,8 +1427,21 @@ help text on that branch saying they need not complete the rest.
   the target table and **creates new records for whatever does not match** — the three test
   submissions alone would mint agencies called "Test Submission Two - Genesee PD (test)".
   The API cannot delete them. Create a new link field instead, which is what was done.
-- **Turn off inline record creation** on the form's link field, or attorneys will invent
-  agencies from the public form — precisely what the picker exists to prevent.
+- **Inline record creation on the form's link field must stay impossible**, or attorneys will
+  invent agencies from the public form — precisely what the picker exists to prevent.
+
+  **Tested on the LIVE form, 12 Aug 2026: it already is.** The form editor offers no setting
+  for it, and typing an unknown office name on the shared form produces no way to create one.
+  Earlier notes here said to go and switch a toggle off; there is no such toggle to find, and
+  looking for one wasted a step. **Why** it is impossible is not established — most likely
+  Airtable has withdrawn inline creation from form views, but that is inference, not fact.
+
+  ⚠️ **Do not treat this as settled forever.** It is behaviour we have observed, not a
+  setting we control, so it can come back — and the "new forms" migration in TODO item 30 is
+  the obvious moment for it to change. Re-test with a nonsense office name after any change
+  to how the form is built. Note that the same is NOT true of the Parties picker, where
+  creation is blocked for a structural reason: its primary field is a formula, and nothing
+  can be typed into one.
 
 ## The conflict check only fires from one specific form
 

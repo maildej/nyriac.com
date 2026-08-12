@@ -1167,6 +1167,11 @@ one-form rule exists to prevent.
       been shared — including the link from nyriac.com, if that is live by then
 - [ ] **[Dan]** Re-check the form's field conditions survived the move, particularly the
       `Type Of Office` routing from item 15
+- [ ] **[Dan]** **Re-test that an attorney still cannot invent an agency.** Type a nonsense
+      office name into the picker on the new live form. Inline creation is impossible on the
+      current form (tested 12 Aug 2026) but that is observed behaviour, not a setting we
+      control — a new form builder is exactly where it could come back, and it would pollute
+      Agencies silently. See `AIRTABLE.md` → "Two traps"
 
 Sources: [Airtable Community — upgraded form](https://community.airtable.com/base-design-9/upgraded-form-44819) ·
 [Airtable — building and sharing forms](https://support.airtable.com/articles/9431794285-building-and-sharing-forms-in-airtable)
