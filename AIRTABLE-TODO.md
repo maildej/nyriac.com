@@ -585,6 +585,29 @@ sentence, often starting mid-word — it is proof of the classification, not the
 definition. Moving it now would produce records that look complete while missing the one
 thing that matters.
 
+### Where the VTL working files live (11 Aug 2026)
+
+All of it is in **`OneDrive - OCBA/RIAC - Documents/Admin/Database Design`**, reachable from
+either desktop. Nothing needed is stranded on one machine.
+
+| File | What it is |
+|---|---|
+| `vtl-full-statute-2026-08-11.json` | The entire VTL with text, one API call. Every scan reads this — no need to re-fetch. |
+| `scan_vtl_crimes.py` | Pass 1: which sections are crimes |
+| `scan_vtl_subdivisions.py` | Pass 2: decompose to subdivision, with the scoping rules |
+| `audit_vtl_attributions.py` | Re-checks the loose attributions after any scanner change |
+| `scan_vtl_immigration_relevant.py` | Finds drugs / fraud / intent provisions outside the crimes |
+| `check_against_ypdcrime.py` | Completeness check against ypdcrime |
+| `build_vtl_records.py` | Attaches the statutory text |
+| `draft_vtl_offence_names.py` | First-pass names (its output was largely discarded — see below) |
+| `vtl-records-for-import-2026-08-11.csv` | **The dataset**: 127 rows with statutory text |
+| `cji-penal-law-index-2026-08-10.txt` | The harvested Penal Law CJI index, if those links ever need rebuilding |
+
+⚠️ **The offence names in that CSV are the machine-generated first pass and are poor.**
+The good ones were written by hand straight into Airtable. **`VTL Crimes (draft)` is the
+authority on names**; the CSV is the authority on statutory text. Do not overwrite the
+Airtable names from the CSV.
+
 ### Statutory text attached, 11 Aug 2026 — `vtl-records-for-import-2026-08-11.csv`
 
 All 127 rows now carry the slice of statute that defines them, built by
