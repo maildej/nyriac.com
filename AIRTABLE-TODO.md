@@ -288,17 +288,145 @@ catches is silent (`⚠ Never checked` looks identical to "checked, nothing foun
 looking). Worth deciding separately, once the signposting is in and it is clear whether the
 workflow really does catch everyone.
 
-## 11. The Court field cannot be changed on the case  **[Dan]**
+## 11. The Court field on the case  **RESOLVED 10 Aug 2026**, one small piece left
 
-On Case Viewer → State Case Info, `Court` is not editable and there is no obvious way to make
-it so.
+Originally: "On Case Viewer → State Case Info, `Court` is not editable and there is no obvious
+way to make it so."
 
-*Notes.* Almost certainly the same trap already recorded in `AIRTABLE.md`: **adding a field to
-a record page is only half the job — if inline editing is off, the field displays but cannot
-be changed.** That is what was wrong with the client detail page in August. Check the field's
-own setting in the designer first. This matters more than it looks: the case inherits its
-county and RIAC region *through the court*, so a case with the wrong court has the wrong
-region and cannot be corrected.
+**It was editable the whole time.** Tested by hand in the published interface: click the **×**
+on the court's card to unlink it, which leaves a **+ Add record** button, and that opens the
+searchable list of courts. Clunky compared with a dropdown, but it works, and Dan is content
+with it. Nothing was changed to achieve this.
+
+### The wrong turn, recorded so it is not repeated
+
+The diagnosis said this was a forgotten inline-editing toggle needing a Publish. That was
+wrong, and it was wrong for a reason worth knowing: **`isEditable` from the API does not mean
+what it appears to for linked-record fields.** `Court` reports `isEditable: false` on the
+Case Viewer, and so does every other linked field on every list page in this base. It is a
+description of how the API renders list pages, not a statement about permissions. The full
+note is in `AIRTABLE.md` under "`isEditable` from the API does NOT mean a linked field can be
+re-linked".
+
+**The lesson: for a linked-record field, the only reliable test is to open the published
+interface and try it.** Not the designer preview, and not the API.
+
+Two other guesses along the way were also wrong, both corrected by looking:
+
+- The field is shown as a **Field**, not a linked-record View, so there was never an element
+  to swap out.
+- **There is no inline-creation risk here.** Typing a name matching no court returns nothing;
+  it does not offer to create one. That is governed by the **"Add records through a form"**
+  toggle, which is off — a *different* toggle from "Link / unlink records", whose gear offers
+  only `All records` / `Specific records` and no creation option at all.
+
+### Still outstanding: you cannot click through to a court  **[Dan]**
+
+The one real gap. A court's card cannot be clicked to open the court and read its address,
+phone, website, judicial district or county — useful things an attorney may well want.
+
+- [ ] On the Case Viewer, select the **`Court`** field and turn **on** **"Click into record
+      details"** under **User actions**. It was off in the designer on 10 Aug 2026, which is
+      exactly why swapping a court works but inspecting one does not
+
+Two things follow from turning it on:
+
+- Clicking a court will open a **Courts record detail page**, which does not exist yet — so
+  expect to choose which fields it shows. `Name`, `Address & Contact`, `Website`,
+  `Judicial District` and `County` are the useful ones.
+- **Editing a court from there changes it for every case linked to that court.** That is
+  correct — court contact details genuinely are shared — but it is the same scope rule as
+  agencies, and worth knowing before anyone corrects an address.
+
+### Show every court with its county  **DONE 10 Aug 2026**
+
+**Why this came up.** The Courts picker searches `Name`, and 1,542 of the 1,551 names are
+unique — but nine names belong to two courts each, and New York really does have two of each.
+**Eight of those nine pairs sit in different RIAC regions:**
+
+| Name | One is in | The other is in |
+|---|---|---|
+| Chester Town Court | Orange (**R4**) | Warren (**R3**) |
+| Lewis Town Court | Essex (**R3**) | Lewis (**R2**) |
+| Fremont Town Court | Sullivan (**R4**) | Steuben (**R1**) |
+| Dickinson Town Court | Franklin (**R3**) | Broome (**R2**) |
+| Ashland Town Court | Greene (**R4**) | Chemung (**R2**) |
+| Franklin Town Court | Franklin (**R3**) | Delaware (**R2**) |
+| Brighton Town Court | Franklin (**R3**) | Monroe (**R1**) |
+| Albion Town Court | Orleans (**R1**) | Oswego (**R2**) |
+| Greenville Town Court | Greene (R4) | Orange (R4) |
+
+Since county and region are both lookups through the court, picking the wrong twin does not
+merely mislabel a case — it files it with the wrong centre, and the two were indistinguishable
+in a picker.
+
+**DECIDED, 10 Aug 2026 — show the county on every court, not just the ambiguous ones.**
+
+> `Alabama Town Court (Genesee County)`
+
+That fixes the nine pairs as a side effect, and pays for itself everywhere else: searching
+`Genesee` now finds every court in that county, which the picker could not do before. An
+earlier fix that tagged only the 18 duplicates by hand has been **reverted** — the names are
+back to plain, ready for the conversion below.
+
+**Every one of the 1,551 courts has a county** (checked 10 Aug 2026), so no court will be left
+without a suffix.
+
+#### Done, and verified
+
+Dan duplicated `Name` (with values) to **`Court Name (original)`**, then converted `Name` to
+the formula below. Verified across all 1,551 afterwards: **every name distinct, none blank,
+every one carrying its county**, and the borough counties rendering as intended.
+
+```
+{Court Name (original)} &
+IF(
+  {County},
+  " (" &
+  IF(
+    FIND("(", ARRAYJOIN({County}, ", ")),
+    SUBSTITUTE(SUBSTITUTE(ARRAYJOIN({County}, ", "), " (", " County, "), ")", ""),
+    ARRAYJOIN({County}, ", ") & " County"
+  ) & ")",
+  ""
+)
+```
+
+The nine duplicated names now separate themselves — `Chester Town Court (Orange County)` and
+`Chester Town Court (Warren County)` — with no hand-tagging to maintain.
+
+**Accepted cosmetic side effect: 337 of the 1,551 courts now name their county twice**, e.g.
+`Saratoga County Surrogate's Court (Saratoga County)`, and a few carry two brackets because
+the court's own name has one — `Genesee County Court (M-B) (Genesee County)`. Left alone
+deliberately. Suppressing the suffix where the name already contains the county would make
+the labelling inconsistent, and the value of the suffix is that it is **always** there and
+always says the same thing. Cases like `Broome Supreme Court` also name the county without
+the word "County", so a suppression rule would misfire on them.
+
+#### Why the formula looks more complicated than "add the county"
+
+Three counties are not stored as bare names — `Kings (Brooklyn)`, `New York (Manhattan)` and
+`Richmond (Staten Island)` carry the borough. Appending " County" naively would give
+`(Kings (Brooklyn) County)`, brackets inside brackets, on every New York City court. The inner
+`IF` spots the bracket and rearranges instead:
+
+| County as stored | Court reads |
+|---|---|
+| Genesee | `Alabama Town Court (Genesee County)` |
+| St. Lawrence | `Massena Town Court (St. Lawrence County)` |
+| Kings (Brooklyn) | `Kings Criminal Court (Kings County, Brooklyn)` |
+
+So both `Kings` and `Brooklyn` still find the court.
+
+#### Consequences worth knowing
+
+- **Every case's `Court Name` gains the county too**, since it is a lookup of this field. That
+  is an improvement, and no case had to be touched to get it.
+- **It is self-maintaining.** Correct a court's county and its name follows; add a new court
+  and it is labelled automatically. That is the advantage over the hand-tagging approach that
+  was reverted.
+- **If a loader script is ever written for Courts, it must not write `Name`** — it is a formula
+  now, and `Court Name (original)` is what would need loading instead.
 
 ## 12. A crime viewer  **[Claude]**
 

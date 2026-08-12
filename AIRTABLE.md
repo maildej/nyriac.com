@@ -1074,6 +1074,103 @@ Two of those matter more than the rest:
 **The general lesson: adding a field to a record page is only half the job.** If inline
 editing is off, a field that must be filled in is still unfillable.
 
+### ⚠️ `isEditable` from the API does NOT mean a linked field can be re-linked
+
+**This cost a wrong diagnosis on 10 August 2026 and will cost another if it is not written
+down.** `list_pages_for_base` reports an `isEditable` flag per field per page. For ordinary
+fields it means what it says. **For linked-record fields on a list or record page it does
+not.**
+
+`Court` on the Case Viewer reports `isEditable: false`, and on that basis it was diagnosed as
+a forgotten toggle needing a Publish. It was neither. Tested by hand in the published
+interface: the court **can** be changed. It just does not work the way a picker does — you
+click the **×** on the court's card to unlink it, which leaves a **+ Add record** button, and
+that opens the searchable list. Clunky, but fully functional, and it had been working all
+along.
+
+Every linked-record field on every list page in this base reports `false` — `Court`,
+`Attorney`, `Attorney's Office`, `Client Code`, `Case Charges`, `Case Parties`. That is a
+description of how the API renders list pages, not a statement about permissions.
+
+**So: never conclude a linked-record field is locked from the API.** The only reliable test
+is to open the published interface and try it. What the flag *is* still good for is genuinely
+computed fields — **lookups, formulas and rollups can never be edited anywhere**, and there
+the `false` is real and no toggle exists to find.
+
+Two toggles do exist on such a field, and they are separate things:
+
+| Toggle | Controls |
+|---|---|
+| **Link / unlink records** | Whether the × and **+ Add record** appear at all — i.e. whether the link can be changed |
+| **Click into record details** | Whether clicking the card opens the linked record to read it |
+
+The second being off is why a court could be swapped but not inspected.
+
+### Every court shows its county — done 10 August 2026
+
+The Courts picker searches `Name`, and 1,542 of the 1,551 names were unique. Nine were not,
+because New York genuinely has two Chesters, two Franklins, two Brightons and so on. **Eight
+of those nine pairs sat in different RIAC regions**, so picking the wrong twin would have
+filed the case with the wrong centre — and the two entries were indistinguishable in a picker,
+which shows the primary field and nothing else. It is the Parties same-name problem, with a
+worse consequence: misrouting rather than mislabelling.
+
+**The answer is to show the county on every court, not just the ambiguous ones:**
+
+> `Alabama Town Court (Genesee County)`
+
+That disambiguates the nine pairs as a side effect and pays for itself everywhere else —
+searching `Genesee` now finds every court in that county, which the picker could not do while
+names were bare. Every one of the 1,551 courts has a county, so none is left unlabelled.
+
+**A first attempt tagged only the 18 duplicates by hand** — `Chester Town Court (ORANGE
+COUNTY, NOT Warren County)` — which worked but was static, covered only nine names, and would
+not have labelled a court added later. It was **reverted** in favour of the formula. Recorded
+because the reasoning generalises: hand-tagging the exceptions is quicker, but a rule that
+applies to every row cannot fall out of date.
+
+**Three counties are not stored as bare names.** `Kings (Brooklyn)`, `New York (Manhattan)`
+and `Richmond (Staten Island)` carry the borough, so naively appending " County" would give
+`(Kings (Brooklyn) County)` on every New York City court. The formula spots the bracket and
+rearranges to `(Kings County, Brooklyn)`, which keeps both `Kings` and `Brooklyn` searchable.
+
+The conversion itself was hand work — the API cannot change a field's type — and followed the
+same order as Parties and Attorneys did: **copy the names to safety first, then convert.**
+Here the copy was made by duplicating the `Name` field with its values, which is why no API
+write was needed across 1,551 records — only an 18-record revert of the earlier hand-tagging.
+`Court Name (original)` holds the plain names. The formula is in `AIRTABLE-TODO.md`, item 11.
+
+Verified after conversion: **all 1,551 names distinct, none blank, every one carrying its
+county.** A cosmetic consequence was accepted knowingly — 337 courts now name their county
+twice (`Saratoga County Surrogate's Court (Saratoga County)`), and a few carry two brackets
+because the court's own name has one (`Genesee County Court (M-B) (Genesee County)`).
+Suppressing the suffix where the name already contains the county was rejected: it would make
+the labelling inconsistent, and the suffix earns its keep precisely by always being there.
+Names like `Broome Supreme Court` also carry the county without the word "County", so a
+suppression rule would misfire on them anyway.
+
+**Once converted, `Name` is a formula.** A loader script for Courts, if one is ever written,
+must write `Court Name (original)` instead — the same care the VTL `Short Name` column needs.
+
+### The court decides which RIAC a case belongs to
+
+`Court Name`, `County` and `RIAC Region` are **all lookups through the `Court` link** on the
+case. Nothing else on the case records the region. Two consequences:
+
+- Correcting a case's court corrects all three at once, which is the design working.
+- **Any picker that writes `Court` must not allow inline record creation.** A typo that mints
+  a new court would give that case a court with no county, so it would silently belong to no
+  region — and the API cannot delete the invented record. Same trap as the intake form's
+  Agencies picker, with worse consequences, because this misroutes the case rather than
+  mislabelling it.
+
+**The Case Viewer is safe on that count — tested 10 August 2026.** Typing a name that matches
+no court simply returns nothing; it does not offer to create one. The relevant setting is the
+**"Add records through a form"** toggle on the field, which is off. Note that this is a
+*different* toggle from "Link / unlink records" — the record-selection gear beside the latter
+offers only `All records` / `Specific records` and has no creation option at all, so that is
+not where to look for it.
+
 ## Which office: a fact about a case, not about a person
 
 **An attorney has no office in this database.** The office is recorded on the case, and
