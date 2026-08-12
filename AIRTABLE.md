@@ -1443,6 +1443,51 @@ help text on that branch saying they need not complete the rest.
   creation is blocked for a structural reason: its primary field is a formula, and nothing
   can be typed into one.
 
+## Case Type — five options, multi-select, in two places
+
+Widened from a single select on **12 August 2026**, and extended from three options to five.
+
+| Option | Meaning |
+|---|---|
+| Criminal Case | A **live** state proceeding |
+| Non-Criminal Case | A live family, matrimonial or other non-criminal proceeding |
+| Appeal | A live appeal |
+| Post Conviction Relief / Post-Disposition | **There is no live state case.** It has concluded, and the question is what it did to the client and what can be undone |
+| Assistance With Removal Defense / USCIS | What RIAC is being **asked to do**, rather than what the case is |
+
+**Multi-select, because a case is genuinely more than one of these at once** — criminal and on
+appeal, say. A single select made people pick the least wrong option and put the truth in a
+notes box.
+
+The last two options typically arrive from **outside the mandated-provider pipeline** —
+affirmative immigration practitioners and removal defence attorneys coming to RIAC after a
+state case has ended. `Type Of Office` on the intake says which, and therefore whether RIAC
+assists (non-profit) or refers out (privately retained).
+
+### DECIDED 12 Aug 2026 — the two "outside" options are never ticked together
+
+Where RIAC helps with removal defence **by** pursuing post-conviction relief, that is logged
+as **two separate cases, then linked** (`Linked Cases`, item 28) — not one case ticked twice.
+
+That is what makes the multi-select safe. The standing objection to multi-selects is that
+they wreck counting: a case in two buckets is counted twice and "how many post-conviction
+matters did we do" stops having an answer. Dan's rule removes the case where that would
+happen, so the objection does not arise here. **It is a working rule, not something the
+base enforces** — nothing stops someone ticking both.
+
+### Two fields, kept in step by hand
+
+`Case Type` exists **separately** on **Pending Intakes** (`fldjirYRp7Dc5zH6v`) and on **State
+Case Info & RIAC Progress** (`fldi4vK65fm5FnOlb`), with different option IDs. Nothing copies
+between them — an intake is turned into a case by hand — so **an option added to one must be
+added to the other**, or it cannot be carried across when the case is created. Both currently
+hold identical names and colours.
+
+**Nothing in the base reads this field**: no formula references it and no automation triggers
+on it, checked 12 Aug 2026. That is why the conversion was safe. **Interface filters are the
+exception** — the API cannot see filter settings, so a filter written as *"Case Type is
+Criminal"* needs re-checking as *"has any of"* after the widening.
+
 ## The conflict check only fires from one specific form
 
 The "Conflict Check on New Intake" automation triggers on `formSubmitted`, bound to one
