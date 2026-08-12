@@ -1128,6 +1128,49 @@ because it is what gets a date of birth recorded.
       this work — check nothing else is half-finished first, because publishing pushes every
       page's draft live at once and layouts have no undo
 
+## 30. Move the intake form onto Airtable's "new forms"  **[Dan]** with a **[Claude]** check
+
+**Not urgent, and deliberately deferred on 12 Aug 2026.** Nothing is broken and the old form
+does the job. This is here so it happens **on our schedule rather than Airtable's.**
+
+Airtable now shows an **"Upgrade to new forms"** button on the form view. The honest case for
+pressing it eventually is not a feature — it is that Airtable is plainly steering everyone
+to the new builder, and old form views will most likely be retired in time. Doing it
+deliberately, with the automation re-pointed under controlled conditions, beats being
+migrated at a moment not of our choosing. **The old form view already supports conditional
+field visibility** (`equals`, `is any of`, `is empty` and so on), so item 15 needs nothing
+from the new builder.
+
+### ⚠️ Why this is dangerous here, and not merely fiddly
+
+**"Upgrade" does not convert the form. It creates a second, separate one.** Airtable's own
+guidance: an upgraded form is treated as a *new* form, and automations with a
+*When a Form Is Submitted* trigger **are not** re-pointed automatically.
+
+`Conflict Check on New Intake` is bound to the original view by internal ID
+(`viw60aBEiAQi6Jcxr`). So nothing breaks loudly — the old view stays, the automation stays
+`valid`, and the new form creates intake records perfectly well. **It just never
+conflict-checks any of them**, and `Possible Conflict Matches` sits empty, which is
+indistinguishable from "checked, found nothing". That is exactly the silent failure the
+one-form rule exists to prevent.
+
+### The order it must be done in
+
+- [ ] **[Dan]** Press Upgrade
+- [ ] **[Dan]** **Immediately** — Automations → `Conflict Check on New Intake` → re-point the
+      trigger at the new form. Do not leave this to another sitting
+- [ ] **[Claude]** Confirm from the API that the trigger points at a live form and reads
+      `configurationStatus: valid`
+- [ ] **[Dan]** Submit a test intake through the **new** form and confirm
+      `Possible Conflict Matches` fills in. Nothing else proves it
+- [ ] **[Dan]** Only then retire the old form view, and replace its URL everywhere it has
+      been shared — including the link from nyriac.com, if that is live by then
+- [ ] **[Dan]** Re-check the form's field conditions survived the move, particularly the
+      `Type Of Office` routing from item 15
+
+Sources: [Airtable Community — upgraded form](https://community.airtable.com/base-design-9/upgraded-form-44819) ·
+[Airtable — building and sharing forms](https://support.airtable.com/articles/9431794285-building-and-sharing-forms-in-airtable)
+
 ---
 
 # Before this goes live
