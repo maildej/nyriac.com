@@ -1371,15 +1371,30 @@ link, which only make sense for that kind of office.
 So **Agencies means "an office RIAC serves"**, and that decides the three groups of
 requester who periodically turn up outside the county system:
 
-- **Federal defenders are mandated providers too** — appointed counsel, same species. They
-  belong in the table. **Five records added 12 Aug 2026**: NDNY, SDNY, EDNY, WDNY, and
-  `Federal Defender — Other Than New York` for a federal defender from another state. Every
-  name contains "Federal Defender", so typing *federal* surfaces all five. Their county link
-  is deliberately blank — federal districts are not counties, and a case takes its county
-  and RIAC region from **the court**, not the agency, so nothing depends on it.
+- **Federal defenders and CJA panel attorneys are mandated providers too** — appointed
+  counsel, same species. They belong in the table. **Ten records added 12 Aug 2026**: five
+  `Federal Defender - …` and five `Federal CJA Panel - …`, each covering NDNY, SDNY, EDNY,
+  WDNY and an `Other Than New York` catch-all. Their county link is deliberately blank —
+  federal districts are not counties, and a case takes its county and RIAC region from **the
+  court**, not the agency, so nothing depends on it.
+
+  **A CJA panel attorney is privately practising but appointed**, which is exactly why they
+  belong here: the line this table draws is *appointed vs privately retained*, not *office vs
+  solo*. The panel records stand for a district's panel rather than an office, so the
+  individual attorney is recorded on the intake rather than inferred from the link.
+
+  **The ten together make federal coverage complete**, which is why the intake form
+  deliberately shows federal requesters no "office not listed" route — the list cannot fail
+  them. The accepted cost is that whoever picks a catch-all does not record which district
+  they are in.
+
   ⚠️ **Unverified:** SDNY and EDNY are believed to be served by a single organisation
   (Federal Defenders of New York, Inc.). They are listed separately anyway because an
   attorney thinks and searches by district. Noted on the records themselves.
+
+- **Names use a plain hyphen, not an em dash.** All 134 records were normalised on
+  12 Aug 2026 (`Albany County - Public Defender`), changing 120 of them. Match that when
+  adding.
 - **Non-profit immigration organisations and privately retained attorneys are NOT** — and
   must never be added to Agencies. Thirty different private firms would collapse onto one
   fake "office" that then appears in county rollups and agency reports as if it were real,
@@ -1399,9 +1414,44 @@ So the real question is **what kind of requester is this**, asked once, at the t
 > Non-profit legal organization · Privately retained attorney or law firm ·
 > None of these / not sure
 
-Everything below it then behaves: the picker and the checkbox appear only for the two
-defender options, and `Office Not Listed - Details` appears for the other three **or** when
-the checkbox is ticked. Each of the four fields now means exactly one thing.
+Everything below it then behaves. **The routing separates three different jobs, and that
+separation is the whole design** (settled 12 Aug 2026, after a first version that ran them
+together):
+
+| `Type Of Office` | Picker | Can request an addition to the list | Free-text name | Message |
+|---|---|---|---|---|
+| NY Public Defender / Institutional Provider | ✓ | ✓ | when ticked | |
+| Assigned Counsel / 18(b) | ✓ | ✓ | when ticked | |
+| Federal Defender / CJA Panel Attorney | ✓ | — | — | |
+| Non-Profit Legal Organization | — | — | ✓ | |
+| Privately Retained Attorney or Law Firm | — | — | — | ✓ |
+| None of These | — | — | ✓ | |
+
+**Asking to be added to the published list is not the same as typing your name.** The first
+is a request that only a New York mandated provider can meaningfully make, and it puts work
+in someone's queue. The second is just a fact being recorded. Federal needs neither, because
+the ten federal records cannot fail them.
+
+⚠️ **`Attorney's Office` must not be required on the form.** Required, an attorney whose
+office is genuinely missing could not submit at all — which defeats `Office Not Listed?`
+entirely.
+
+### Telling one group something: it takes a field, not a text block
+
+`Privately Retained - Firm Details` (`fldPcIGORdr3knstT`) exists to carry a message, not to
+collect data. **A form view cannot show a block of text conditionally**, because labels and
+help text belong to a *field* rather than to a branch — so saying something to one group
+requires a field only that group sees. That is the whole reason this field exists, and the
+pattern to reuse next time the same need arises.
+
+**It cannot stop them submitting.** A form view has no conditional block on submission and no
+conditional redirect, so a privately retained attorney can read the message and send a
+complete intake anyway, RAP sheet and client details included. The message reduces wasted
+effort; it does not prevent it. The backstop is `Type Of Office` making the referral decision
+visible the moment the intake lands.
+
+**A gate that actually works belongs on the website** — on `intake.html`, the page that links
+to the form, before anyone reaches it.
 
 **Putting "My office is not listed" into the picker itself was rejected**, and the reason
 generalises: the burying problem comes from **length, not from being a list**. Entry 125 of

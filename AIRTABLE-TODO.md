@@ -363,16 +363,20 @@ The four fields exist but nothing can reach them, so the form is still collectin
 *old* free-text office. Short, and blocking nothing else — but the form is live-facing.
 
 **Data side finished 12 Aug 2026 — what is left is all form-editor work.** Built that day:
-`Type Of Office` (`fldVztD8WLlMBM8cG`), a five-option single select asked *first* and routing
-everything below it, and **five federal defender records** in Agencies (NDNY, SDNY, EDNY,
-WDNY, and `Federal Defender — Other Than New York`). The reasoning — what the Agencies table
-means, why non-profits and private firms must never be added to it, and why a type question
-beats a longer picker — is in `AIRTABLE.md` under "The intake form: office as a picker".
-The four fields' own descriptions in Airtable now spell out their form conditions too.
+`Type Of Office` (`fldVztD8WLlMBM8cG`), a **six-option** single select asked *first* and
+routing everything below it; `Privately Retained - Firm Details` (`fldPcIGORdr3knstT`), which
+exists to carry a message rather than to collect data; and **ten federal records** in Agencies
+— five Federal Defender and five Federal CJA Panel, each covering NDNY, SDNY, EDNY, WDNY and
+"Other Than New York". The reasoning — what the Agencies table means, why non-profits and
+private firms must never be added to it, and why a type question beats a longer picker — is in
+`AIRTABLE.md` under "The intake form: office as a picker". Every field's own description in
+Airtable now spells out its form condition too.
+
+**All 134 agency names were normalised to a plain hyphen** the same day (`Albany County -
+Public Defender`), replacing the em dash on 120 of them, at Dan's request.
 
 ⚠️ **The field descriptions must not be shown as form help text.** They are long internal
-notes written for whoever maintains the base — one of them says "TURN OFF the option that
-lets submitters create new records". Type attorney-facing wording instead.
+notes written for whoever maintains the base. Type attorney-facing wording instead.
 
 **Renaming an option later is safe** — Airtable references choices by internal ID, and
 nothing reads `Type Of Office` as text. **Deleting** one is not: it silently clears that
@@ -386,23 +390,64 @@ why the two listings do not match.
 ⚠️ **Never delete this form.** The conflict check is bound to it by internal ID; delete it and
 every intake stops being conflict-checked.
 
-- [ ] Add **`Type Of Office`** at the **top**, above the office question, and make it
-      **required**. Reword the question to *"Which best describes your office?"*
-- [ ] Add **`Attorney's Office`**, shown **only when `Type Of Office` is one of the two
-      defender options**
-- [ ] On that field, **turn OFF the option allowing submitters to create new records**
-      (usually "Allow linking to new records"). Left on, attorneys will invent agencies from a
-      public form — the exact thing the picker exists to prevent. **The trap is live here:**
-      the Agencies primary field is ordinary text, so inline creation genuinely is possible
-      (unlike the Parties picker, where a formula primary field blocks it outright)
-- [ ] Add **`Office Not Listed?`** (checkbox), **same condition** — the two defender options
-      only. That narrowing is what makes it mean one precise thing: a mandated provider
-      office is genuinely missing from Agencies and should be added
+### The routing, as decided 12 Aug 2026
+
+The six options do three different things, and the distinction is the point: **asking to be
+added to the published list** is only meaningful for New York mandated providers, whereas
+**typing your name** is just recording a fact.
+
+| `Type Of Office` | Picker | Can request an addition | Free-text name | Message |
+|---|---|---|---|---|
+| NY Public Defender / Institutional Provider | ✓ | ✓ | when ticked | |
+| Assigned Counsel / 18(b) | ✓ | ✓ | when ticked | |
+| Federal Defender / CJA Panel Attorney | ✓ | — | — | |
+| Non-Profit Legal Organization | — | — | ✓ | |
+| Privately Retained Attorney or Law Firm | — | — | — | ✓ |
+| None of These | — | — | ✓ | |
+
+**Federal gets no "not listed" route because the list cannot fail them** — ten records now
+cover both federal defenders and CJA panels across all four New York districts plus an
+out-of-state catch-all each. The cost is that whoever picks a catch-all does not record which
+district they are actually in; the "Anything Else" box catches that, and it was judged not
+worth a field of its own.
+
+*Residual risk, accepted:* an unusual New York mandated provider who does not recognise
+themselves in the categories may pick **None of These**, and would then get no "add to list"
+flag. Nothing is lost — the reviewer still sees their typed name and can add the agency by
+hand — it simply is not flagged as a request.
+
+- [x] ~~Add **`Type Of Office`** at the **top**, required, question reworded~~ — **done
+      12 Aug 2026.** Shown as a **List**, not a dropdown, so all six options are read at once;
+      "limit selection to specific options" left **off**, so a future option cannot go missing
+      from the form silently
+- [ ] Add **`Attorney's Office`**, shown when `Type Of Office` **is any of the THREE defender
+      options** — Public Defender / Institutional Provider, Assigned Counsel / 18(b), Federal
+      Defender / CJA Panel Attorney. ⚠️ **Do NOT make it required**: an attorney whose office
+      is genuinely missing could then not submit at all, which defeats the checkbox below
+- [x] ~~Turn off inline record creation on that field~~ — **nothing to do, tested on the live
+      form 12 Aug 2026.** No such setting is offered and an unknown office name creates
+      nothing. See `AIRTABLE.md` → "Two traps" — it is observed behaviour, not a setting we
+      control, so re-test after any change to how the form is built
+- [x] ~~Add **`Office Not Listed?`**~~ — **added 12 Aug 2026**, but ⚠️ **its condition is now
+      TWO options, not three**: Public Defender / Institutional Provider and Assigned Counsel
+      / 18(b) only. Federal comes off it. That narrowing is what makes it mean one precise
+      thing — a mandated provider office is genuinely missing from Agencies and should be
+      added, after RIAC review
 - [ ] Add **`Office Not Listed - Details`**, shown when **`Office Not Listed?` is ticked OR
-      `Type Of Office` is non-profit / privately retained / none of these**. Label it
-      neutrally — *"What is your office or firm called?"* — because it now serves both.
+      `Type Of Office` is Non-Profit Legal Organization or None of These**. Note privately
+      retained is **not** on this list any more — they get their own field below. Label it
+      neutrally: *"What is your office or organization called?"*
       If the form editor will not do an OR condition, leave it unconditional with
       *"(leave blank if you picked your office from the list above)"*
+- [ ] Add **`Privately Retained - Firm Details`**, shown **only when `Type Of Office` is
+      Privately Retained Attorney or Law Firm**. Its question label carries the message —
+      RIAC serves mandated providers; contact your RIAC directly; details at
+      nyriac.com/contact.html — with an invitation to give the firm name anyway. Write the
+      address as plain text, not a link.
+      ⚠️ **A form view cannot block submission conditionally**, so this reduces wasted effort
+      but cannot prevent a privately retained attorney sending a full intake with client
+      details. The gate that would actually work belongs on **`intake.html`**, before anyone
+      reaches the form — see the website item at the top of this file
 - [ ] **Remove the old `Affiliation`** field from the form (do not delete the field yet — it
       still holds three test submissions)
 - [ ] **Check the form asks for first and last name in separate boxes.** The conflict check
@@ -412,10 +457,12 @@ every intake stops being conflict-checked.
 - [ ] Submit **two** test intakes. **One as a defender office**, using surname *Smith* so the
       conflict check has something to find — check that **Possible Conflict Matches** fills
       in, that the surname landed in **`Client Last Name`**, and that `Attorney's Office`
-      came through as a proper link. **One as a private attorney** — check the picker and the
-      checkbox stay hidden and the name box appears instead. The first proves the conflict
-      check still fires after the changes and that names arrive split; the second proves the
-      routing works. Both rows then join the test data to be cleared before go-live
+      came through as a proper link. **One as a privately retained attorney** — check the
+      picker, the checkbox and `Office Not Listed - Details` all stay hidden, and that
+      `Privately Retained - Firm Details` appears carrying the message instead. The first
+      proves the conflict check still fires after the changes and that names arrive split;
+      the second proves the routing works. Both rows then join the test data to be cleared
+      before go-live
 
 ## 16. Delete the superseded fields  **[Dan]**
 
