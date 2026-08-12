@@ -359,8 +359,24 @@ do.
 
 ## 15. Finish the intake form  **[Dan]**
 
-The three new fields exist but nothing can reach them, so the form is still collecting the
+The four fields exist but nothing can reach them, so the form is still collecting the
 *old* free-text office. Short, and blocking nothing else — but the form is live-facing.
+
+**Data side finished 12 Aug 2026 — what is left is all form-editor work.** Built that day:
+`Type Of Office` (`fldVztD8WLlMBM8cG`), a five-option single select asked *first* and routing
+everything below it, and **five federal defender records** in Agencies (NDNY, SDNY, EDNY,
+WDNY, and `Federal Defender — Other Than New York`). The reasoning — what the Agencies table
+means, why non-profits and private firms must never be added to it, and why a type question
+beats a longer picker — is in `AIRTABLE.md` under "The intake form: office as a picker".
+The four fields' own descriptions in Airtable now spell out their form conditions too.
+
+⚠️ **The field descriptions must not be shown as form help text.** They are long internal
+notes written for whoever maintains the base — one of them says "TURN OFF the option that
+lets submitters create new records". Type attorney-facing wording instead.
+
+**Renaming an option later is safe** — Airtable references choices by internal ID, and
+nothing reads `Type Of Office` as text. **Deleting** one is not: it silently clears that
+value on every record. Add and re-point instead.
 
 **The form is called "Attorney Intake Form", and it is the only form in the base.** Find it in
 the **Data** tab → **Pending Intakes** table → the **view list down the left**, below "Grid
@@ -370,21 +386,36 @@ why the two listings do not match.
 ⚠️ **Never delete this form.** The conflict check is bound to it by internal ID; delete it and
 every intake stops being conflict-checked.
 
-- [ ] Add **`Attorney's Office`** to the form
+- [ ] Add **`Type Of Office`** at the **top**, above the office question, and make it
+      **required**. Reword the question to *"Which best describes your office?"*
+- [ ] Add **`Attorney's Office`**, shown **only when `Type Of Office` is one of the two
+      defender options**
 - [ ] On that field, **turn OFF the option allowing submitters to create new records**
       (usually "Allow linking to new records"). Left on, attorneys will invent agencies from a
-      public form — the exact thing the picker exists to prevent
-- [ ] Add **`Office Not Listed?`** (checkbox)
-- [ ] Add **`Office Not Listed - Details`**, shown **only when `Office Not Listed?` is ticked**
+      public form — the exact thing the picker exists to prevent. **The trap is live here:**
+      the Agencies primary field is ordinary text, so inline creation genuinely is possible
+      (unlike the Parties picker, where a formula primary field blocks it outright)
+- [ ] Add **`Office Not Listed?`** (checkbox), **same condition** — the two defender options
+      only. That narrowing is what makes it mean one precise thing: a mandated provider
+      office is genuinely missing from Agencies and should be added
+- [ ] Add **`Office Not Listed - Details`**, shown when **`Office Not Listed?` is ticked OR
+      `Type Of Office` is non-profit / privately retained / none of these**. Label it
+      neutrally — *"What is your office or firm called?"* — because it now serves both.
+      If the form editor will not do an OR condition, leave it unconditional with
+      *"(leave blank if you picked your office from the list above)"*
 - [ ] **Remove the old `Affiliation`** field from the form (do not delete the field yet — it
       still holds three test submissions)
 - [ ] **Check the form asks for first and last name in separate boxes.** The conflict check
       matches on surname OR date of birth, and if `Client Last Name` arrives empty then
       *every person on file* matches and the check becomes noise. Two of the three intakes on
       file have both name boxes empty, which may just be how those test rows were made
-- [ ] Submit one test intake and check that **Possible Conflict Matches** fills in, and that
-      the surname landed in **`Client Last Name`**. That confirms the conflict check still
-      fires after the changes, and that names are arriving split
+- [ ] Submit **two** test intakes. **One as a defender office**, using surname *Smith* so the
+      conflict check has something to find — check that **Possible Conflict Matches** fills
+      in, that the surname landed in **`Client Last Name`**, and that `Attorney's Office`
+      came through as a proper link. **One as a private attorney** — check the picker and the
+      checkbox stay hidden and the name box appears instead. The first proves the conflict
+      check still fires after the changes and that names arrive split; the second proves the
+      routing works. Both rows then join the test data to be cleared before go-live
 
 ## 16. Delete the superseded fields  **[Dan]**
 

@@ -1343,13 +1343,14 @@ confidential.
 
 The old `Affiliation` on Pending Intakes was free text typed by the requesting attorney,
 which produced a different spelling every time and could not be matched to an agency.
-Replaced by three fields:
+Replaced by four fields:
 
 | Field | Type | Purpose |
 |---|---|---|
-| `Attorney's Office` | Link to Agencies | The picker. Empty means not found. |
-| `Office Not Listed?` | Checkbox | Makes "not found" an **answer** rather than a blank. Without it, an empty office could equally mean the question was skipped. |
-| `Office Not Listed - Details` | Long text | What the attorney can tell us. Shown on the form only when the checkbox is ticked. Working text for the reviewer, not a substitute for the link. |
+| `Type Of Office` (`fldVztD8WLlMBM8cG`) | Single select | **Asked first, and routes the other three.** What KIND of requester this is. Added 12 Aug 2026 — see below. |
+| `Attorney's Office` | Link to Agencies | The picker. Shown only to the two defender options. Empty means not found. |
+| `Office Not Listed?` | Checkbox | Makes "not found" an **answer** rather than a blank. Without it, an empty office could equally mean the question was skipped. Shown only to the two defender options. |
+| `Office Not Listed - Details` | Long text | The office or firm name in words. Does double duty — see below. |
 
 **"Not Listed" is deliberately NOT an agency record.** Adding one would put a fake office
 into the Agencies table, where it would surface in county rollups, agency reports and every
@@ -1358,6 +1359,67 @@ non-existent office with nothing flagging it. An empty link plus a ticked checkb
 same thing without polluting the data.
 
 The review queue is then a filter: **checkbox ticked, link still empty.**
+
+### What the Agencies table means, and what follows from it (12 Aug 2026)
+
+All 124 original records are **mandated providers** — county public defenders, conflict
+defenders, assigned counsel plans, and the institutional providers (Brooklyn Defender
+Services, The Bronx Defenders, The Legal Aid Society, Hiscock, Appellate Advocates). The
+table also carries `Name of Chief Defender`, `Chief Defender Email Address` and a county
+link, which only make sense for that kind of office.
+
+So **Agencies means "an office RIAC serves"**, and that decides the three groups of
+requester who periodically turn up outside the county system:
+
+- **Federal defenders are mandated providers too** — appointed counsel, same species. They
+  belong in the table. **Five records added 12 Aug 2026**: NDNY, SDNY, EDNY, WDNY, and
+  `Federal Defender — Other Than New York` for a federal defender from another state. Every
+  name contains "Federal Defender", so typing *federal* surfaces all five. Their county link
+  is deliberately blank — federal districts are not counties, and a case takes its county
+  and RIAC region from **the court**, not the agency, so nothing depends on it.
+  ⚠️ **Unverified:** SDNY and EDNY are believed to be served by a single organisation
+  (Federal Defenders of New York, Inc.). They are listed separately anyway because an
+  attorney thinks and searches by district. Noted on the records themselves.
+- **Non-profit immigration organisations and privately retained attorneys are NOT** — and
+  must never be added to Agencies. Thirty different private firms would collapse onto one
+  fake "office" that then appears in county rollups and agency reports as if it were real,
+  and the actual firm name would be lost. Same reasoning as "Not Listed".
+
+### Why a *type* question and not just a longer picker
+
+The three groups above are not a "my office is missing" problem. `Office Not Listed?` asks
+*is our list incomplete*, and ticking it instructs the reviewer to go find or create the
+agency — which for a private firm is an **error**, not a task. Their office is not missing;
+it was never going to be there.
+
+So the real question is **what kind of requester is this**, asked once, at the top:
+
+> **Which best describes your office?**
+> NY public defender, legal aid, conflict defender or assigned counsel · Federal defender ·
+> Non-profit legal organization · Privately retained attorney or law firm ·
+> None of these / not sure
+
+Everything below it then behaves: the picker and the checkbox appear only for the two
+defender options, and `Office Not Listed - Details` appears for the other three **or** when
+the checkbox is ticked. Each of the four fields now means exactly one thing.
+
+**Putting "My office is not listed" into the picker itself was rejected**, and the reason
+generalises: the burying problem comes from **length, not from being a list**. Entry 125 of
+a searchable dropdown is unreachable — nobody scrolls, and nobody thinks to *search for the
+absence* of something. Five options shown at once are read in two seconds.
+
+**The referral decision is the other half of the payoff.** RIAC assists federal defenders
+and non-profits but generally refers privately retained attorneys out to private crim-imm
+counsel. Making that a recorded answer rather than an inference from a blank means the queue
+shows it at a glance, nobody starts work on a case that is going to be referred out, and it
+can be counted.
+
+Two consequences still open, both by hand: `Review Status` offers only **New / Under Review
+/ Accepted - Case Created / Rejected**, and "Rejected" is a harsh word for "referred out" —
+a **Referred Out** option may be wanted. And a privately retained attorney completing the
+whole form uploads a RAP sheet and full client details for a case RIAC will not take, which
+puts someone else's confidential client data in the base for no reason; the cheap fix is
+help text on that branch saying they need not complete the rest.
 
 ### Two traps
 
