@@ -1564,12 +1564,32 @@ survive misspelt first names and initials — but it only works if a surname act
 arrives. The automation's own description warns that when `Client Last Name` comes through
 empty, *every person on file* matches, and the check stops being a signal.
 
-So the public form must ask for **first and last name in separate boxes**. Of the three
-intake submissions currently on file, **two have both name boxes empty** — the `Client
-Name` formula renders as a single space. That may simply be how those test rows were made;
-the form could not be read from the API to confirm, because it is a view-based form rather
-than an interface form (see "Forms: two places" below). **Submit the live form once and
-check the surname lands in `Client Last Name`.**
+So the public form must ask for **first and last name in separate boxes**. Two of the three
+oldest intake submissions have both name boxes empty — the `Client Name` formula renders as
+a single space — which is what raised the question.
+
+**Answered 12 Aug 2026 by a live test submission.** "Daniel" and "Jackson" arrived in
+`Client First Name` and `Client Last Name` separately. The form asks properly.
+
+### An empty result is NOT the same as an unchecked one — the header proves it ran
+
+Worth knowing, because it softens the silent-failure problem recorded above. The automation
+writes its heading — *"Possible matches - same surname, or same date of birth:"* — **whether
+or not it finds anything**. So on any intake:
+
+| `Possible Conflict Matches` | Means |
+|---|---|
+| Heading, then names | Checked, and here is who to look at |
+| **Heading, nothing after it** | **Checked, found nobody** |
+| Completely empty | **The check never ran** — this intake did not come through the form |
+
+That last row is the dangerous one and it is now visibly distinguishable, which it was not
+thought to be. Verified on the 12 Aug test: surname "Jackson", no Jackson anywhere in
+Parties, and the field came back with the heading and nothing under it.
+
+⚠️ **That test did not prove the matching arm still finds people** — only that the automation
+fires and writes. Proving the other half needs a submission whose surname is actually on
+file; **Smith** works, because Steven Smith is in Parties.
 
 ## Forms: two places, one confusing overlap
 
