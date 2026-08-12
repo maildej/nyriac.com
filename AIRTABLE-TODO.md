@@ -357,112 +357,16 @@ do.
 
 # Already recorded, still outstanding
 
-## 15. Finish the intake form  **[Dan]**
+## 15. Finish the intake form  — **DONE 12 August 2026**
 
-The four fields exist but nothing can reach them, so the form is still collecting the
-*old* free-text office. Short, and blocking nothing else — but the form is live-facing.
+Kept as a marker because later items refer to it by number. The office picker, the six-way
+`Type Of Office` routing, the "not listed" pair, and the privately-retained message field are
+all built and on the live form, and **two test submissions proved both arms of the conflict
+check** — a surname match (Steven Smith) and a date-of-birth match (Fatoumata Sissoko).
+First and last name arrive in separate boxes, which was the question blocking it.
 
-**Data side finished 12 Aug 2026 — what is left is all form-editor work.** Built that day:
-`Type Of Office` (`fldVztD8WLlMBM8cG`), a **six-option** single select asked *first* and
-routing everything below it; `Privately Retained - Firm Details` (`fldPcIGORdr3knstT`), which
-exists to carry a message rather than to collect data; and **ten federal records** in Agencies
-— five Federal Defender and five Federal CJA Panel, each covering NDNY, SDNY, EDNY, WDNY and
-"Other Than New York". The reasoning — what the Agencies table means, why non-profits and
-private firms must never be added to it, and why a type question beats a longer picker — is in
-`AIRTABLE.md` under "The intake form: office as a picker". Every field's own description in
-Airtable now spells out its form condition too.
-
-**All 134 agency names were normalised to a plain hyphen** the same day (`Albany County -
-Public Defender`), replacing the em dash on 120 of them, at Dan's request.
-
-⚠️ **The field descriptions must not be shown as form help text.** They are long internal
-notes written for whoever maintains the base. Type attorney-facing wording instead.
-
-**Renaming an option later is safe** — Airtable references choices by internal ID, and
-nothing reads `Type Of Office` as text. **Deleting** one is not: it silently clears that
-value on every record. Add and re-point instead.
-
-**The form is called "Attorney Intake Form", and it is the only form in the base.** Find it in
-the **Data** tab → **Pending Intakes** table → the **view list down the left**, below "Grid
-view". It does **not** appear in the Forms tab in the top navigation — see `AIRTABLE.md` on
-why the two listings do not match.
-
-⚠️ **Never delete this form.** The conflict check is bound to it by internal ID; delete it and
-every intake stops being conflict-checked.
-
-### The routing, as decided 12 Aug 2026
-
-The six options do three different things, and the distinction is the point: **asking to be
-added to the published list** is only meaningful for New York mandated providers, whereas
-**typing your name** is just recording a fact.
-
-| `Type Of Office` | Picker | Can request an addition | Free-text name | Message |
-|---|---|---|---|---|
-| NY Public Defender / Institutional Provider | ✓ | ✓ | when ticked | |
-| Assigned Counsel / 18(b) | ✓ | ✓ | when ticked | |
-| Federal Defender / CJA Panel Attorney | ✓ | — | — | |
-| Non-Profit Legal Organization | — | — | ✓ | |
-| Privately Retained Attorney or Law Firm | — | — | — | ✓ |
-| None of These | — | — | ✓ | |
-
-**Federal gets no "not listed" route because the list cannot fail them** — ten records now
-cover both federal defenders and CJA panels across all four New York districts plus an
-out-of-state catch-all each. The cost is that whoever picks a catch-all does not record which
-district they are actually in; the "Anything Else" box catches that, and it was judged not
-worth a field of its own.
-
-*Residual risk, accepted:* an unusual New York mandated provider who does not recognise
-themselves in the categories may pick **None of These**, and would then get no "add to list"
-flag. Nothing is lost — the reviewer still sees their typed name and can add the agency by
-hand — it simply is not flagged as a request.
-
-- [x] ~~Add **`Type Of Office`** at the **top**, required, question reworded~~ — **done
-      12 Aug 2026.** Shown as a **List**, not a dropdown, so all six options are read at once;
-      "limit selection to specific options" left **off**, so a future option cannot go missing
-      from the form silently
-- [ ] Add **`Attorney's Office`**, shown when `Type Of Office` **is any of the THREE defender
-      options** — Public Defender / Institutional Provider, Assigned Counsel / 18(b), Federal
-      Defender / CJA Panel Attorney. ⚠️ **Do NOT make it required**: an attorney whose office
-      is genuinely missing could then not submit at all, which defeats the checkbox below
-- [x] ~~Turn off inline record creation on that field~~ — **nothing to do, tested on the live
-      form 12 Aug 2026.** No such setting is offered and an unknown office name creates
-      nothing. See `AIRTABLE.md` → "Two traps" — it is observed behaviour, not a setting we
-      control, so re-test after any change to how the form is built
-- [x] ~~Add **`Office Not Listed?`**~~ — **added 12 Aug 2026**, but ⚠️ **its condition is now
-      TWO options, not three**: Public Defender / Institutional Provider and Assigned Counsel
-      / 18(b) only. Federal comes off it. That narrowing is what makes it mean one precise
-      thing — a mandated provider office is genuinely missing from Agencies and should be
-      added, after RIAC review
-- [ ] Add **`Office Not Listed - Details`**, shown when **`Office Not Listed?` is ticked OR
-      `Type Of Office` is Non-Profit Legal Organization or None of These**. Note privately
-      retained is **not** on this list any more — they get their own field below. Label it
-      neutrally: *"What is your office or organization called?"*
-      If the form editor will not do an OR condition, leave it unconditional with
-      *"(leave blank if you picked your office from the list above)"*
-- [ ] Add **`Privately Retained - Firm Details`**, shown **only when `Type Of Office` is
-      Privately Retained Attorney or Law Firm**. Its question label carries the message —
-      RIAC serves mandated providers; contact your RIAC directly; details at
-      nyriac.com/contact.html — with an invitation to give the firm name anyway. Write the
-      address as plain text, not a link.
-      ⚠️ **A form view cannot block submission conditionally**, so this reduces wasted effort
-      but cannot prevent a privately retained attorney sending a full intake with client
-      details. The gate that would actually work belongs on **`intake.html`**, before anyone
-      reaches the form — see the website item at the top of this file
-- [ ] **Remove the old `Affiliation`** field from the form (do not delete the field yet — it
-      still holds three test submissions)
-- [ ] **Check the form asks for first and last name in separate boxes.** The conflict check
-      matches on surname OR date of birth, and if `Client Last Name` arrives empty then
-      *every person on file* matches and the check becomes noise. Two of the three intakes on
-      file have both name boxes empty, which may just be how those test rows were made
-- [ ] Submit **two** test intakes. **One as a defender office**, using surname *Smith* so the
-      conflict check has something to find — check that **Possible Conflict Matches** fills
-      in, that the surname landed in **`Client Last Name`**, and that `Attorney's Office`
-      came through as a proper link. **One as a privately retained attorney** — check the
-      picker, the checkbox and `Office Not Listed - Details` all stay hidden, and that
-      `Privately Retained - Firm Details` appears carrying the message instead. The first
-      proves the conflict check still fires after the changes and that names arrive split;
-      the second proves the routing works. Both rows then join the test data to be cleared
-      before go-live
+The reasoning is in `AIRTABLE.md` under "The intake form: office as a picker". Further intake
+work is **item 31**.
 
 ## 16. Delete the superseded fields  **[Dan]**
 
@@ -474,6 +378,9 @@ The API cannot delete fields. Each of these is safe — every case now carries i
       **NEVER convert this field to a linked record.** Airtable would create a new agency for
       every value it cannot match — including "Test Submission Two - Genesee PD (test)" — and
       the API cannot delete them
+- [ ] **`Court Name`** on **Pending Intakes** (`fldNWlXrLiFqxFJq0`). Superseded 12 Aug 2026 by
+      the `Court` link. Free text, and a test submission proved the point by arriving as
+      "Fake Court". Take it off the form first; delete once the test intakes are cleared
 - [ ] **`Case List Line`** on **State Case Info & RIAC Progress** (`fldvaVSnvTAmdmzBP`).
       Confirmed orphaned 11 Aug 2026: it returns only `"Attorney: …"`, and the Case Viewer
       list uses `Case List Title` as its Title and `Top Charge` as its second line, so this
@@ -1222,6 +1129,113 @@ one-form rule exists to prevent.
 
 Sources: [Airtable Community — upgraded form](https://community.airtable.com/base-design-9/upgraded-form-44819) ·
 [Airtable — building and sharing forms](https://support.airtable.com/articles/9431794285-building-and-sharing-forms-in-airtable)
+
+## 31. The second round of intake form work  **[Both]**
+
+Item 15 got the form correct. This is making it *good*. Raised by Dan 12 Aug 2026 after
+working through the live form.
+
+### Built 12 Aug 2026, waiting to go on the form  **[Dan]**
+
+| Field | |
+|---|---|
+| `Court` (`fldNjwAvSSJ1FyX0b`) | Link to Courts, replacing free-text `Court Name` |
+| `Court Not Listed / Non-NY Court?` (`fld7TA3GDEFJFnyYG`) | Checkbox |
+| `Court Not Listed - Details` (`fldNd67cwVHPM4TtH`) | Long text, shown only when ticked |
+| `County (from Court)` (`flduSvqKuxUIobdmF`) | Lookup — arrives automatically |
+| `RIAC Area (from Court)` (`fldVDCz3RPvpAQDRv`) | Lookup — arrives automatically |
+| `Date Of Birth Check` (`fld2iF5qXgC6wLJ6g`) | Formula flag, for the grid — **not** for the form |
+
+**Why the court link matters more than it looks.** County came off the form the same day, and
+this is what replaces it: **a case takes its county and RIAC region from the court, not from
+the attorney's office.** An attorney at the Albany County PD can have a case in Rensselaer, so
+deriving county from the agency would have been quietly wrong. Courts already carried `County`
+and `RIAC Area (from County)`, so both now arrive on the intake for free and the attorney
+answers one question instead of two.
+
+✅ **No inline-creation trap here.** The Courts primary field is a formula, so a court cannot
+be created from the picker at all — the same structural block as the Parties picker, unlike
+Agencies where the primary field is ordinary text.
+
+- [ ] **[Dan]** Put `Court` on the form where `Court Name` is now, and **take `Court Name`
+      off** (do not delete it — item 16)
+- [ ] **[Dan]** Add `Court Not Listed / Non-NY Court?`, then `Court Not Listed - Details`
+      shown only when it is ticked
+- [ ] **[Dan]** Consider setting `Court` to allow **one** record rather than many — the API
+      cannot set that, and a case has one court
+- [ ] **[Dan]** Add help text to `Client DoB`: *"Type the date as M/D/YYYY."* The picker opens
+      on the current month and cannot be turned off, so typing is the only sane route for a
+      date twenty years back. `Date Of Birth Check` catches the obvious failures afterwards —
+      it already flags the 12 Aug test intake that came through with a 2026 date of birth
+
+### `Urgent Flags` — split it rather than remove it  **[Decide]**
+
+Dan's instinct on 12 Aug was to take it off the form and make it a paralegal review step. The
+four options are not the same kind of thing, so the recommendation is to split by **who
+actually knows**:
+
+| Option | |
+|---|---|
+| **ICE Detainer** | Keep. Only the attorney knows, and it is what makes a case urgent |
+| **TOP/OP** | Keep. A fact on the attorney's file |
+| **Next Court Date Imminent** | **Drop** — `Next Court Date` is already collected, and a formula on it is objective where a tick can drift |
+| **SIJS Eligible** | **Move off the form.** That is RIAC's legal assessment, not something a requester should be guessing at |
+
+If the paralegal's own triage should also be recorded, that is a **second field**, not a
+relocation of this one — attorney-reported and RIAC-assessed are different facts, the same
+split as everywhere else in this base.
+
+### Renamed 12 Aug 2026
+
+`Charges & Case Description` → **`Attorney's Account Of The Allegations`**
+(`fldplCTuEEDye3KMc`). It had no description at all and was doing two jobs. It is now
+explicitly **the facts, not the citations** — charges become structured `Case Charges` records
+later — and it pairs with `RIAC Summary Of Allegations` on the case table: what we were told,
+and what we made of it.
+
+- [ ] **[Dan]** Reword the form question to *"What is the client alleged to have done?"* and
+      add help text naming what matters for immigration: value of any loss, age of any
+      complainant, weapon or controlled substance, relationship between the parties, and
+      anything touching intent
+
+### The form's appearance  **[Both]**
+
+Dan, 12 Aug 2026: *"extremely ugly — minimal branding, everything in a scroll-down list,
+everything in a weirdly narrow column."* True, and form views give almost no control: a cover
+image, a logo, the title and description. Deeper branding needs a higher plan.
+
+- [ ] **[Both]** **Embed the form in `intake.html`** using *Share form → embed*. The page
+      around it is ours — RIAC header, our own width, colours and intro copy — even though the
+      form inside the frame stays Airtable-styled. This is also the only place a real gate can
+      live, so the "who this form is for" message that the form itself cannot enforce belongs
+      on that page. ⚠️ **Submit one test through the embedded version** and confirm the
+      conflict check still fires
+- ⛔ **Still absolutely not:** a form of our own that posts into Airtable. The conflict check
+  is bound to this one form view and would silently stop running
+- Multi-page forms, and better layout generally, are a reason to look at **item 30** — a form
+  view cannot hide questions until earlier ones are answered, because conditions key on
+  *values*, not on completion
+
+### Confirmation email with a reference number  **[Claude]** to build
+
+- [ ] **[Claude]** An automation on form submission emailing the address in `Attorney Email`
+      a confirmation carrying a reference like `INT-0042`, so an attorney chasing later has
+      something to quote. Needs a reference-number field on Pending Intakes — an autonumber
+      plus a formula — which does not exist yet.
+      ⚠️ **It would send from Airtable's own mail server**, exactly like the reminder ladder,
+      so it must move to Outlook with the rest before go-live. Build it now, switch it then.
+- Airtable's own *"Allow people to request a copy of their responses"* toggle is the built-in
+  alternative. It is greyed out until the toggle above it is on, gives no reference number,
+  and the wording cannot be controlled.
+
+### Form settings  **[Dan]**
+
+- [ ] **Turn on "Email me at …"** for the pilot — the cheapest safety net against an intake
+      sitting unnoticed. Revisit at go-live: it is a personal address, and RIAC is moving to
+      @nyriac.com where a shared inbox would be better
+- Leave **"Submit another response"** and **"show a new blank form after 5 seconds"** off —
+  the second would wipe the confirmation message before anyone read it
+- "Show Airtable branding" is already off, and the post-submission message is good
 
 ---
 

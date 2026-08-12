@@ -1538,6 +1538,61 @@ on it, checked 12 Aug 2026. That is why the conversion was safe. **Interface fil
 exception** — the API cannot see filter settings, so a filter written as *"Case Type is
 Criminal"* needs re-checking as *"has any of"* after the widening.
 
+## The court decides the county, not the office (12 August 2026)
+
+The intake form used to ask for **County** as its own question and for the court as free text.
+Both changed on 12 August: `Court` (`fldNjwAvSSJ1FyX0b`) is now a link to the **Courts** table,
+and county came off the form entirely.
+
+**The reason is not just brevity — deriving county from the agency would have been wrong.** An
+attorney at the Albany County Public Defender can perfectly well have a case in Rensselaer. The
+county that matters is where the case is *heard*, which is exactly the rule the case table
+already follows. Courts carries `County` and `RIAC Area (from County)`, so both now arrive on
+the intake as lookups — `County (from Court)` and `RIAC Area (from Court)` — and the attorney
+answers one question instead of two.
+
+Free text was also actively bad: a test submission arrived with `Court Name` reading
+**"Fake Court"**, which matches nothing and routes nowhere.
+
+**No inline-creation trap here**, unlike Agencies: the Courts primary field is a **formula**, so
+a court cannot be created from the picker at all. Same structural block as the Parties picker.
+
+**The fallback costs both lookups.** `Court Not Listed / Non-NY Court?` plus
+`Court Not Listed - Details` handle an out-of-state or missing court — but an intake that goes
+that way arrives with **no county and no RIAC area**, so somebody must set the county by hand
+before it can be routed. Dan reports the Courts list is currently complete and changes perhaps
+once every year or two, so this should be rare.
+
+## Dates of birth: the picker defaults to today, and that gets submitted
+
+`Date Of Birth Check` (`fld2iF5qXgC6wLJ6g`) is a formula that is blank on any plausible date
+and otherwise says what is wrong — a date in the future, an age under 5, or an age over 110.
+
+It exists because a test submission on 12 August arrived carrying **2 August 2026** as a date
+of birth. The form's date picker opens on the current month and steps month by month, so
+accepting today's date is the path of least resistance. **The picker cannot be removed from a
+form view**; the box accepts typing, and the help text should say so, but some junk will get
+through regardless.
+
+That matters more than it looks: the conflict check matches on **date of birth as well as
+surname**, so a junk date silently weakens the check, and it then travels onto the client's own
+record. The under-5 threshold is deliberately crude — RIAC does see genuinely young clients,
+SIJS cases among them — so this catches nonsense rather than second-guessing the attorney. It
+is a flag, not a block.
+
+## Two accounts of the allegations, deliberately
+
+`Charges & Case Description` on Pending Intakes was renamed to **`Attorney's Account Of The
+Allegations`** on 12 August 2026. It had no description and was doing two jobs at once.
+
+- **It is the facts, not the citations.** Charges become structured `Case Charges` records once
+  the case exists, carrying their statutory text, classification and jury-instruction links. A
+  citation typed into this box connects to nothing.
+- **It pairs with `RIAC Summary Of Allegations`** on the case table: what we were told, and what
+  we made of it. Both should draw out the same details, because they are what the immigration
+  analysis turns on — value of any loss, age of any complainant, weapon or controlled substance,
+  relationship between the parties, and anything touching intent.
+
 ## The conflict check only fires from one specific form
 
 The "Conflict Check on New Intake" automation triggers on `formSubmitted`, bound to one
