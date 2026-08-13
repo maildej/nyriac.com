@@ -380,7 +380,11 @@ The API cannot delete fields. Each of these is safe — every case now carries i
       the API cannot delete them
 - [ ] **`Court Name`** on **Pending Intakes** (`fldNWlXrLiFqxFJq0`). Superseded 12 Aug 2026 by
       the `Court` link. Free text, and a test submission proved the point by arriving as
-      "Fake Court". Take it off the form first; delete once the test intakes are cleared
+      "Fake Court". Take it off the form first; delete once the test intakes are cleared.
+      **Nothing is lost by going:** `Court Not Listed / Non-NY Court?` already catches the
+      court that is genuinely not in the list, which is the only job free text was doing.
+      **It is still on the form and on the Pending Intakes interface page**, so until it is
+      swapped out attorneys keep filling the box that routes nothing
 - [ ] **`Case List Line`** on **State Case Info & RIAC Progress** (`fldvaVSnvTAmdmzBP`).
       Confirmed orphaned 11 Aug 2026: it returns only `"Attorney: …"`, and the Case Viewer
       list uses `Case List Title` as its Title and `Top Charge` as its second line, so this
@@ -1161,8 +1165,9 @@ Agencies where the primary field is ordinary text.
       off** (do not delete it — item 16)
 - [ ] **[Dan]** Add `Court Not Listed / Non-NY Court?`, then `Court Not Listed - Details`
       shown only when it is ticked
-- [ ] **[Dan]** Consider setting `Court` to allow **one** record rather than many — the API
-      cannot set that, and a case has one court
+- [x] ~~Set `Court` to allow **one** record rather than many~~ — **done 12 Aug 2026.** The API
+      cannot set this; Dan did it in the field editor. Checked afterwards: the lookups and
+      `RIAC (Routing)` all still resolve, and it now matches how `County` is already set
 - [ ] **[Dan]** Add help text to `Client DoB`: *"Type the date as M/D/YYYY."* The picker opens
       on the current month and cannot be turned off, so typing is the only sane route for a
       date twenty years back. `Date Of Birth Check` catches the obvious failures afterwards —
