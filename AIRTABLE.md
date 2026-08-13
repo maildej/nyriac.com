@@ -1668,8 +1668,23 @@ written from — question 3 asks for out-of-region requests **and their reasons*
 
 ### `Region This Case Belongs To` (`fldNcByMdwfhLLFPW`)
 
-Renamed from `RIAC (Routing)` and simplified the same day. It is now purely the court's region,
-with a warning when no court is linked.
+Renamed from `RIAC (Routing)` and simplified the same day. It is now purely the court's region.
+
+**It gives three answers, and the middle one was added after Dan's first live test:**
+
+| | |
+|---|---|
+| A region name | A court is linked |
+| *"No region - attorney says the court is not on our list"* | `Court Not Listed / Non-NY Court?` is ticked. **Not an error** |
+| *"⚠ NO REGION YET - no court linked"* | Neither — somebody skipped the court question |
+
+**Why the middle one exists.** The first test submission ticked *court not listed*, and the
+field answered *"no court linked"* — which reads like a fault when nothing had gone wrong. Two
+different situations were sharing one warning, and only one of them is anybody's fault. A
+warning that fires on correct behaviour is a warning people learn to ignore.
+
+⚠️ **Either way the case has no county**, so it will not reach the ILS county totals.
+`County (No Court On File)` on the case table is where somebody records it by hand.
 
 Under six databases the receiving center is already decided by which form was used, so this
 field stopped being a routing decision and became **a check on where the intake landed**: if it
@@ -1746,9 +1761,10 @@ That last row is the dangerous one and it is now visibly distinguishable, which 
 thought to be. Verified on the 12 Aug test: surname "Jackson", no Jackson anywhere in
 Parties, and the field came back with the heading and nothing under it.
 
-⚠️ **That test did not prove the matching arm still finds people** — only that the automation
-fires and writes. Proving the other half needs a submission whose surname is actually on
-file; **Smith** works, because Steven Smith is in Parties.
+✅ **The matching arm is now proven too** (13 Aug 2026). The Sissoko test intake came back with
+a full match — surname, date of birth, country of birth, and both RIAC cases that person is
+attached to. So both halves of the automation are confirmed: it fires and writes on every
+submission, and it genuinely finds people when they are on file.
 
 ## Who RIAC acts for, and why it changes what "conflict" means
 

@@ -1365,13 +1365,27 @@ avoided.** One public file was reasoned about carefully and the others were not.
 remembering as a pattern: *"is this file published?"* has to be asked about every file, not the
 obvious one.
 
-- [ ] **[Decide]** Pick one:
-      - **Docs in a separate private repo** — site stays public and free, notes stay private and
-        still readable from any computer. Preferred
-      - **Make this repo private** — simplest, but Pages from a private repo needs a paid plan
-      - **Accept it** — defensible only if the rule is that nothing confidential ever enters
-        these files, which is true today and needs to stay true
-- [ ] **[Dan]** Until then, do not treat any unlisted address in this repo as secret
+**DECIDED 13 Aug 2026: a separate private repository for the notes.**
+
+- [ ] **[Dan]** ⚠️ **Create it — Claude cannot.** The GitHub integration returns
+      *"403 Resource not accessible by integration"* on repository creation, so this is by hand:
+      github.com → **+** (top right) → **New repository** → name it `riac-notes` → tick
+      **Private** → tick **Add a README** → Create
+- [ ] **[Claude]** Once it exists, add it to a session and move `AIRTABLE.md` and
+      `AIRTABLE-TODO.md` across, leaving short pointer files behind
+- [ ] **[Decide]** Whether `CLAUDE.md` moves too. **It probably should not** — Claude Code reads
+      it automatically from the working folder, and moving it means losing that. Better to strip
+      the sensitive specifics out of it and leave the rest
+- ⚠️ **THE MOVE IS FORWARD-LOOKING ONLY. Deleting a file does not remove it from git history**,
+      and on a public repository every past commit stays readable. Everything written so far is
+      already published permanently. Harmless — no client data has ever been in these files —
+      but it means the move protects what comes next, not what already happened
+- ⚠️ **The test page address is therefore burned.** `k3n7qv92xr5t8m4w` is in the public history
+      and in two published files. If that page's obscurity is meant to be worth anything, rename
+      the folder to a fresh slug when the notes move, and do not write the new one into any file
+      that stays in the public repo
+- ⚠️ **Workflow cost worth knowing:** with the notes in a second repository, a session working
+      on the website will not see them unless that repo is added too
 
 ## MAKE AUTOMATION SETTINGS USER-EDITABLE  **[Both]**
 
