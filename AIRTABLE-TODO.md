@@ -383,8 +383,13 @@ The API cannot delete fields. Each of these is safe — every case now carries i
       "Fake Court". Take it off the form first; delete once the test intakes are cleared.
       **Nothing is lost by going:** `Court Not Listed / Non-NY Court?` already catches the
       court that is genuinely not in the list, which is the only job free text was doing.
-      **It is still on the form and on the Pending Intakes interface page**, so until it is
-      swapped out attorneys keep filling the box that routes nothing
+      Taken off the form 12 Aug 2026 and confirmed working - the picker offers county-qualified
+      names ("Fishkill Town Court (Dutchess County)"), so the wrong county's court cannot be
+      picked by accident. Still on the **Pending Intakes interface page**, which needs the
+      same swap.
+      ⚠️ **Claude cannot do the deletion.** The Airtable API can create and update fields but
+      has no delete-field call, so this one is Dan's hands only: Data tab → click the field
+      header → Delete field
 - [ ] **`Case List Line`** on **State Case Info & RIAC Progress** (`fldvaVSnvTAmdmzBP`).
       Confirmed orphaned 11 Aug 2026: it returns only `"Attorney: …"`, and the Case Viewer
       list uses `Case List Title` as its Title and `Top Charge` as its second line, so this
