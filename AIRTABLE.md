@@ -1879,18 +1879,77 @@ review to decide whether the relationship is a conflict needing referral or with
 review needs facts, and the facts come from the case we are not conflicted out of.
 ⚠️ **Nobody is represented here and no attorney should ever be contacted about it.**
 
-### Why no formula was changed to enforce this
+### A conflict record closes itself - Dan's fix, 13 August 2026
 
-**The reminder ladder already excludes both, with no change at all.** Route A only fires on a
-status containing the word *"awaiting"*, and Route B only on *"Atty Has Been In Contact"*. A
-conflict record left at *Case Opened (No Action Taken Yet)* is never chased. Editing any of the
-seven word-matching formulas to enforce it was rejected as more risk than the problem - see
-"The word-matching rule".
+An earlier version of this section said the safeguard was "the label being visible, not a rule
+preventing it", and flagged that setting a conflict record to *Intake Sent / Awaiting Contact*
+would put it on the chase list and email an attorney about a case RIAC is not on.
 
-⚠️ **What that leaves.** Setting a conflict record's status to *Intake Sent / Awaiting Contact*
-**would** put it on the chase list, and would email an attorney about a case RIAC is not on.
-The safeguard is the label being visible, not a rule preventing it. If that ever happens once,
-that is the moment to revisit the formula.
+**Dan's answer was to stamp the closing code instead, and it turns that habit into a rule.**
+Automation **`5. Conflict record closes itself`** (`wflw0tWN8KVbCvgDL`) fires when `Case Origin`
+becomes *Conflict record*, and sets `Closing Code` = **Conflicted Out** and `RIAC Next Steps` =
+**Closed**.
+
+**Checked against the formulas before building, and all three hold:**
+
+| | |
+|---|---|
+| `Reminder Stage` | Returns blank if `NOT({Closing Code} = "")` - **any** closing code drops the case off the chaser ladder *whatever the status says* |
+| `Dormant Case Flag` | Requires `{Closing Code} = ""`, so the dormancy route excludes it too |
+| `Closed Case Banner` | Fires on any closing code - the case carries a visible **"⚠ THIS CASE IS CLOSED — Conflicted Out"** |
+
+So the exposure is closed at the formula level, not by anyone remembering. Setting the status
+to Closed as well is what stops the banner appending its *"(status still reads: ...)"*
+inconsistency note - the banner checks for exactly that mismatch.
+
+**No word-matching formula was edited**, which was the thing worth avoiding. The fix works
+entirely through a value the formulas already test for.
+
+**`Date Closed` is deliberately left blank.** The case never opened, and the banner omits the
+date cleanly when it is empty. The closing code alone does all the excluding.
+
+**Accepted imprecision, Dan's call:** *Conflicted Out* is also the code for cases genuinely
+referred to another center, so the two are not distinguished. If the referral later arrives,
+the record makes the situation obvious and it can be referred then - at which point the label
+becomes literally accurate. It never misleads anyone into doing something wrong in the interim.
+
+## Statewide reporting: counts only, and the model already holds them (13 August 2026)
+
+**Dan's requirement, in his words:** the RIACs are only ever asked to report *numbers* - e.g.
+by county, how many written advisals, how many email advisals. Ideal is that ILS sees those
+numbers in real time **without accidentally creating a back door to client information**;
+acceptable is that each center generates them and sends them.
+
+**The good news: no new fields are needed.** `Closing Code` already carries *Email Advisal
+Sent* and *Written Advisal Sent*, and county arrives on the case through the `Court` link. The
+report ILS wants is a count of cases grouped by **county × closing code** over a period, which
+is answerable from the data as it stands today.
+
+### The shape that gives ILS live numbers without a back door
+
+A **Monthly Return** table in each center's base - one row per period × county × advisal type,
+carrying a **count and nothing else** - written by a scheduled automation. Only that table is
+synced out, into a reporting base ILS can see.
+
+**The safety property is structural, not permissions-based**, which is what makes it worth
+doing this way: the reporting base *physically contains only counts*. There is no client data
+in it to expose, so a misconfigured share cannot leak one. Filtering an interface would rely on
+the filter being right for ever; this does not.
+
+⚠️ **It is near-real-time, not live, and that is deliberate.** The numbers are as fresh as the
+automation's schedule - nightly, say. Genuinely live figures would mean syncing the case table
+itself, which is precisely the back door Dan wants to avoid. **Fresh enough is the trade that
+buys the isolation.**
+
+**Fallback (Dan's option c) needs nothing built:** a grouped view exported per center. Worth
+keeping in mind as the answer if Sync turns out not to be available.
+
+⚠️ **One definition to settle before counting anything.** `Closing Code` is a *multi-select*, so
+one case can carry both *Email Advisal Sent* and *Written Advisal Sent*. Counting by type will
+then count that case twice. That is probably right if ILS is counting **advisals**, and wrong
+if it is counting **cases** - and nobody has yet said which.
+
+
 
 **`RIAC Case No.` copes with an empty client**, which is what makes a stub case workable: it is
 the autonumber plus 5999, with the client and attorney parts each wrapped in their own `IF`. A

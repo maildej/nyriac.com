@@ -1194,17 +1194,34 @@ automation, interface and loader script exists six times, and every future chang
 made six times, for ever.
 
 - [ ] **[Dan]** ⚠️ **Check whether RIAC's Airtable plan includes Sync.** Everything below
-      depends on it. This is the first question and it blocks the rest
+      depends on it, including the ILS reporting design. This is the first question and it
+      blocks the rest. The API does not expose the plan - `list_workspaces` returns only that
+      there is **one workspace, "My First Workspace", owner**. That it still carries Airtable's
+      default name is a hint that nobody has set up a paid team workspace, but it is a hint and
+      not proof. **The quickest real test:** open a base, click **+** to add a table, and see
+      whether a **"Sync data from..."** option appears without an upgrade prompt
 - [ ] **[Claude]** Design the reference base: Courts, Counties, RIACs, Agencies, NY Penal Law,
       NY VTL, IDP Chart Entry, Email Templates - synced one-way and read-only into all six.
       Linked-record fields work against synced tables, so the `Court` link and the charge
       picker survive unchanged
 - [ ] **[Decide]** Which base is the template, and how a change made in one reaches the other
       five
-- [ ] **[Decide]** **Statewide reporting.** Six bases means no single place to count cases
-      across all centers. Nobody has said this is required - it is raised because finding out
-      late would be expensive. Likely answer if it is: a summary synced *back*, counts only,
-      no client detail
+- [x] ~~**Statewide reporting** - is it required?~~ **Answered by Dan 13 Aug 2026.** Yes, but
+      **numbers only** - by county, how many written advisals, how many email advisals. Ideal
+      is ILS seeing them live with no back door to client data; acceptable is each center
+      generating and sending them. Design in `AIRTABLE.md` → "Statewide reporting"
+- [ ] **[Claude]** Build the **Monthly Return** table - one row per period x county x advisal
+      type, a count and nothing else, written by a scheduled automation. Only that table syncs
+      out to a reporting base. The isolation is structural: the reporting base contains no
+      client data to leak. **No new fields needed on the case table** - `Closing Code` already
+      carries the advisal types and county arrives through the `Court` link
+- [ ] **[Decide]** ⚠️ **Is ILS counting advisals or cases?** `Closing Code` is a multi-select, so
+      one case can carry both *Email Advisal Sent* and *Written Advisal Sent* and would be
+      counted twice by type. Right for advisals, wrong for cases - the definition has to be
+      settled before any number is reported
+- ⚠️ Numbers would be **near-real-time, not live** - as fresh as the automation's schedule.
+      Genuinely live figures would mean syncing the case table, which is the back door being
+      avoided
 - ⚠️ Do **not** add a region picker to the intake form. `RIAC (Routing)` already derives the
       center from the court's county, and a picker would be a second source of truth for one
       fact
@@ -1219,9 +1236,12 @@ intake form, opened from attorney enquiry, conflict record. Reasoning in `AIRTAB
 
 - [ ] **[Dan]** Put `Case Origin` on the Case Viewer, and ideally on Find a Case, so a conflict
       record is never mistaken for a live case
-- [ ] **[Dan]** A conflict record must never be set to *Intake Sent / Awaiting Contact* - that
-      status is what puts a case on the chase list, and it would email an attorney about a case
-      RIAC is not on. No formula prevents this; the label is the safeguard
+- [ ] **[Dan]** ⚠️ **Turn on automation `5. Conflict record closes itself`**
+      (`wflw0tWN8KVbCvgDL`). New automations are saved switched OFF. It stamps
+      `Closing Code` = Conflicted Out and `RIAC Next Steps` = Closed whenever `Case Origin`
+      becomes *Conflict record*, which is what keeps these off the chase list at the formula
+      level rather than by anyone remembering. ~~No formula prevents this; the label is the
+      safeguard~~ - superseded by Dan's fix, 13 Aug 2026
 - [ ] **[Decide]** Whether a stub case should get a conflict check run by hand once real client
       details arrive. There is no name to check when it is opened, so the check is deferred
       rather than skipped - but nothing currently reminds anyone to come back to it
