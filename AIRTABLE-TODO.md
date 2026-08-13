@@ -1501,10 +1501,9 @@ very center that was conflicted out, so that center could pass it on — which m
 |---|---|
 
 - [ ] **[Dan]** Add that one field to the form. Always visible, not required, no conditions
-- [ ] **[Dan]** **Delete the two retired fields** once confirmed empty:
-      `ZZ RETIRED - Conflict Referral?` (`fldG2H1eYXswsOiC4`) and
-      `ZZ RETIRED - RIAC Requested` (`fldOk6aUmYq44J4jw`). Claude cannot delete fields.
-      `Region This Case Belongs To` was simplified first, so nothing references them
+- [x] ~~Delete the two retired fields~~ — **done by Dan, 13 Aug 2026.** Verified afterwards:
+      both gone, `Region This Case Belongs To` still valid and now referencing only the court
+      lookup, and all eight automations still reading `configurationStatus: valid`
 - ⚠️ **Do NOT rebuild a "have you been told this is a conflict?" question**, in any wording. It
       is the leading question the whole redesign exists to remove. The conflict check catches
       known conflicts anyway, whatever anyone ticks

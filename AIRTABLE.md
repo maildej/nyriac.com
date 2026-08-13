@@ -1675,15 +1675,16 @@ Under six databases the receiving center is already decided by which form was us
 field stopped being a routing decision and became **a check on where the intake landed**: if it
 names a different region, the case came from outside, and `Out-Of-Region Reason` should say why.
 
-### Retired, and awaiting deletion by hand
+### Retired and deleted, 13 August 2026
 
-| | |
-|---|---|
-| `ZZ RETIRED - Conflict Referral?` (`fldG2H1eYXswsOiC4`) | The checkbox that invited the unsafe submission |
-| `ZZ RETIRED - RIAC Requested` (`fldOk6aUmYq44J4jw`) | Named the onward center |
+`Conflict Referral?` — the checkbox that invited the unsafe submission — and `RIAC Requested`,
+which named the onward center. Both gone.
 
-**The formula was simplified before either was renamed**, so `Region This Case Belongs To` no
-longer references them and deleting them breaks nothing. Order matters if this is ever repeated.
+**The formula was simplified before either was renamed for retirement**, so
+`Region This Case Belongs To` never referenced a field that was about to disappear. Verified
+after deletion: the formula still resolves, and all eight automations still read
+`configurationStatus: valid`. **Order matters if this is ever repeated** — change what depends
+on a field before retiring the field.
 
 **`Conflict Alert?` on Parties is untouched and still right.** That is a center flagging a
 person inside its own database before an intake arrives — no submission, no disclosure, no
