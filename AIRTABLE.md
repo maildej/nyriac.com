@@ -2053,8 +2053,52 @@ obvious gap. They fall into three groups:
   (alternate defenders do conflict work, so "Public Defender" would be misleading).
 - **The NYC institutional providers**, which do not map onto ILS's county-shaped categories at
   all: *The Bronx Defenders*, *Brooklyn Defender Services*, *New York County Defender
-  Services*, *Neighborhood Defender Service of Harlem*, *Center for Family Representation*,
-  *Appellate Advocates*, *Center for Appellate Litigation*, *Office of the Appellate Defender*.
+  Services*, *Neighborhood Defender Service of Harlem*, *Center for Family Representation*.
+
+**A seventh option, `Appellate / Assigned`, was added by Dan on 13 August 2026** and applied to
+the three appellate institutional providers — *Appellate Advocates*, *Center for Appellate
+Litigation*, *Office of the Appellate Defender*. **10 records remain blank.**
+
+Adding a select option is safe and additive; nothing reads this field yet. Two things follow
+from it, though:
+
+- ⚠️ **It is not one of ILS's five categories**, so the annual report needs a rule for where it
+  lands — *Assigned Counsel* is the natural home, since these are court-assigned appellate
+  providers, but that is not yet decided. Same situation as `Federal Defender / CJA Panel`.
+- ⚠️ **It overlaps with two records already classified as Assigned Counsel** — *Assigned Counsel
+  Plan - Appellate Division, First Department* and *... Second Department*. Those are literally
+  appellate assigned-counsel plans, so they arguably belong in the new category. Left as they
+  are pending a decision, because moving them changes counts that the other classification
+  already assumes.
+
+**A note on how it was added:** the Airtable API cannot add a choice to an existing select
+through `update_field`, but writing a new value with `typecast: true` creates the option as a
+side effect. That is a useful escape hatch and also a hazard — it means a typo in a write can
+silently invent a select option. Use it deliberately, never as a default.
+
+### Reporting cases sent OUT for conflict
+
+Confirmed possible, and worth writing down because two things now share one closing code.
+
+`Closing Code` = **Conflicted Out** is set in two quite different situations:
+
+1. A case this center took in and then referred to another center — **this is the one ILS-style
+   reporting would count**
+2. A conflict record, where automation `5. Conflict record closes itself` stamps the same code
+   on a case RIAC never acted on
+
+**`Case Origin` is what separates them.** The count of cases genuinely referred out is:
+
+> `Closing Code` has *Conflicted Out* **AND** `Case Origin` is **not** *Conflict record - RIAC
+> does not act on this case*
+
+Without that second condition the number would be inflated by every conflict record ever
+created. Dan accepted the shared label on 13 August knowing the two were not distinguished;
+this is the case where it would have mattered, and `Case Origin` rescues it.
+
+The case table also carries a **`Referred Out To`** field, which is undocumented and empty on
+the pilot data — worth checking before building any report, since it may already be the right
+home for the destination center.
 
 ⚠️ **A field was created on the wrong table first.** `Provider Type` initially landed on
 **Attorneys & Requestors** because that table's ID was used by mistake. It has been renamed
@@ -2069,9 +2113,12 @@ to an *office*, and a copy on the person would be a second version of the same f
 
 ⚠️ **Ticking the box does not share anything yet** — the repository it feeds does not exist. It
 is built now because the decision is cheapest at the moment the event is logged and nearly
-impossible to reconstruct later. **Default is unticked, deliberately:** a deck can carry case
-specifics or a client's circumstances, and none of that should travel between centers because a
-box defaulted to on.
+impossible to reconstruct later.
+
+**On confidentiality, Dan is clear and it is his call to make:** RIAC trainings never contain
+client confidential information, so there is no review step and none is wanted. The unticked
+default stays only because sharing should be a positive choice, not because the contents are
+suspected.
 
 ## Trainings & Presentations (13 August 2026)
 

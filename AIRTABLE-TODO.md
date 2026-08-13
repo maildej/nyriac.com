@@ -1294,18 +1294,27 @@ in `AIRTABLE.md` → "Checked against a real ILS annual report".
 - [x] ~~**Q6: classify all 134 Agencies**~~ - **121 done 13 Aug 2026** (`fldAgfjArnPJUoIgE`):
       44 Public Defender, 45 Assigned Counsel / 18-B, 11 Conflict Defender, 11 Legal Aid,
       10 Federal Defender / CJA Panel
-- [ ] **[Dan]** **Classify the 13 left blank** - filter Agencies for an empty `Provider Type`.
+- [ ] **[Dan]** **Classify the 10 still blank.** Filter Agencies for an empty `Provider Type`.
       Left blank on purpose: a wrong value that looks decided is worse than an obvious gap.
       Two carry two roles in one name (*Ontario - Conflict Defender & Assigned Counsel Plan*,
       *Sullivan - Conflict Legal Aid*); three have names no rule can read (*Chemung - Public
       Advocate*, *Erie - Aid to Indigent Prisoners Society*, *Albany - Alternate Public
       Defender*, where "Public Defender" would mislead because alternate defenders do conflict
-      work); and eight are NYC institutional providers that do not map onto ILS's
-      county-shaped categories at all
-- [ ] **[Dan]** ⚠️ **Delete `ZZ DELETE ME - created in error`** on **Attorneys & Requestors**.
-      `Provider Type` was created on the wrong table first. It is empty, nothing reads it, and
-      it should not be filled in - provider type belongs to an office, not a person. Claude
-      cannot delete fields
+      work); and five are NYC institutional providers that do not map onto ILS's county-shaped
+      categories
+- [x] ~~The three appellate providers~~ - resolved 13 Aug 2026 by Dan's new
+      **`Appellate / Assigned`** option, applied to Appellate Advocates, Center for Appellate
+      Litigation and Office of the Appellate Defender
+- [ ] **[Decide]** **Where does `Appellate / Assigned` land on the ILS form?** It is not one of
+      ILS's five categories. *Assigned Counsel* is the natural home - these are court-assigned
+      appellate providers - but it is undecided. Same open question as `Federal Defender /
+      CJA Panel`
+- [ ] **[Decide]** **Do the two Appellate Division plans move?** *Assigned Counsel Plan -
+      Appellate Division, First Department* and *... Second Department* are currently
+      `Assigned Counsel / 18-B` and are literally appellate assigned-counsel plans. Left as they
+      are because moving them changes counts
+- [x] ~~Delete `ZZ DELETE ME - created in error` on Attorneys & Requestors~~ - done by Dan,
+      13 Aug 2026
 - [x] ~~**Q3: add a reason field to the case table**~~ - done, `Out-Of-Region Reason`
       (`fldOhd5K7Q2ymCcW0`). ⚠️ Nothing copies it from the intake's
       `Conflict Referral - Details` - that is a hand step when the case is created
@@ -1360,10 +1369,9 @@ box currently shares nothing** - it records an intention, and somebody sends the
       the direction of travel one-way and matches the reference-data design: nothing client-side
       ever leaves a center's own base
 - [ ] **[Decide]** Who may publish into it, and whether anything is reviewed before it appears
-- ⚠️ **The confidentiality risk here is different from everywhere else in this base**, and it is
-      worth naming: a training deck is exactly the kind of document that quietly contains a real
-      case's facts in an example slide. The share flag defaults to unticked for that reason, but
-      a default is not a review
+- ✅ **No review step is wanted.** Dan, 13 Aug 2026: RIAC trainings never contain client
+      confidential information. The unticked default stays only because sharing should be a
+      positive choice, not because the contents are suspected
 - ⚠️ Depends on the six-base split and on Sync, so it cannot be built before those
 
 ## Trainings & Presentations - built 13 Aug 2026  **[Dan]**
