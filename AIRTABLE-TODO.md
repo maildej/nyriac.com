@@ -1633,8 +1633,46 @@ Do not start these until testing is finished. Several have no undo.
       fake; confusing if anyone mistakes it for real
 - [ ] **Link nyriac.com to the Airtable intake form.** Link to it — do not build a form on
       the website that posts into Airtable, or the conflict check silently stops running
-      on every intake
+      on every intake.
+      **Staged, 13 Aug 2026:** the page is built and live at the unlisted address
+      `nyriac.com/k3n7qv92xr5t8m4w/`, linked from nowhere and carrying a "do not submit a real
+      client's details" notice. `intake.html` is deliberately untouched. Going live means
+      moving that content into `intake.html` and deleting the folder — **and not before the
+      online route has been tested end to end**
+- [ ] ⚠️ **RE-RUN THE FIELD-REACHABILITY AUDIT.** Not the same as doing it once — see the last
+      section of this file. Every field added since the audit is one that may have no home, and
+      under interface-only access a field on no page is a field nobody can fill in. **This is
+      the check that has to happen closest to go-live**, after the last field is built
 - [ ] From then on, treat everything in the base as confidential — see `AIRTABLE.md`
 
 The website has its own outstanding list — contact details to verify, advisory PDFs, DNS
 setup — in `CLAUDE.md`, separately.
+
+---
+
+# ⛔ THE LAST ITEM ON THIS LIST
+
+## Every editable field must be reachable from an interface page  **[Both]**
+
+**Deliberately placed at the end of the file, because it has to be done at the end of the
+work.** The detail and scoping are under "INTERFACE-ONLY ACCESS: every editable field needs a
+home" above; this is the marker saying *when*.
+
+Interface-only access for center staff is the goal — it is what turns the one-route intake rule
+from a working practice into a mechanism. **Its precondition is that no editable field is
+stranded**, because with no Data tab, a field on no page cannot be filled in by anyone.
+
+**It has to run twice, and Dan asked for both (13 Aug 2026):**
+
+1. **Once as the final build item** — after everything else on this list is finished, so the
+   audit covers a base that has stopped changing shape.
+2. **Again as a pre-go-live recheck** — because between finishing the list and going live there
+   will be more fields. There always are. This conversation alone added about a dozen.
+
+⚠️ **Doing it early is worse than not doing it**, because it produces a clean bill of health
+that stops being true the next time a field is created — and nobody re-reads a green tick.
+
+**Method** (`AIRTABLE.md` has the reasoning): `list_tables_for_base` gives every field;
+`list_pages_for_base` gives `visibleFieldIdsByTableId` per page and element. Subtract, and what
+is left is the stranded list. Exclude computed fields, which cannot be edited anywhere, and the
+reference tables, which should stay read-only.
