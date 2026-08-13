@@ -1488,174 +1488,28 @@ already checked - but only if the route genuinely cannot be used to introduce a 
 Work out what stops that before building anything.
 
 
-### Conflict referrals — built 12 Aug 2026, waiting to go on the form  **[Dan]**
+### Conflict referrals — REDESIGNED 13 Aug 2026  **[Dan]**
 
-The county is a default, not a rule: a RIAC can accept a case outside its region when another
-center has a conflict. Full reasoning in `AIRTABLE.md` → "Conflict referrals".
+⚠️ **The 12 Aug design was scrapped.** It invited an attorney to submit a known conflict to the
+very center that was conflicted out, so that center could pass it on — which means that center
+**receiving the client's confidential information first.** Full reasoning in `AIRTABLE.md` →
+"Conflict referrals: only one side of them can be asked about".
 
-| Field | |
+**What goes on the form is now one optional box, no checkbox, not required:**
+
+| `Out-Of-Region Reason` (`fldxu8KfszBikoBIj`) | *"If this case is not in our region, please tell us why you are sending it to us — for example, another RIAC asked you to."* |
 |---|---|
-| `Conflict Referral?` (`fldG2H1eYXswsOiC4`) | Checkbox |
-| `RIAC Requested` (`fldOk6aUmYq44J4jw`) | Single select, six center names |
-| `Conflict Referral - Details` (`fldxu8KfszBikoBIj`) | Which center declined it, and why |
-| `RIAC (Routing)` (`fldNcByMdwfhLLFPW`) | Formula — **the one field to read.** Not for the form |
 
-- [x] ~~Put `Court` on the form and take `Court Name` off~~ - **both done.** `Court Name`
-      (`fldNWlXrLiFqxFJq0`) has also been deleted from the table entirely, confirmed 13 Aug 2026
-- [ ] **[Dan]** Add `Conflict Referral?` to the form, then `RIAC Requested` and
-      `Conflict Referral - Details` shown **only when it is ticked**. Suggested question:
-      *"Has a RIAC already told you this is a conflict, or are you a RIAC entering a case you
-      have accepted as a conflict?"*
-- ⚠️ **Do NOT make `RIAC Requested` required** (corrected 13 Aug 2026). Under the six-database
-      plan the website picks the center before the attorney starts, so a blank here means *"I am
-      content with wherever you refer it"* rather than a missing answer. Requiring it would make
-      attorneys invent a destination nobody gave them. `Conflict Referral - Details` required is
-      still defensible - that is the box that stops the referral looking like an error later
-- [ ] **[Dan]** Put `RIAC (Routing)` on the **Needs Review** page, so an intake with no court
-      and no referral shows its `⚠ NO RIAC YET` warning rather than sitting silently unrouted
-- [ ] **[Decide]** Whether `RIAC Requested` should be visible to *every* submitting attorney or
-      only really intended for RIAC staff. It is on a public form, so anyone can tick the box
-      and choose a center — the details box is what makes a wrong claim visible, not the field
-      itself
-- ⚠️ **Renaming a center means renaming it twice** — in the RIACs table and in this select. The
-  RIACs primary field is a number, so a link picker would have shown attorneys "1, 2, 3"
-
-### `Urgent Flags` — split it rather than remove it  **[Decide]**
-
-Dan's instinct on 12 Aug was to take it off the form and make it a paralegal review step. The
-four options are not the same kind of thing, so the recommendation is to split by **who
-actually knows**:
-
-| Option | |
-|---|---|
-| **ICE Detainer** | Keep. Only the attorney knows, and it is what makes a case urgent |
-| **TOP/OP** | Keep. A fact on the attorney's file |
-| **Next Court Date Imminent** | **Drop** — `Next Court Date` is already collected, and a formula on it is objective where a tick can drift |
-| **SIJS Eligible** | **Move off the form.** That is RIAC's legal assessment, not something a requester should be guessing at |
-
-If the paralegal's own triage should also be recorded, that is a **second field**, not a
-relocation of this one — attorney-reported and RIAC-assessed are different facts, the same
-split as everywhere else in this base.
-
-### Renamed 12 Aug 2026
-
-`Charges & Case Description` → **`Attorney's Summary of Misconduct Allegations`**
-(`fldplCTuEEDye3KMc`). It had no description at all and was doing two jobs. It is now
-explicitly **the facts, not the citations** — charges become structured `Case Charges` records
-later — and it pairs with `RIAC Summary Of Allegations` on the case table: what we were told,
-and what we made of it.
-
-- [x] ~~Reword the form question and add help text~~ — **done 12 Aug 2026, in Dan's words:**
-      *"Please summarize allegations against your client stated at their worst - i.e. NOT just
-      what can be proven - e.g. 'Client alleged to have slapped complainant, his girlfriend.
-      She is alleged to have sustained a nose bleed and minor bruising'."*
-      **"At their worst" is the instruction that matters** — the immigration consequence turns
-      on what the record of conviction could be made to support, so an attorney who summarises
-      defensively hides the very facts RIAC needs.
-
-### The form's appearance  **[Both]**
-
-Dan, 12 Aug 2026: *"extremely ugly — minimal branding, everything in a scroll-down list,
-everything in a weirdly narrow column."* True, and form views give almost no control: a cover
-image, a logo, the title and description. Deeper branding needs a higher plan.
-
-- [ ] **[Both]** **Embed the form in `intake.html`** using *Share form → embed*. The page
-      around it is ours — RIAC header, our own width, colours and intro copy — even though the
-      form inside the frame stays Airtable-styled. This is also the only place a real gate can
-      live, so the "who this form is for" message that the form itself cannot enforce belongs
-      on that page. ⚠️ **Submit one test through the embedded version** and confirm the
-      conflict check still fires
-- ⛔ **Still absolutely not:** a form of our own that posts into Airtable. The conflict check
-  is bound to this one form view and would silently stop running
-- Multi-page forms, and better layout generally, are a reason to look at **item 30** — a form
-  view cannot hide questions until earlier ones are answered, because conditions key on
-  *values*, not on completion
-
-### Confirmation email with a reference number  **[Claude]** to build
-
-- [ ] **[Claude]** An automation on form submission emailing the address in `Attorney Email`
-      a confirmation carrying a reference like `INT-0042`, so an attorney chasing later has
-      something to quote. Needs a reference-number field on Pending Intakes — an autonumber
-      plus a formula — which does not exist yet.
-      ⚠️ **It would send from Airtable's own mail server**, exactly like the reminder ladder,
-      so it must move to Outlook with the rest before go-live. Build it now, switch it then.
-- Airtable's own *"Allow people to request a copy of their responses"* toggle is the built-in
-  alternative. It is greyed out until the toggle above it is on, gives no reference number,
-  and the wording cannot be controlled.
-
-### Form settings  **[Dan]**
-
-- [ ] **Turn on "Email me at …"** for the pilot — the cheapest safety net against an intake
-      sitting unnoticed. Revisit at go-live: it is a personal address, and RIAC is moving to
-      @nyriac.com where a shared inbox would be better
-- Leave **"Submit another response"** and **"show a new blank form after 5 seconds"** off —
-  the second would wipe the confirmation message before anyone read it
-- "Show Airtable branding" is already off, and the post-submission message is good
-
----
-
-# Before this goes live
-
-Do not start these until testing is finished. Several have no undo.
-
-- [ ] **Delete all test data.** Filter on **`Fake Entry?`** and clear it in: Parties, State
-      Case Info & RIAC Progress, Case Parties, Attorneys & Requestors, Case Charges
-- [ ] Delete the three test intakes in Pending Intakes
-- [ ] **Add a `Fake Entry?` filter to the EOIR Checks page** — if that page still exists after
-      item 10. It was deliberately left off so the page had something to show during testing;
-      leave it off and the page lists test people for ever
-- [ ] **Reset Espoir Mukendi's EOIR fields** if he survives the test-data clear-out — his
-      result was set on 8 August 2026 to prove the automation works, not because anyone looked
-      him up
-- [ ] **Remove `Fake Entry?` from the charge popup** — item 9(f) puts it there deliberately
-      for the pilot only
-- [ ] Review who can see the base, the interfaces, and any shared links
-- [x] ~~Confirm both chaser systems are meant to be there~~ — **settled 10 Aug 2026. There is
-      now only one.** `Monthly reminders 1` and `2` were deleted, along with the Monthly
-      Reminders and Run Monthly Reminders pages and the fields only they used. **`Send
-      approved reminders` is the only sender**, and the ladder is **three rungs**, not four:
-      first reminder at 30 days from the referral, second at 60, closure for non-response at
-      90. The separate final-warning rung was removed on 11 Aug
-- [ ] **Switch the reminder emails to Outlook.** Still the real blocker before any of this
-      touches a live attorney. All three rungs currently send from **Airtable's own mail
-      server**; each of the three `Send` steps in `Send approved reminders` needs swapping to
-      the Microsoft Outlook action, and the **BCC and Reply-To must be re-checked afterwards**
-      — the BCC is what files each sent chaser back as a case note
-- [ ] **Approve the reminder wording.** All three templates in **Email Templates** now have
-      text, but the Second Reminder and Closeout are **unapproved drafts written on 11 Aug**.
-      One open question inside them: Dan's original sketch for the old final-warning rung said
-      "we will close this case **and report you**", and who the attorney would be reported *to*
-      was never settled. That sentence has deliberately been left out of both drafts rather
-      than guessed at. If reporting is real, it belongs in the Second Reminder, and the
-      Closeout then needs a line saying it has happened
-- [ ] **Test that rich-text formatting survives into a sent email.** Opening Paragraph,
-      Closing Paragraph and Sign-off were converted to Rich text on 11 Aug. Airtable stores
-      rich text as Markdown and the send step renders Markdown, so bold and bullets *should*
-      come through — but nobody has seen it work. Send one first reminder to a real address
-      and look at what arrives
-- [ ] **Put Gennaro Apicella's email back.** It was pointed at `dejackson@outlook.com` on
-      11 Aug to test the closure branch end to end, and left there. Harmless while the data is
-      fake; confusing if anyone mistakes it for real
-- [ ] **Link nyriac.com to the Airtable intake form.** Link to it — do not build a form on
-      the website that posts into Airtable, or the conflict check silently stops running
-      on every intake.
-      **Staged, 13 Aug 2026:** the page is built and live at the unlisted address
-      `nyriac.com/k3n7qv92xr5t8m4w/`, linked from nowhere and carrying a "do not submit a real
-      client's details" notice. `intake.html` is deliberately untouched. Going live means
-      moving that content into `intake.html` and deleting the folder — **and not before the
-      online route has been tested end to end**
-- [ ] ⚠️ **RE-RUN THE FIELD-REACHABILITY AUDIT.** Not the same as doing it once — see the last
-      section of this file. Every field added since the audit is one that may have no home, and
-      under interface-only access a field on no page is a field nobody can fill in. **This is
-      the check that has to happen closest to go-live**, after the last field is built
-- [ ] From then on, treat everything in the base as confidential — see `AIRTABLE.md`
-
-The website has its own outstanding list — contact details to verify, advisory PDFs, DNS
-setup — in `CLAUDE.md`, separately.
-
----
-
-# ⛔ THE LAST ITEM ON THIS LIST
+- [ ] **[Dan]** Add that one field to the form. Always visible, not required, no conditions
+- [ ] **[Dan]** **Delete the two retired fields** once confirmed empty:
+      `ZZ RETIRED - Conflict Referral?` (`fldG2H1eYXswsOiC4`) and
+      `ZZ RETIRED - RIAC Requested` (`fldOk6aUmYq44J4jw`). Claude cannot delete fields.
+      `Region This Case Belongs To` was simplified first, so nothing references them
+- ⚠️ **Do NOT rebuild a "have you been told this is a conflict?" question**, in any wording. It
+      is the leading question the whole redesign exists to remove. The conflict check catches
+      known conflicts anyway, whatever anyone ticks
+- ℹ️ `RIAC (Routing)` is now **`Region This Case Belongs To`** and is purely geographic — a
+      check on where an intake landed, not a decision about where it goes
 
 ## Every editable field must be reachable from an interface page  **[Both]**
 

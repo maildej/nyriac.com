@@ -1619,74 +1619,82 @@ only what the prosecution can prove — hides the very facts RIAC needs. Both th
 `RIAC Summary Of Allegations` want the same details: value of any loss, age of any complainant,
 weapon or controlled substance, relationship between the parties, and anything touching intent.
 
-## Conflict referrals: the county is a default, not a rule
+## Conflict referrals: only one side of them can be asked about (13 August 2026)
 
 `RIAC Area (from Court)` derives the center from the county. That is right almost always and
-wrong in exactly the cases that matter most, because **a RIAC can accept a case outside its own
-region when another center has a conflict.** Two situations, both real (Dan, 12 August 2026):
+wrong in the cases that matter, because **a RIAC can accept a case outside its own region when
+another center has a conflict.** Two sides to that, and **only one is safe to build for.**
 
-1. **The attorney already knows.** Their default RIAC has declined as a conflict and named the
-   center to use instead. Rare.
-2. **A RIAC paralegal enters a case their own center accepted.** Expected to be the common one.
+### ⚠️ The side that cannot exist, and why
 
-Note what situation 2 depends on: **the paralegal uses the public form like anybody else**,
-because the form is the only route that runs the conflict check. Entering the case any other way
-would skip it silently — and a conflict-referred case is the last one you would want unchecked.
+A first design, built 12 August, let an attorney tick *"a RIAC has told me this is a conflict"*,
+name where it should go, and have the receiving center pass it on. **Dan spotted the flaw the
+next day, and it is fatal:**
 
-### Built 12 August 2026
+> **To refer a case onward, the conflicted center must first receive the client's confidential
+> information — which is exactly what being conflicted out means it must not do.** Referring it
+> on afterwards does not undo having read it.
 
-| Field | |
+So the pathway is not merely unnecessary, it is **harmful**: putting that question on a public
+form actively invites the submission that must not happen. An attorney told to go elsewhere
+goes elsewhere, directly, and never touches the conflicted center's form.
+
+**Nothing replaced it on that side, deliberately.** The conflict check catches known conflicts
+regardless of what anyone ticks — it searches every person on file, so nothing is lost by not
+asking.
+
+**Do not rebuild it, and do not add any variation.** A checkbox asking an attorney whether they
+have been told they are conflicted is the leading question this design exists to avoid.
+
+### The side that is safe: a case arriving from outside
+
+A center *receiving* an out-of-region case has no confidentiality problem at all — the case is
+being accepted, not passed along. All that is needed is the reason.
+
+**One field, one question, no checkbox gating it:**
+
+| `Out-Of-Region Reason` (`fldxu8KfszBikoBIj`) | Long text, always visible, **not required** |
 |---|---|
-| `Conflict Referral?` (`fldG2H1eYXswsOiC4`) | Checkbox — reveals the two below |
-| `RIAC Requested` (`fldOk6aUmYq44J4jw`) | Single select, the six center names |
-| `Conflict Referral - Details` (`fldxu8KfszBikoBIj`) | Which center declined it, and why |
-| **`RIAC (Routing)`** (`fldNcByMdwfhLLFPW`) | **The one field to read.** Override if set, else the county's center, else a warning |
 
-**The override beats the geography deliberately** — a conflict referral is a decision a human
-has already taken, and the county is only ever a default. `RIAC Area (from Court)` stays visible
-alongside it so you can see what the geographic answer *would* have been.
+Suggested wording: *"If this case is not in our region, please tell us why you are sending it
+to us — for example, another RIAC asked you to."*
 
-### ⚠️ What the six-database split does to this (Dan, 13 August 2026)
+**Why no checkbox in front of it:** one asking *"is this out of region?"* would need the
+attorney to know the county-to-region map; one asking about conflicts is the leading question
+above. An optional box that most people skip costs nothing.
 
-**`RIAC Requested` stops being the routing decision, and a blank stops being a problem.**
+It feeds `Out-Of-Region Reason` on the case table, which is where the ILS annual report is
+written from — question 3 asks for out-of-region requests **and their reasons**.
 
-These fields were designed when all six centers shared one database, so the field genuinely
-*was* where the case would go — and a ticked box with no center named silently fell back to the
-county, sending the case straight back to the center that had just conflicted out of it. That
-was worth guarding against, and the guard was to make the question required.
+### `Region This Case Belongs To` (`fldNcByMdwfhLLFPW`)
 
-**Under six databases, each center has its own intake form and the website decides who receives
-a submission before the attorney fills anything in.** So the question the field answers changes:
+Renamed from `RIAC (Routing)` and simplified the same day. It is now purely the court's region,
+with a warning when no court is linked.
+
+Under six databases the receiving center is already decided by which form was used, so this
+field stopped being a routing decision and became **a check on where the intake landed**: if it
+names a different region, the case came from outside, and `Out-Of-Region Reason` should say why.
+
+### Retired, and awaiting deletion by hand
 
 | | |
 |---|---|
-| **A center named** | *"I have been told specifically this should go to Region X"* |
-| **Blank** | *"I know it is a conflict, and I am content with wherever you refer it"* |
+| `ZZ RETIRED - Conflict Referral?` (`fldG2H1eYXswsOiC4`) | The checkbox that invited the unsafe submission |
+| `ZZ RETIRED - RIAC Requested` (`fldOk6aUmYq44J4jw`) | Named the onward center |
 
-**So it must NOT be a required question on the form.** Requiring it would force attorneys to
-invent a destination nobody has given them, and turn a meaningful blank into a guess.
+**The formula was simplified before either was renamed**, so `Region This Case Belongs To` no
+longer references them and deleting them breaks nothing. Order matters if this is ever repeated.
 
-`RIAC (Routing)` keeps its job, but the job is different: it stops being *"who gets this"* and
-becomes *"does this actually belong here, or should it be referred on?"* — still worth having,
-because it is what catches a case sitting with the wrong center, but it is a check on the
-routing rather than the routing itself.
+**`Conflict Alert?` on Parties is untouched and still right.** That is a center flagging a
+person inside its own database before an intake arrives — no submission, no disclosure, no
+other center involved.
 
-**This is a good example of a design that was correct and quietly stopped being correct.**
-Nothing about the fields changed; the architecture underneath them did.
+### The lesson worth keeping
 
-**`Conflict Referral - Details` is the point of the whole thing.** A Buffalo case sitting with
-the Syracuse center is either a considered referral or a mistake, and nothing else on the record
-distinguishes them. Six months on, nobody remembers.
-
-⚠️ **`RIAC Requested` is a single select, not a link to RIACs — and that is a compromise.** The
-RIACs table's primary field is the **number** (1–6), and a link picker displays the primary
-field, so a link would offer an attorney "1, 2, 3" with no names. The six names are therefore
-written in two places, and renaming a center means renaming it twice. Accepted only because
-center names change essentially never.
-
-**The case side needs nothing.** `State Case Info & RIAC Progress` links to RIACs directly and
-can be set to any center, so it already supports conflict cases. It was only the *intake* that
-derived the answer with no way to say otherwise.
+**This design was built, documented, reasoned about at length, and was wrong for a reason that
+had nothing to do with the database.** It handled the data correctly and would have caused a
+professional-responsibility problem the first time it was used. Structure cannot be checked
+against itself; it has to be checked against what actually happens to a real client.
 
 ## The conflict check only fires from one specific form
 
