@@ -1410,6 +1410,29 @@ Right now a cadence change is one formula edit. **After the split it would be th
 six bases** - and if centers ever want different cadences from each other, formulas cannot
 express that at all. Settings-in-a-table solves both. Worth doing before the split, not after.
 
+## INTERFACE-ONLY ACCESS: every editable field needs a home  **[Both]**
+
+Dan, 13 Aug 2026: interface-only access for center staff **is the goal**. It turns the
+one-route intake rule from a working practice into a mechanism - staff with no Data tab cannot
+create an intake by hand at all.
+
+**But it has a hard precondition.** With no Data tab, a field that appears on no interface page
+is a field nobody can ever fill in. So **every editable field in the base must be reachable
+from some page**, before access is narrowed and not after.
+
+- [ ] **[Claude]** **Run the audit.** It can be done from the API: `list_tables_for_base` gives
+      every field and type; `list_pages_for_base` gives `visibleFieldIdsByTableId` for each page
+      and element. Subtract one from the other and what remains is the list of fields that would
+      become unreachable. Produce it as a per-table list
+- [ ] **[Dan]** Place whatever the audit turns up
+- **Reference tables are out of scope** and should stay read-only: Agencies, Counties, Courts,
+  RIACs, NY Penal Law Offenses, NY VTL Offenses, IDP Chart Entry. Nobody at a center should be
+  editing the statute catalogues
+- ⚠️ **Computed fields do not need placing** - formulas, lookups, rollups and autonumbers cannot
+  be edited anywhere, so they only need to be *visible* where somebody needs to read them
+- ⚠️ **Do the audit LAST, or expect to redo it.** Every field added between now and then is
+  another one to place, and this conversation alone added a dozen
+
 ## A SHARED REPOSITORY FOR ALL SIX CENTERS  **[Both]**
 
 Raised by Dan 13 Aug 2026, and it **subsumes** the narrower "share training materials" idea:
@@ -1477,6 +1500,8 @@ center has a conflict. Full reasoning in `AIRTABLE.md` → "Conflict referrals".
 | `Conflict Referral - Details` (`fldxu8KfszBikoBIj`) | Which center declined it, and why |
 | `RIAC (Routing)` (`fldNcByMdwfhLLFPW`) | Formula — **the one field to read.** Not for the form |
 
+- [x] ~~Put `Court` on the form and take `Court Name` off~~ - **both done.** `Court Name`
+      (`fldNWlXrLiFqxFJq0`) has also been deleted from the table entirely, confirmed 13 Aug 2026
 - [ ] **[Dan]** Add `Conflict Referral?` to the form, then `RIAC Requested` and
       `Conflict Referral - Details` shown **only when it is ticked**. Suggested question:
       *"Has a RIAC already told you this is a conflict, or are you a RIAC entering a case you
