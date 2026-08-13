@@ -1173,10 +1173,10 @@ Agencies where the primary field is ordinary text.
 - [x] ~~Set `Court` to allow **one** record rather than many~~ — **done 12 Aug 2026.** The API
       cannot set this; Dan did it in the field editor. Checked afterwards: the lookups and
       `RIAC (Routing)` all still resolve, and it now matches how `County` is already set
-- [ ] **[Dan]** Add help text to `Client DoB`: *"Type the date as M/D/YYYY."* The picker opens
-      on the current month and cannot be turned off, so typing is the only sane route for a
-      date twenty years back. `Date Of Birth Check` catches the obvious failures afterwards —
-      it already flags the 12 Aug test intake that came through with a 2026 date of birth
+- [x] ~~Add help text to `Client DoB`~~ — **dropped 13 Aug 2026, Dan's call and he is right.**
+      The box already shows a `mm/dd/yyyy` placeholder before anything is typed, so the format
+      is on screen without help text. `Date Of Birth Check` still catches the failures
+      afterwards — it flagged the 12 Aug test intake that arrived with a 2026 date of birth
 
 ## THE BIGGEST ITEM BEFORE GO-LIVE: six siloed bases  **[Both]**
 
@@ -1344,6 +1344,34 @@ in `AIRTABLE.md` → "Checked against a real ILS annual report".
       (`fld0v0okJdm56sxyF`) and `Collaborators` (`fldFNN6RMVeqYrrDE`) added to
       `Trainings & Presentations`. Both are named columns on the ILS form and had been folded
       into `Notes` on the mistaken view that the funder wanted counts only
+
+## ⚠️ THE REPOSITORY IS PUBLIC — decide before real data exists  **[Decide]** **[Dan]**
+
+Found 13 Aug 2026, checking why the unlisted test page 404'd. `maildej/nyriac.com` is
+`"visibility": "public"`, and **`AIRTABLE.md`, `AIRTABLE-TODO.md`, `CLAUDE.md` and `SETUP.md`
+are all on `main`** — so they are readable at `nyriac.com/AIRTABLE.md`, and on github.com by
+anyone.
+
+**Two consequences:**
+
+1. **An "unlisted" folder in this repo is not unlisted.** Merging the intake test page puts its
+   folder name in a public tree, and the slug is written into `CLAUDE.md` and this file as well.
+   Obscurity was the entire security model for that page, and there is none.
+2. **These notes describe which routes bypass the conflict check.** Harmless while the base
+   holds fake data; a roadmap once it does not.
+
+⚠️ **This is the same mistake as putting the address in `robots.txt`, which was deliberately
+avoided.** One public file was reasoned about carefully and the others were not. Worth
+remembering as a pattern: *"is this file published?"* has to be asked about every file, not the
+obvious one.
+
+- [ ] **[Decide]** Pick one:
+      - **Docs in a separate private repo** — site stays public and free, notes stay private and
+        still readable from any computer. Preferred
+      - **Make this repo private** — simplest, but Pages from a private repo needs a paid plan
+      - **Accept it** — defensible only if the rule is that nothing confidential ever enters
+        these files, which is true today and needs to stay true
+- [ ] **[Dan]** Until then, do not treat any unlisted address in this repo as secret
 
 ## MAKE AUTOMATION SETTINGS USER-EDITABLE  **[Both]**
 
