@@ -1324,6 +1324,20 @@ conversations can all be as open as they are.
 - Revisit where conversations about the database happen, since transcripts will then
   contain client information.
 
+⚠️ **The same routine diagnostic becomes a disclosure the day real data arrives.** On
+13 August 2026, checking that two new formulas were computing meant reading four case records
+into the chat - client name, county and category. Harmless now, because everything in the base
+is fake test data. **After go-live that exact command discloses client information into a
+transcript**, and it is the most ordinary thing in the world to run.
+
+So once real data is in: read **schema** freely, but check formulas against **counts, blanks
+and filtered views** rather than by pulling records. Where a record genuinely has to be
+inspected, do it in the Airtable UI rather than through a chat.
+
+Worth separating from the reporting design, which has never been at risk here: what the funder
+receives is a table of **counts only**, so there is nothing in it to redact. The exposure is in
+how the base gets *worked on*, not in what gets *sent*.
+
 Until that point, treat nothing here as confidential. After it, treat everything as
 confidential.
 
