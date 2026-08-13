@@ -1986,6 +1986,93 @@ columns on the form. They had been folded into `Notes` on the reasoning that the
 counts only, which the actual form disproves. `Audience Type`, added the same day on a guess,
 turns out to answer ILS's "groups served" directly.
 
+## The ILS report: answers and what was built (13 August 2026)
+
+Dan settled the four open definitions, and the fields below follow from them.
+
+### The definitions
+
+| | |
+|---|---|
+| **A "consultation"** | **A RIAC case existing.** RIAC opens a case for anything it gives substantive legal advice on, even one with every field blank, so cases and consultations are the same population |
+| **ILS's Total column** | **Requests, not ticks.** A case marked criminal *and* appeal counts as **one appeal case** |
+| **"Family Court"** | ILS's name for what this base calls **Non-Criminal** — family court, and supreme court matrimonial, spousal support and custody. Anything else falls into ILS's own catch-all, "Immigration-related or other matter" |
+| **Trainings vs meetings** | One table. Dan added a *Provider meeting* option and renamed the field **`Training / Meeting Type`** |
+
+**One consequence Dan's definition carries that is easy to miss: conflict records must be
+excluded.** A conflict record is a case RIAC expressly does *not* act on, so counting it as a
+consultation would inflate every figure on the form. `ILS Report Category` excludes them in its
+first branch.
+
+### `ILS Report Category` (`fldTihyUK4BKDQcH6`)
+
+Reduces the multi-select `Case Type` to exactly one of ILS's five columns, so the per-county
+rows add up. Order, most specific first: **Post-conviction → Appeals → Family Court → Criminal
+defense → Immigration-related or other.**
+
+⚠️ **Only one step of that order is confirmed.** Dan's rule was that appeal beats criminal. The
+rest is a sensible-looking assumption — in particular whether post-conviction should beat
+appeal, and what a case marked both criminal *and* non-criminal should report as. **Confirm
+before the first return is filed.**
+
+### `County (Reporting)` (`fldpreoJWQUz60lxg`) — the answer to the missing-county problem
+
+Dan asked whether to default the value to something like "court not selected yet". Close, but
+county is a *lookup through the court*, and a lookup cannot be given a default. The same
+result comes from the shape already used by `RIAC (Routing)`:
+
+1. The **court's county** whenever a court is linked — always preferred, cannot be mistyped
+2. Otherwise **`County (No Court On File)`** (`fld2dCt7RLzZl6N1M`), a hand-filled link, marked
+   in the output so you can see it was entered by hand
+3. Otherwise **"⚠ NO COUNTY - will not appear in the ILS county totals"**
+
+**The warning is the point.** Before this, a case with no court simply had no county and
+vanished from every breakdown with nothing marking it missing, so Q2 could never be reconciled
+against Q1. Now those cases are *countable*: filter on the warning text and that is the list to
+fix.
+
+### `Out-Of-Region Reason` (`fldOhd5K7Q2ymCcW0`)
+
+ILS Q3 asks for out-of-region requests **and the reasons**. `Conflict Referral - Details` records
+that at intake, but the report is written from the **cases**, and the link from case back to
+intake was deliberately removed — so the reason was not where the person filling in the form
+would be looking. Copy it across when creating the case from the intake.
+
+### `Provider Type` on Agencies — 121 of 134 classified
+
+Applied from the names where the name settles it: **44 Public Defender, 45 Assigned Counsel /
+18-B, 11 Conflict Defender, 11 Legal Aid, 10 Federal Defender / CJA Panel.**
+
+**13 were left deliberately blank**, because a wrong value that looks decided is worse than an
+obvious gap. They fall into three groups:
+
+- **Two roles in one name** — *Ontario County - Conflict Defender & Assigned Counsel Plan*, and
+  *Sullivan County - Conflict Legal Aid, Inc.* A single select cannot hold both.
+- **The name says nothing a rule can use** — *Chemung County - Public Advocate*, *Erie County -
+  Aid to Indigent Prisoners Society, Inc.*, and *Albany County - Alternate Public Defender*
+  (alternate defenders do conflict work, so "Public Defender" would be misleading).
+- **The NYC institutional providers**, which do not map onto ILS's county-shaped categories at
+  all: *The Bronx Defenders*, *Brooklyn Defender Services*, *New York County Defender
+  Services*, *Neighborhood Defender Service of Harlem*, *Center for Family Representation*,
+  *Appellate Advocates*, *Center for Appellate Litigation*, *Office of the Appellate Defender*.
+
+⚠️ **A field was created on the wrong table first.** `Provider Type` initially landed on
+**Attorneys & Requestors** because that table's ID was used by mistake. It has been renamed
+**`ZZ DELETE ME - created in error`** and needs deleting by hand — Claude cannot delete fields.
+It is empty and nothing reads it. It should not be filled in either way: provider type belongs
+to an *office*, and a copy on the person would be a second version of the same fact.
+
+### Training materials and sharing between centers
+
+`Materials` (`fldBAWNf9NcsX8r5E`) holds the deck and handouts. `Share With Other RIACs?`
+(`fldBrsHVV5o8ZwuFS`) records whether they may be shared.
+
+⚠️ **Ticking the box does not share anything yet** — the repository it feeds does not exist. It
+is built now because the decision is cheapest at the moment the event is logged and nearly
+impossible to reconstruct later. **Default is unticked, deliberately:** a deck can carry case
+specifics or a client's circumstances, and none of that should travel between centers because a
+box defaulted to on.
+
 ## Trainings & Presentations (13 August 2026)
 
 `Trainings & Presentations` (`tblIe2KxbV3cr4M2c`) logs every training RIAC delivers, for the

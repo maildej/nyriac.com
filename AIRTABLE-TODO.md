@@ -1291,14 +1291,36 @@ in `AIRTABLE.md` → "Checked against a real ILS annual report".
 
 - [ ] **[Dan]** **Define "consultation"** (Q1). The base counts cases. Is a consultation a
       case, an advisal, or every contact? Every other number has to reconcile with it
-- [ ] **[Claude]** **Q6: classify all 134 Agencies** by `Provider Type` (`fldBTrHMPXKWuMfqH`,
-      added 13 Aug, **currently empty on every record**). Most can be read from the name; the
-      irregular ones - *Attica Legal Aid Bureau, Inc.*, the institutional providers, the ten
-      federal records - need Dan's eye. Propose a pass, then have Dan check the exceptions
-- [ ] **[Claude]** **Q3: add a reason field to the case table** for why an out-of-region case
-      was accepted. `Conflict Referral - Details` sits on the **intake**, and there is no link
-      from case back to intake, so the reason is not where the report gets written from. ILS
-      asks for it explicitly, naming "a conflict of interest at another Center"
+- [x] ~~**Q6: classify all 134 Agencies**~~ - **121 done 13 Aug 2026** (`fldAgfjArnPJUoIgE`):
+      44 Public Defender, 45 Assigned Counsel / 18-B, 11 Conflict Defender, 11 Legal Aid,
+      10 Federal Defender / CJA Panel
+- [ ] **[Dan]** **Classify the 13 left blank** - filter Agencies for an empty `Provider Type`.
+      Left blank on purpose: a wrong value that looks decided is worse than an obvious gap.
+      Two carry two roles in one name (*Ontario - Conflict Defender & Assigned Counsel Plan*,
+      *Sullivan - Conflict Legal Aid*); three have names no rule can read (*Chemung - Public
+      Advocate*, *Erie - Aid to Indigent Prisoners Society*, *Albany - Alternate Public
+      Defender*, where "Public Defender" would mislead because alternate defenders do conflict
+      work); and eight are NYC institutional providers that do not map onto ILS's
+      county-shaped categories at all
+- [ ] **[Dan]** ⚠️ **Delete `ZZ DELETE ME - created in error`** on **Attorneys & Requestors**.
+      `Provider Type` was created on the wrong table first. It is empty, nothing reads it, and
+      it should not be filled in - provider type belongs to an office, not a person. Claude
+      cannot delete fields
+- [x] ~~**Q3: add a reason field to the case table**~~ - done, `Out-Of-Region Reason`
+      (`fldOhd5K7Q2ymCcW0`). ⚠️ Nothing copies it from the intake's
+      `Conflict Referral - Details` - that is a hand step when the case is created
+- [x] ~~**Q1: define "consultation"**~~ - **answered:** a RIAC case existing. Conflict records
+      are therefore excluded, and `ILS Report Category` does that in its first branch
+- [x] ~~**Q4: what does ILS's Total mean?**~~ - **answered: requests.** Criminal + appeal counts
+      as one appeal case. Built as `ILS Report Category` (`fldTihyUK4BKDQcH6`)
+- [ ] **[Decide]** ⚠️ **Confirm the rest of the `ILS Report Category` order.** Only "appeal beats
+      criminal" came from Dan. Whether post-conviction should beat appeal, and what a case
+      marked both criminal and non-criminal reports as, are assumptions. Check before filing
+- [x] ~~**Q2: cases with no court have no county**~~ - solved by `County (Reporting)`
+      (`fldpreoJWQUz60lxg`) plus the hand-filled `County (No Court On File)`
+      (`fld2dCt7RLzZl6N1M`). Cases with neither now say so in terms and can be filtered for
+- [ ] **[Dan]** Put `County (Reporting)`, `ILS Report Category` and `Out-Of-Region Reason` on
+      the Case Viewer
 - [ ] **[Decide]** **Q4: "Non-Criminal Case" is not "Family Court".** ILS wants Family Court as
       its own column; ours also covers matrimonial and other non-criminal work. Either split
       the option in two, or accept that this column is approximate and say so to ILS
@@ -1321,6 +1343,28 @@ in `AIRTABLE.md` → "Checked against a real ILS annual report".
       (`fld0v0okJdm56sxyF`) and `Collaborators` (`fldFNN6RMVeqYrrDE`) added to
       `Trainings & Presentations`. Both are named columns on the ILS form and had been folded
       into `Notes` on the mistaken view that the funder wanted counts only
+
+## A SHARED REPOSITORY FOR ALL SIX CENTERS  **[Both]**
+
+Raised by Dan 13 Aug 2026, and it **subsumes** the narrower "share training materials" idea:
+every center should be able to put any document it chooses into a repository all six can see.
+
+The pieces that already exist: `Materials` (`fldBAWNf9NcsX8r5E`) and
+`Share With Other RIACs?` (`fldBrsHVV5o8ZwuFS`) on `Trainings & Presentations`. **Ticking the
+box currently shares nothing** - it records an intention, and somebody sends the file by hand.
+
+- [ ] **[Decide]** Scope: is this trainings-and-materials, or anything at all - practice
+      advisories, sample motions, template letters, research notes? The answer changes whether
+      it is one shared table or a small library with its own categories
+- [ ] **[Claude]** Design it as a **seventh base**, shared, that all six sync FROM. That keeps
+      the direction of travel one-way and matches the reference-data design: nothing client-side
+      ever leaves a center's own base
+- [ ] **[Decide]** Who may publish into it, and whether anything is reviewed before it appears
+- ⚠️ **The confidentiality risk here is different from everywhere else in this base**, and it is
+      worth naming: a training deck is exactly the kind of document that quietly contains a real
+      case's facts in an example slide. The share flag defaults to unticked for that reason, but
+      a default is not a review
+- ⚠️ Depends on the six-base split and on Sync, so it cannot be built before those
 
 ## Trainings & Presentations - built 13 Aug 2026  **[Dan]**
 
