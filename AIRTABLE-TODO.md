@@ -1506,6 +1506,11 @@ center has a conflict. Full reasoning in `AIRTABLE.md` → "Conflict referrals".
       `Conflict Referral - Details` shown **only when it is ticked**. Suggested question:
       *"Has a RIAC already told you this is a conflict, or are you a RIAC entering a case you
       have accepted as a conflict?"*
+- ⚠️ **Do NOT make `RIAC Requested` required** (corrected 13 Aug 2026). Under the six-database
+      plan the website picks the center before the attorney starts, so a blank here means *"I am
+      content with wherever you refer it"* rather than a missing answer. Requiring it would make
+      attorneys invent a destination nobody gave them. `Conflict Referral - Details` required is
+      still defensible - that is the box that stops the referral looking like an error later
 - [ ] **[Dan]** Put `RIAC (Routing)` on the **Needs Review** page, so an intake with no court
       and no referral shows its `⚠ NO RIAC YET` warning rather than sitting silently unrouted
 - [ ] **[Decide]** Whether `RIAC Requested` should be visible to *every* submitting attorney or

@@ -1646,6 +1646,34 @@ would skip it silently — and a conflict-referred case is the last one you woul
 has already taken, and the county is only ever a default. `RIAC Area (from Court)` stays visible
 alongside it so you can see what the geographic answer *would* have been.
 
+### ⚠️ What the six-database split does to this (Dan, 13 August 2026)
+
+**`RIAC Requested` stops being the routing decision, and a blank stops being a problem.**
+
+These fields were designed when all six centers shared one database, so the field genuinely
+*was* where the case would go — and a ticked box with no center named silently fell back to the
+county, sending the case straight back to the center that had just conflicted out of it. That
+was worth guarding against, and the guard was to make the question required.
+
+**Under six databases, each center has its own intake form and the website decides who receives
+a submission before the attorney fills anything in.** So the question the field answers changes:
+
+| | |
+|---|---|
+| **A center named** | *"I have been told specifically this should go to Region X"* |
+| **Blank** | *"I know it is a conflict, and I am content with wherever you refer it"* |
+
+**So it must NOT be a required question on the form.** Requiring it would force attorneys to
+invent a destination nobody has given them, and turn a meaningful blank into a guess.
+
+`RIAC (Routing)` keeps its job, but the job is different: it stops being *"who gets this"* and
+becomes *"does this actually belong here, or should it be referred on?"* — still worth having,
+because it is what catches a case sitting with the wrong center, but it is a check on the
+routing rather than the routing itself.
+
+**This is a good example of a design that was correct and quietly stopped being correct.**
+Nothing about the fields changed; the architecture underneath them did.
+
 **`Conflict Referral - Details` is the point of the whole thing.** A Buffalo case sitting with
 the Syracuse center is either a considered referral or a mistake, and nothing else on the record
 distinguishes them. Six months on, nobody remembers.
