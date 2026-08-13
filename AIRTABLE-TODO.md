@@ -1353,6 +1353,71 @@ in `AIRTABLE.md` → "Checked against a real ILS annual report".
       `Trainings & Presentations`. Both are named columns on the ILS form and had been folded
       into `Notes` on the mistaken view that the funder wanted counts only
 
+## MAKE AUTOMATION SETTINGS USER-EDITABLE  **[Both]**
+
+Raised by Dan 13 Aug 2026. Every number and trigger word an automation depends on should be
+**visible and changeable by the user**, not buried in a formula.
+
+This is the next step of a goal the base already half-has. `AIRTABLE.md` → "Changing behaviour
+without touching an automation" lists the levers - but every answer there is still *"edit this
+formula"*, which needs Claude or a developer. Dan wants them editable in a table.
+
+### The settings to expose
+
+| Setting | Where it is hard-coded now | Value |
+|---|---|---|
+| Rung spacing - first, second, closing | `Reminder Stage` formula | 30 / 60 / 90 days |
+| How long a sent chaser mutes a case | `Reminder Stage` formula | 21 days |
+| Silence before a case is flagged dormant | `Dormant Case Flag` formula | 45 days |
+| Words that mean "the attorney responded" | `Attorney Contact Date` formula | *email received*, *phone call*, *documents received*, *substantive* |
+| Subject prefixes that file an advisal and close a case | `Advisal Type From Subject` formula | *RIAC ADVISAL*, *RIAC EMAIL ADVISAL*, behind up to two *Fw:*/*Fwd:* |
+| Status words the ladder keys on | `Reminder Stage`, `Dormant Case Flag` | *awaiting*, *been in contact* |
+
+### ⚠️ The constraint that shapes the whole job
+
+**An Airtable formula can only read fields on its own record.** It cannot reach into a settings
+table. So a number living in `Reminder Control` cannot simply be referenced by `Reminder Stage`
+on the case table.
+
+The workable design:
+
+1. Put the settings on the single **`Reminder Control`** record, which already exists and
+   already holds one-off controls
+2. Add a **link field on the case table** pointing at that one record, filled automatically on
+   creation by a small automation
+3. Add **lookups** bringing each setting onto the case
+4. Rewrite the formulas to read the lookups instead of the literals
+
+- [ ] **[Claude]** Build the above for the **numbers** first
+- ⚠️ **Every rewritten formula must fall back to its current default when the lookup is blank** -
+  `IF({Setting} = BLANK(), 30, {Setting})`. A case that somehow lacks the link would otherwise
+  read the threshold as zero and chase immediately. This is the single most important detail in
+  the job
+
+### ⚠️ Numbers are safe to expose. Trigger words are not, and should be phase two
+
+Worth separating, because the two fail in completely different ways:
+
+- **A wrong number fails loudly.** Reminders go out at 14 days instead of 30 and somebody
+  notices within a fortnight.
+- **A wrong word fails silently.** One typo in *RIAC ADVISAL* and every filed advisal stops
+  closing its case, with no error anywhere - the exact silent-failure pattern this base has
+  been built to avoid. `AIRTABLE.md` already carries standing warnings about this wording for
+  precisely that reason.
+
+- [ ] **[Claude]** For the words, add a **validation formula** beside the settings that flags an
+      obviously broken value - blank, leading or trailing spaces, punctuation that cannot match -
+      and shows a visible warning on the control record
+- [ ] **[Decide]** Whether the words should be editable at all, or whether the honest answer is
+      that they stay a documented developer change. Exposing them is possible; making them
+      *safe* is not fully possible
+
+### It gets more valuable under the six-base split
+
+Right now a cadence change is one formula edit. **After the split it would be the same edit in
+six bases** - and if centers ever want different cadences from each other, formulas cannot
+express that at all. Settings-in-a-table solves both. Worth doing before the split, not after.
+
 ## A SHARED REPOSITORY FOR ALL SIX CENTERS  **[Both]**
 
 Raised by Dan 13 Aug 2026, and it **subsumes** the narrower "share training materials" idea:
