@@ -1913,6 +1913,57 @@ referred to another center, so the two are not distinguished. If the referral la
 the record makes the situation obvious and it can be referred then - at which point the label
 becomes literally accurate. It never misleads anyone into doing something wrong in the interim.
 
+## Trainings & Presentations (13 August 2026)
+
+`Trainings & Presentations` (`tblIe2KxbV3cr4M2c`) logs every training RIAC delivers, for the
+annual return to the funder. Roughly **20 events a year**. The funder asks for two things:
+what was given, and how many attended.
+
+| Field | |
+|---|---|
+| `Event` | Primary. Short recognisable name |
+| `Date` | What every count is grouped by |
+| `Training Type` | CLE (attorneys), CJE (judges), Magistrates' meeting, Other presentation |
+| `Audience Type` | A countable category - PD office, bar association, judges, magistrates, non-profit, other |
+| `Audience / Host` | Free text: who it was for, and who organised it if different |
+| `Attendees` | Whole numbers |
+| `Geographic Scope` | Single county / Regional / Statewide |
+| `County` | **Optional** link to Counties |
+| `Notes` | Everything else |
+
+### Why it is not linked to Agencies
+
+Dan's reasoning, and it holds. The audience for an event is frequently **not one entity** - a
+CLE at a public defender's office draws attorneys from outside it. The **host and the audience
+are often different bodies**, a county bar association organising an event for a PD office's
+staff, and the two are not co-extensive, so one link could not represent both. And many
+audiences are **not in this base at all**: non-profits, community groups, ad-hoc gatherings.
+
+**The deciding point is the third one, and it is stronger than the volume argument.** Because
+free text is needed for those audiences regardless, a link could only ever be populated for
+some rows - and **a partially-populated link is worse than no link, because any count drawn
+from it looks complete and is not.** That is the same failure this file already records for
+`Linked Cases`, where reading one side of a relationship gives a silently partial answer.
+
+At ~20 events a year a person can read the whole list in a minute, and the funder asks for no
+analysis beyond counts.
+
+### The two additions Dan did not ask for, and why
+
+- **`Audience Type`.** Free text cannot be grouped, so *"how many trainings went to public
+  defender offices rather than bar associations?"* would mean reading every row. Nobody has
+  asked that. It is here because the answer costs nothing at the time and cannot be
+  reconstructed reliably a year later.
+- **`Geographic Scope`.** County is optional by design, because regional and statewide events
+  have no single county. But that leaves a blank County ambiguous - not applicable, or never
+  filled in? This separates the two. **Set it before County.**
+
+**The link to Counties creates a matching field on the Counties table** listing trainings held
+there. Normal Airtable behaviour for a link; nothing depends on it.
+
+**Under the six-base split this table is per-center**, like the case data - each center reports
+its own trainings.
+
 ## Statewide reporting: counts only, and the model already holds them (13 August 2026)
 
 **Dan's requirement, in his words:** the RIACs are only ever asked to report *numbers* - e.g.

@@ -1215,10 +1215,17 @@ made six times, for ever.
       out to a reporting base. The isolation is structural: the reporting base contains no
       client data to leak. **No new fields needed on the case table** - `Closing Code` already
       carries the advisal types and county arrives through the `Court` link
-- [ ] **[Decide]** ⚠️ **Is ILS counting advisals or cases?** `Closing Code` is a multi-select, so
-      one case can carry both *Email Advisal Sent* and *Written Advisal Sent* and would be
-      counted twice by type. Right for advisals, wrong for cases - the definition has to be
-      settled before any number is reported
+- [x] ~~**Is ILS counting advisals or cases?**~~ **Answered 13 Aug 2026: advisals, not just
+      cases.** So a case carrying both *Email Advisal Sent* and *Written Advisal Sent* should
+      count once under each - the multi-select behaviour is correct as it stands, and no
+      de-duplication is wanted
+- [x] ~~**Does the Airtable plan include Sync?**~~ **Yes, as far as can be told, 13 Aug 2026.**
+      "Airtable base" appears in *Add data to a new table → Other sources* with **no Enterprise
+      badge**, while Adobe Experience Manager, Azure DevOps and Databricks all carry one - so
+      gated sources are visibly labelled and base-to-base sync is not among them.
+      ⚠️ Residual risk: limits on the *number* of synced tables can still bite at build time.
+      Worth confirming when the reference base is actually built, not before
+- [ ] ~~**[Decide]** Is ILS counting advisals or cases?~~ superseded
 - ⚠️ Numbers would be **near-real-time, not live** - as fresh as the automation's schedule.
       Genuinely live figures would mean syncing the case table, which is the back door being
       avoided
@@ -1271,6 +1278,21 @@ automatically** - what connects them is somebody having recorded the co-defendan
       nothing prompts it or reports it missing
 - [ ] **[Decide]** Whether to ask the attorney about known co-defendants on the intake form
       itself, which would catch them at the one moment somebody is definitely paying attention
+
+## Trainings & Presentations - built 13 Aug 2026  **[Dan]**
+
+`Trainings & Presentations` (`tblIe2KxbV3cr4M2c`). Standalone log for the funder's annual
+return: what training was given, and how many attended. ~20 events a year. Reasoning for the
+deliberate lack of an Agencies link is in `AIRTABLE.md` → "Trainings & Presentations".
+
+- [ ] **[Dan]** Add an interface page for it, so it is not only reachable from the Data tab
+- [ ] **[Dan]** Backfill this year's events, if the return is due before the base goes live
+- [ ] **[Decide]** Whether to record who delivered each training. Not asked for by the funder,
+      so it is left in `Notes` for now rather than given its own field - easy to promote later
+      if it turns out to be wanted regularly
+- ⚠️ **Set `Geographic Scope` before `County`.** County is optional because regional and
+      statewide events have no single one; Scope is what stops a blank County being ambiguous
+
 
 ## NEXT CONVERSATION: supplemental intakes for cases we already have  **[Both]**
 
