@@ -1371,8 +1371,14 @@ obvious one.
       *"403 Resource not accessible by integration"* on repository creation, so this is by hand:
       github.com → **+** (top right) → **New repository** → name it `riac-notes` → tick
       **Private** → tick **Add a README** → Create
-- [ ] **[Claude]** Once it exists, add it to a session and move `AIRTABLE.md` and
-      `AIRTABLE-TODO.md` across, leaving short pointer files behind
+- [x] ~~Create it~~ — **done by Dan, 13 Aug 2026: `maildej/riac-notes`, private**
+- [ ] **[Dan]** ⚠️ **Grant the Claude GitHub App access to it.** Creating a repository does not
+      add it to the App's scope, so Claude gets *"you don't have access to maildej/riac-notes"*
+      and cannot touch it. github.com → profile photo → **Settings** → **Applications** →
+      **Installed GitHub Apps** → **Claude** → **Configure** → under **Repository access** add
+      `riac-notes` → Save. **This applies to every future repository too**
+- [ ] **[Claude]** Then move `AIRTABLE.md` and `AIRTABLE-TODO.md` across, leaving short pointer
+      files behind
 - [ ] **[Decide]** Whether `CLAUDE.md` moves too. **It probably should not** — Claude Code reads
       it automatically from the working folder, and moving it means losing that. Better to strip
       the sensitive specifics out of it and leave the rest
