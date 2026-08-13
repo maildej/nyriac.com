@@ -1166,8 +1166,8 @@ answers one question instead of two.
 be created from the picker at all — the same structural block as the Parties picker, unlike
 Agencies where the primary field is ordinary text.
 
-- [ ] **[Dan]** Put `Court` on the form where `Court Name` is now, and **take `Court Name`
-      off** (do not delete it — item 16)
+- [x] ~~Put `Court` on the form where `Court Name` is now, and take `Court Name` off~~ —
+      **done 12–13 Aug 2026**, and `Court Name` has since been deleted from the table entirely
 - [ ] **[Dan]** Add `Court Not Listed / Non-NY Court?`, then `Court Not Listed - Details`
       shown only when it is ticked
 - [x] ~~Set `Court` to allow **one** record rather than many~~ — **done 12 Aug 2026.** The API
