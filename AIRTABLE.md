@@ -1582,16 +1582,69 @@ is a flag, not a block.
 
 ## Two accounts of the allegations, deliberately
 
-`Charges & Case Description` on Pending Intakes was renamed to **`Attorney's Account Of The
-Allegations`** on 12 August 2026. It had no description and was doing two jobs at once.
+`Charges & Case Description` on Pending Intakes was renamed on 12 August 2026 to
+**`Attorney's Summary of Misconduct Allegations`** (`fldplCTuEEDye3KMc`). It had no description
+and was doing two jobs at once.
 
 - **It is the facts, not the citations.** Charges become structured `Case Charges` records once
   the case exists, carrying their statutory text, classification and jury-instruction links. A
   citation typed into this box connects to nothing.
 - **It pairs with `RIAC Summary Of Allegations`** on the case table: what we were told, and what
-  we made of it. Both should draw out the same details, because they are what the immigration
-  analysis turns on — value of any loss, age of any complainant, weapon or controlled substance,
-  relationship between the parties, and anything touching intent.
+  we made of it.
+
+**Dan's wording, and the instruction that matters — "at their worst":**
+
+> Please summarize allegations against your client stated at their worst — i.e. NOT just what
+> can be proven — e.g. "Client alleged to have slapped complainant, his girlfriend. She is
+> alleged to have sustained a nose bleed and minor bruising".
+
+That is not carelessness about the evidence, it is the immigration analysis working backwards:
+the consequence turns on what the record of conviction *could* be made to support, so the
+worst-case reading is the one that has to be assessed. An attorney who summarises defensively —
+only what the prosecution can prove — hides the very facts RIAC needs. Both this field and
+`RIAC Summary Of Allegations` want the same details: value of any loss, age of any complainant,
+weapon or controlled substance, relationship between the parties, and anything touching intent.
+
+## Conflict referrals: the county is a default, not a rule
+
+`RIAC Area (from Court)` derives the center from the county. That is right almost always and
+wrong in exactly the cases that matter most, because **a RIAC can accept a case outside its own
+region when another center has a conflict.** Two situations, both real (Dan, 12 August 2026):
+
+1. **The attorney already knows.** Their default RIAC has declined as a conflict and named the
+   center to use instead. Rare.
+2. **A RIAC paralegal enters a case their own center accepted.** Expected to be the common one.
+
+Note what situation 2 depends on: **the paralegal uses the public form like anybody else**,
+because the form is the only route that runs the conflict check. Entering the case any other way
+would skip it silently — and a conflict-referred case is the last one you would want unchecked.
+
+### Built 12 August 2026
+
+| Field | |
+|---|---|
+| `Conflict Referral?` (`fldG2H1eYXswsOiC4`) | Checkbox — reveals the two below |
+| `RIAC Requested` (`fldOk6aUmYq44J4jw`) | Single select, the six center names |
+| `Conflict Referral - Details` (`fldxu8KfszBikoBIj`) | Which center declined it, and why |
+| **`RIAC (Routing)`** (`fldNcByMdwfhLLFPW`) | **The one field to read.** Override if set, else the county's center, else a warning |
+
+**The override beats the geography deliberately** — a conflict referral is a decision a human
+has already taken, and the county is only ever a default. `RIAC Area (from Court)` stays visible
+alongside it so you can see what the geographic answer *would* have been.
+
+**`Conflict Referral - Details` is the point of the whole thing.** A Buffalo case sitting with
+the Syracuse center is either a considered referral or a mistake, and nothing else on the record
+distinguishes them. Six months on, nobody remembers.
+
+⚠️ **`RIAC Requested` is a single select, not a link to RIACs — and that is a compromise.** The
+RIACs table's primary field is the **number** (1–6), and a link picker displays the primary
+field, so a link would offer an attorney "1, 2, 3" with no names. The six names are therefore
+written in two places, and renaming a center means renaming it twice. Accepted only because
+center names change essentially never.
+
+**The case side needs nothing.** `State Case Info & RIAC Progress` links to RIACs directly and
+can be set to any center, so it already supports conflict cases. It was only the *intake* that
+derived the answer with no way to say otherwise.
 
 ## The conflict check only fires from one specific form
 

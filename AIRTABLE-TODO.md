@@ -1168,6 +1168,31 @@ Agencies where the primary field is ordinary text.
       date twenty years back. `Date Of Birth Check` catches the obvious failures afterwards —
       it already flags the 12 Aug test intake that came through with a 2026 date of birth
 
+### Conflict referrals — built 12 Aug 2026, waiting to go on the form  **[Dan]**
+
+The county is a default, not a rule: a RIAC can accept a case outside its region when another
+center has a conflict. Full reasoning in `AIRTABLE.md` → "Conflict referrals".
+
+| Field | |
+|---|---|
+| `Conflict Referral?` (`fldG2H1eYXswsOiC4`) | Checkbox |
+| `RIAC Requested` (`fldOk6aUmYq44J4jw`) | Single select, six center names |
+| `Conflict Referral - Details` (`fldxu8KfszBikoBIj`) | Which center declined it, and why |
+| `RIAC (Routing)` (`fldNcByMdwfhLLFPW`) | Formula — **the one field to read.** Not for the form |
+
+- [ ] **[Dan]** Add `Conflict Referral?` to the form, then `RIAC Requested` and
+      `Conflict Referral - Details` shown **only when it is ticked**. Suggested question:
+      *"Has a RIAC already told you this is a conflict, or are you a RIAC entering a case you
+      have accepted as a conflict?"*
+- [ ] **[Dan]** Put `RIAC (Routing)` on the **Needs Review** page, so an intake with no court
+      and no referral shows its `⚠ NO RIAC YET` warning rather than sitting silently unrouted
+- [ ] **[Decide]** Whether `RIAC Requested` should be visible to *every* submitting attorney or
+      only really intended for RIAC staff. It is on a public form, so anyone can tick the box
+      and choose a center — the details box is what makes a wrong claim visible, not the field
+      itself
+- ⚠️ **Renaming a center means renaming it twice** — in the RIACs table and in this select. The
+  RIACs primary field is a number, so a link picker would have shown attorneys "1, 2, 3"
+
 ### `Urgent Flags` — split it rather than remove it  **[Decide]**
 
 Dan's instinct on 12 Aug was to take it off the form and make it a paralegal review step. The
@@ -1187,16 +1212,19 @@ split as everywhere else in this base.
 
 ### Renamed 12 Aug 2026
 
-`Charges & Case Description` → **`Attorney's Account Of The Allegations`**
+`Charges & Case Description` → **`Attorney's Summary of Misconduct Allegations`**
 (`fldplCTuEEDye3KMc`). It had no description at all and was doing two jobs. It is now
 explicitly **the facts, not the citations** — charges become structured `Case Charges` records
 later — and it pairs with `RIAC Summary Of Allegations` on the case table: what we were told,
 and what we made of it.
 
-- [ ] **[Dan]** Reword the form question to *"What is the client alleged to have done?"* and
-      add help text naming what matters for immigration: value of any loss, age of any
-      complainant, weapon or controlled substance, relationship between the parties, and
-      anything touching intent
+- [x] ~~Reword the form question and add help text~~ — **done 12 Aug 2026, in Dan's words:**
+      *"Please summarize allegations against your client stated at their worst - i.e. NOT just
+      what can be proven - e.g. 'Client alleged to have slapped complainant, his girlfriend.
+      She is alleged to have sustained a nose bleed and minor bruising'."*
+      **"At their worst" is the instruction that matters** — the immigration consequence turns
+      on what the record of conviction could be made to support, so an attorney who summarises
+      defensively hides the very facts RIAC needs.
 
 ### The form's appearance  **[Both]**
 
