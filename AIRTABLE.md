@@ -1699,6 +1699,145 @@ Parties, and the field came back with the heading and nothing under it.
 fires and writes. Proving the other half needs a submission whose surname is actually on
 file; **Smith** works, because Steven Smith is in Parties.
 
+## Who RIAC acts for, and why it changes what "conflict" means
+
+**RIAC serves the mandated attorney, not the defendant.** There is no direct
+attorney-client relationship with the person named on the case. Dan confirmed this on
+13 August 2026 and it belongs here because it shapes everything below: a "conflict" in this
+base is not the ordinary one-client-against-another test. It is about **RIAC's own
+knowledge** - having already advised one attorney on a matter, and being asked to advise a
+different attorney whose client's interests may run against the first.
+
+That is why the conflict check searches **people**, not clients, and why `Parties` holds
+everyone RIAC has ever recorded in any capacity.
+
+## Five conflict scenarios, and how the base answers them (13 August 2026)
+
+Dan put five real situations to the base. They are recorded here in full because the
+answers are not obvious from any single field, and four of the five turn on one idea:
+
+> **`Parties` + `Case Parties` IS the conflict memory.** The check reads it. Anything a
+> center learns and does not write there is invisible to every future intake.
+
+### (A) A center enters a case from another region's county, because that region conflicted out
+
+**Covered.** The `Conflict Referral?` / `RIAC Requested` / `Conflict Referral - Details`
+trio on Pending Intakes, built 12 Aug 2026. `RIAC (Routing)` then follows the requested
+center rather than the county. See "Conflict referrals" above.
+
+The paralegal uses the public form like anybody else - that is the only route that runs the
+conflict check.
+
+### (B) The co-defendant is already a client of the same center
+
+**Covered, but only if somebody wrote the co-defendant down.**
+
+The check matches the incoming client's **surname or date of birth** against `Parties`. Two
+co-defendants are two different people with two different surnames, so **nothing about the
+shared case connects them automatically.** What connects them is that when the first case
+was opened, the co-defendant was added as a `Case Parties` row with role Co-Defendant -
+which puts them in `Parties`. Their own intake then matches on their own name, and the
+check's output includes `Other Roles On RIAC Cases`, which says in terms: *this person is a
+co-defendant on case 6022*.
+
+⚠️ **So the safeguard is a data-entry habit, not a mechanism.** A center that opens a case
+and never records the co-defendant has silently disabled the check for that person. Nothing
+prompts it and nothing reports it missing.
+
+**Matching on docket number was considered and not built.** It is the obvious way to tie two
+people to one case without anyone recording anything, but docket numbers arrive as free text
+from attorneys in formats that vary case to case, so it would miss often and match wrongly
+sometimes. The habit is more reliable; it just has to be taught.
+
+### (C) A center knows a referral is coming and wants to flag it as a conflict in advance
+
+**Now covered - built 13 Aug 2026.** There was nowhere to put this. A person could be added
+to `Parties`, but nothing on the record said *"when this one arrives, it is a conflict"*.
+
+| Field on `Parties` | |
+|---|---|
+| `Conflict Alert?` (`fldc3Lyc9mNXq1dQn`) | Checkbox |
+| `Conflict Alert - Details` (`fldYwPCSVQmUfJzG1`) | Which center is conflicted, why, where it should go |
+
+The full move is: add the person to `Parties`, add them to the **existing** case as a
+`Case Parties` row with the right role, then tick and explain.
+
+⚠️ **It does not surface automatically yet.** The conflict-check automation renders a fixed
+list of fields onto the intake and this pair is not in it, so ticking the box does not put a
+warning on the incoming intake. Adding it is an outstanding job in `AIRTABLE-TODO.md`.
+
+**Note what is deliberately NOT possible here: creating the case in advance.** The case
+tables have no form, on purpose, so that every case arrives through intake and is therefore
+conflict-checked. Pre-logging a person is right; pre-creating their case is not.
+
+### (D) Person X turns out to be the former partner of person Y, who is or was a client
+
+**Covered, through `Case Parties` rather than through `Parties`.** Add X to Y's case as a
+Case Parties row - role Complainant, Witness or Other as fits - tick
+`Domestically Related To Client`, and put what the relationship actually is in `Notes`. X is
+then in `Parties`, so if X ever arrives as a client the check finds her and shows the case
+she is attached to.
+
+**There is deliberately no person-to-person link on `Parties`.** A self-link would be the
+tidy-looking answer and it is a trap already documented in this file under "Linked cases: a
+self-link is NOT symmetric" - Airtable creates a second field for the other end, and reading
+one box gives a silently incomplete answer. Relationships therefore hang off the case, where
+they also carry the context that makes them mean something.
+
+**The gap that remains:** if X has no connection to any case at all, there is nowhere to
+record her. Judged rare - the reason a center learns about someone is almost always a case.
+
+### (E) Splitting the base six ways - NOT SOLVED, and the hardest question here
+
+Dan's proposal was six intake forms behind HTML tabs, the attorney picking their region.
+**Three things are wrong with that, and the third is the real problem.**
+
+**1. Six forms would not create a confidentiality boundary.** All six would write into the
+same `Pending Intakes` table in the same base. Anyone who can see the base still sees every
+region's intakes. **Permissions create the boundary; forms do not.**
+
+**2. Six forms would multiply the base's most fragile part.** The conflict check is bound to
+one form view by internal ID. Six forms need six automations, and a region whose automation
+is misconfigured gets intakes that are silently never checked - the exact failure this base
+is built to avoid.
+
+**3. Routing is already solved without asking.** `RIAC (Routing)` derives the center from the
+court's county, with the conflict-referral override on top. Asking the attorney to pick their
+region as well creates a second source of truth for one fact, which is the drift pattern that
+killed the old `Status` field.
+
+#### The tension that has to be decided, not engineered around
+
+> **A statewide conflict check and six confidential silos cannot both be had in full.**
+
+The check works *because* every person any center has ever recorded sits in one table. Split
+the base six ways and each center can only check itself - which is precisely the check that
+would have missed every scenario (A) to (D) above.
+
+⚠️ **And the check already discloses across regions.** `Possible Conflict Matches` writes
+matched people's **names, dates of birth, country of birth and the cases they are attached
+to** onto the new intake. A Region 2 paralegal reading a Region 2 intake is therefore already
+reading facts about Region 4's people. That is inherent in a shared check, but it is a
+disclosure, and nobody has yet decided whether it is the right amount of one. A narrower
+version - *"possible conflict, contact Region 4"* with no names - is buildable, and loses the
+ability to eyeball whether a match is real.
+
+#### What the shape probably has to be
+
+One base, so the conflict memory stays whole, with per-center **visibility** rather than
+per-center data:
+
+- RIAC staff get **interface-only access**, not base access. A base collaborator can open the
+  data whatever the interface shows; only an interface-only collaborator is actually limited
+  to it. **This is the load-bearing decision** and it has not been checked against the plan
+  Airtable is on.
+- Each center gets its own filtered pages, keyed on the case's RIAC.
+- The conflict check stays statewide, with a decision taken about how much it may reveal.
+
+**None of this is built, and the permission question is Dan's to answer** - it is about
+RIAC's own professional obligations, not a technical preference. It is now the largest
+unfinished item before go-live, and it is bigger than the website connection.
+
 ## Forms: two places, one confusing overlap
 
 This cost two rounds of confusion, so it is worth writing down carefully — including the

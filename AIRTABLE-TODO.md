@@ -1178,6 +1178,79 @@ Agencies where the primary field is ordinary text.
       date twenty years back. `Date Of Birth Check` catches the obvious failures afterwards —
       it already flags the 12 Aug test intake that came through with a 2026 date of birth
 
+## THE BIGGEST ITEM BEFORE GO-LIVE: who can see what  **[Decide]** **[Dan]**
+
+Raised 13 Aug 2026. **Nothing anywhere had addressed this** - the only trace was a one-line
+"review who can see the base" under the pilot-status note. Full reasoning in `AIRTABLE.md` →
+"(E) Splitting the base six ways".
+
+The short version: **six intake forms would not do it.** All six would write to one table in
+one base, so anyone with base access still sees everything. Permissions create the boundary,
+forms do not. And the check is bound to one form by internal ID, so six forms means six
+automations and six chances for a region's intakes to go silently unchecked.
+
+**The decision that cannot be engineered around:** a statewide conflict check needs one
+shared pool of people; six confidential silos need separation. Both in full is not available.
+
+- [ ] **[Dan]** Decide the access model. The likely shape is one base with **interface-only**
+      collaborators - a base collaborator can open the data whatever the interface shows, so
+      only interface-only access actually restricts anyone. **Check this against the Airtable
+      plan RIAC is on before designing around it.**
+- [ ] **[Decide]** How much the conflict check may reveal across regions. It currently writes
+      matched people's names, dates of birth, country of birth and attached cases onto the new
+      intake - so a Region 2 paralegal already reads facts about Region 4's people. A narrower
+      version ("possible conflict, contact Region 4", no names) is buildable and costs the
+      ability to judge whether a match is real
+- [ ] **[Claude]** Once decided: per-center filtered pages keyed on the case's RIAC
+- ⚠️ Do **not** add a region picker to the intake form. `RIAC (Routing)` already derives the
+      center from the court's county, and a picker would be a second source of truth for one
+      fact
+
+## Conflict alerts on a person  **[Claude]**
+
+Built 13 Aug 2026 on `Parties`: `Conflict Alert?` (`fldc3Lyc9mNXq1dQn`) and
+`Conflict Alert - Details` (`fldYwPCSVQmUfJzG1`), for flagging that a referral involving
+this person will be a conflict *before* their intake arrives.
+
+- [ ] **[Claude]** Add both to the **Conflict Check on New Intake** automation's rendered
+      output, so a ticked alert actually appears on the incoming intake. Right now it does
+      not surface anywhere automatically and has to be looked at by hand.
+      ⚠️ **Needs Dan's go-ahead first:** edits land on the automation's *draft*, and this is
+      the one automation that must not break. Expect to have to review and re-enable it.
+- [ ] **[Dan]** Put both fields on the People page in the interface
+
+## The co-defendant habit is a habit, not a mechanism  **[Dan]**
+
+The conflict check matches the incoming client's surname or date of birth against `Parties`.
+Two co-defendants are two different people, so **nothing about a shared case connects them
+automatically** - what connects them is somebody having recorded the co-defendant as a
+`Case Parties` row when the first case was opened.
+
+- [ ] **[Dan]** Make this part of how centers are told to work. A center that opens a case and
+      never records the co-defendant has silently disabled the check for that person, and
+      nothing prompts it or reports it missing
+- [ ] **[Decide]** Whether to ask the attorney about known co-defendants on the intake form
+      itself, which would catch them at the one moment somebody is definitely paying attention
+
+## NEXT CONVERSATION: supplemental intakes for cases we already have  **[Both]**
+
+Raised by Dan 13 Aug 2026, parked deliberately until the conflict scenarios were finished.
+
+The situation: RIAC sends the initial email, and the attorney comes back with everything -
+already knowing the RIAC case number it belongs to. **Today they would have to fill the whole
+intake form again**, re-entering their own name, affiliation and contact details, to tell us
+something about a case we already have.
+
+The shape to work out: a second, shorter route for *additional material on a known case*, as
+against *telling us about a new case*. Probably keyed on the RIAC case number, and probably
+landing as documents plus a case note rather than as a Pending Intake.
+
+⚠️ **The trap to design around from the start:** the conflict check is bound to the one intake
+form, and a second form would not run it. That is correct for supplemental material on a case
+already checked - but only if the route genuinely cannot be used to introduce a *new* case.
+Work out what stops that before building anything.
+
+
 ### Conflict referrals — built 12 Aug 2026, waiting to go on the form  **[Dan]**
 
 The county is a default, not a rule: a RIAC can accept a case outside its region when another
