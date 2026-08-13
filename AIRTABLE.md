@@ -1766,9 +1766,9 @@ The full move is: add the person to `Parties`, add them to the **existing** case
 list of fields onto the intake and this pair is not in it, so ticking the box does not put a
 warning on the incoming intake. Adding it is an outstanding job in `AIRTABLE-TODO.md`.
 
-**Note what is deliberately NOT possible here: creating the case in advance.** The case
-tables have no form, on purpose, so that every case arrives through intake and is therefore
-conflict-checked. Pre-logging a person is right; pre-creating their case is not.
+**An earlier version of this section said pre-creating the case was wrong. That was wrong,
+and Dan was right to push back.** See "Cases that never had an intake" below - creating a
+case by hand is not a workaround, it is how every case in this base is made.
 
 ### (D) Person X turns out to be the former partner of person Y, who is or was a client
 
@@ -1787,56 +1787,114 @@ they also carry the context that makes them mean something.
 **The gap that remains:** if X has no connection to any case at all, there is nowhere to
 record her. Judged rare - the reason a center learns about someone is almost always a case.
 
-### (E) Splitting the base six ways - NOT SOLVED, and the hardest question here
+### (E) Splitting the base six ways - DECIDED 13 August 2026: strict silos
 
-Dan's proposal was six intake forms behind HTML tabs, the attorney picking their region.
-**Three things are wrong with that, and the third is the real problem.**
+**Dan's answer, in his words:** each database strictly siloed, *"especially not being able to
+run conflict checks against another center's clients"*. The only things shared are public
+reference data - defender offices (not individual attorney details), and the NY Penal Law and
+VTL sections.
 
-**1. Six forms would not create a confidentiality boundary.** All six would write into the
-same `Pending Intakes` table in the same base. Anyone who can see the base still sees every
-region's intakes. **Permissions create the boundary; forms do not.**
+That settles a question this file had framed as an agonising trade-off. It is worth recording
+that **the trade-off was overstated here**, because it changes how easy the decision is:
 
-**2. Six forms would multiply the base's most fragile part.** The conflict check is bound to
-one form view by internal ID. Six forms need six automations, and a region whose automation
-is misconfigured gets intakes that are silently never checked - the exact failure this base
-is built to avoid.
+> An earlier draft of this section warned that six silos would break the check that "would
+> have caught every one of (A) to (D)". **That was wrong.** Scenarios (B), (C) and (D) are all
+> **within one center** - the co-defendant, the anticipated referral and the former partner are
+> all things one center learns about its own caseload. Only (A) crosses centers, and (A) is
+> already handled by a human being sending an email, not by the database.
 
-**3. Routing is already solved without asking.** `RIAC (Routing)` derives the center from the
-court's county, with the conflict-referral override on top. Asking the attorney to pick their
-region as well creates a second source of truth for one fact, which is the drift pattern that
-killed the old `Status` field.
+**So strict silos cost very little of what was actually being asked for.** What is genuinely
+given up is the case nobody raised: a person who appeared in Region 5 two years ago quietly
+surfacing in Region 1. Dan has decided that cross-center visibility is not wanted, and there
+are good professional-responsibility reasons why one center's client information should not be
+searchable by another.
 
-#### The tension that has to be decided, not engineered around
+#### What this means in practice
 
-> **A statewide conflict check and six confidential silos cannot both be had in full.**
+**Six separate bases - not one base with clever permissions.** Interface-only access restricts
+what a *user* sees, but the data still sits together and anyone with base or workspace
+admin rights can reach all of it. "Strictly siloed" means separate bases.
 
-The check works *because* every person any center has ever recorded sits in one table. Split
-the base six ways and each center can only check itself - which is precisely the check that
-would have missed every scenario (A) to (D) above.
+| | |
+|---|---|
+| **Conflict check** | Stays exactly as built, but each center only ever searches its own `Parties`. The cross-region disclosure problem disappears entirely. |
+| **`RIAC (Routing)`** | Still earns its place - it tells a center *"this one belongs to another region, refer it out"*. It no longer routes inside a shared queue. |
+| **Conflict referral fields** | Still right, now on the **receiving** center's base. A referral between centers becomes a re-entry by hand, because the two bases cannot see each other. |
+| **This pilot base** | Becomes one center's base, or the template the other five are copied from. |
 
-⚠️ **And the check already discloses across regions.** `Possible Conflict Matches` writes
-matched people's **names, dates of birth, country of birth and the cases they are attached
-to** onto the new intake. A Region 2 paralegal reading a Region 2 intake is therefore already
-reading facts about Region 4's people. That is inherent in a shared check, but it is a
-disclosure, and nobody has yet decided whether it is the right amount of one. A narrower
-version - *"possible conflict, contact Region 4"* with no names - is buildable, and loses the
-ability to eyeball whether a match is real.
+#### The real cost, and it is not small
 
-#### What the shape probably has to be
+**Everything gets built six times, and every future change has to be made six times.** Tables,
+fields, automations, interfaces, the offence catalogues and their loader scripts. This base has
+spent a fortnight learning things the hard way; multiplying that by six is the dominant risk of
+the whole plan, and it is a *maintenance* risk rather than a build risk - it never ends.
 
-One base, so the conflict memory stays whole, with per-center **visibility** rather than
-per-center data:
+**The mitigation is Airtable Sync.** One reference base holds the genuinely shared, public
+tables - Courts, Counties, RIACs, Agencies, NY Penal Law, NY VTL, IDP Chart Entry, Email
+Templates - and syncs them one-way and read-only into each of the six. Linked-record fields
+work against a synced table, so the `Court` link and the charge picker carry on unchanged.
+That is exactly the split Dan described: public reference shared, client data never.
 
-- RIAC staff get **interface-only access**, not base access. A base collaborator can open the
-  data whatever the interface shows; only an interface-only collaborator is actually limited
-  to it. **This is the load-bearing decision** and it has not been checked against the plan
-  Airtable is on.
-- Each center gets its own filtered pages, keyed on the case's RIAC.
-- The conflict check stays statewide, with a decision taken about how much it may reveal.
+⚠️ **Sync is a paid-plan feature and has not been checked against the plan RIAC is on.** That
+check comes before any of this is designed in detail.
 
-**None of this is built, and the permission question is Dan's to answer** - it is about
-RIAC's own professional obligations, not a technical preference. It is now the largest
-unfinished item before go-live, and it is bigger than the website connection.
+#### Still open
+
+- **Statewide reporting.** Six bases means no single place to count cases across all centers.
+  If RIAC ever has to report aggregate numbers, that needs designing - most likely a summary
+  synced *back* from each center carrying counts and no client detail. **Nobody has said this
+  is required; it is flagged because finding out late would be expensive.**
+- **Which base is the template**, and how a change made in one is carried to the other five.
+
+## Cases that never had an intake (13 August 2026)
+
+**This corrects a claim made earlier in this file.** It said, of pre-creating a case, that
+*"pre-logging a person is right; pre-creating their case is not"*, on the reasoning that the
+case tables have no form so every case must arrive through intake.
+
+**That reasoning does not hold.** There is no automation that creates cases. **Every case in
+this base is made by hand** - the Needs Review page *pushes* an intake into a case, and a human
+does the pushing. Creating a case without an intake is therefore not a workaround; it is the
+ordinary mechanism used without an intake in front of you.
+
+The only true cost is narrow and worth stating exactly: **the conflict check runs on intake
+submission, so a case with no intake behind it never had one run.** Which matters differently
+in the two cases below - and in neither is it a reason not to do it.
+
+### Two different no-intake cases, which behave nothing alike
+
+`Case Origin` (`fldWA9t94mcTny5Us`) on the case table records which is which.
+
+**1. Opened from attorney enquiry - details to follow.** The vague email: *"I have a client who
+says he is a green card holder, charged with murder, what is a safe plea?"* Nothing usable, but
+RIAC wants a case to hang the reply on and something to chase. Attorney name, everything else
+unknown. **This is a live case and should be chased like any other.** The missing conflict
+check is deferred, not skipped - there is no name to check yet, and one can be run when the
+details arrive.
+
+**2. Conflict record - RIAC does not act on this case.** Built from what was learned on a case
+the center *does* act on, usually about a co-defendant. Dan's reasoning, which is the right
+one: the conflict check only says whether a person is known to us, and **it takes an attorney's
+review to decide whether the relationship is a conflict needing referral or withdrawal.** That
+review needs facts, and the facts come from the case we are not conflicted out of.
+⚠️ **Nobody is represented here and no attorney should ever be contacted about it.**
+
+### Why no formula was changed to enforce this
+
+**The reminder ladder already excludes both, with no change at all.** Route A only fires on a
+status containing the word *"awaiting"*, and Route B only on *"Atty Has Been In Contact"*. A
+conflict record left at *Case Opened (No Action Taken Yet)* is never chased. Editing any of the
+seven word-matching formulas to enforce it was rejected as more risk than the problem - see
+"The word-matching rule".
+
+⚠️ **What that leaves.** Setting a conflict record's status to *Intake Sent / Awaiting Contact*
+**would** put it on the chase list, and would email an attorney about a case RIAC is not on.
+The safeguard is the label being visible, not a rule preventing it. If that ever happens once,
+that is the moment to revisit the formula.
+
+**`RIAC Case No.` copes with an empty client**, which is what makes a stub case workable: it is
+the autonumber plus 5999, with the client and attorney parts each wrapped in their own `IF`. A
+case with no client still numbers itself and still reads sensibly in a list.
 
 ## Forms: two places, one confusing overlap
 

@@ -1178,33 +1178,53 @@ Agencies where the primary field is ordinary text.
       date twenty years back. `Date Of Birth Check` catches the obvious failures afterwards —
       it already flags the 12 Aug test intake that came through with a 2026 date of birth
 
-## THE BIGGEST ITEM BEFORE GO-LIVE: who can see what  **[Decide]** **[Dan]**
+## THE BIGGEST ITEM BEFORE GO-LIVE: six siloed bases  **[Both]**
 
-Raised 13 Aug 2026. **Nothing anywhere had addressed this** - the only trace was a one-line
-"review who can see the base" under the pilot-status note. Full reasoning in `AIRTABLE.md` →
-"(E) Splitting the base six ways".
+**DECIDED 13 Aug 2026 by Dan: strict silos.** Each center gets its own database, with no
+ability to run conflict checks against another center's clients. Shared: public reference data
+only - defender offices (not individual attorneys), NY Penal Law and VTL sections. Full
+reasoning in `AIRTABLE.md` → "(E) Splitting the base six ways".
 
-The short version: **six intake forms would not do it.** All six would write to one table in
-one base, so anyone with base access still sees everything. Permissions create the boundary,
-forms do not. And the check is bound to one form by internal ID, so six forms means six
-automations and six chances for a region's intakes to go silently unchecked.
+**This costs less than this file previously claimed.** Scenarios (B), (C) and (D) are all
+*within* one center; only (A) crosses centers, and that is already a human sending an email.
+The earlier warning that silos would break the check for all four was wrong.
 
-**The decision that cannot be engineered around:** a statewide conflict check needs one
-shared pool of people; six confidential silos need separation. Both in full is not available.
+**The dominant risk is maintenance, not build.** Six bases means every table, field,
+automation, interface and loader script exists six times, and every future change has to be
+made six times, for ever.
 
-- [ ] **[Dan]** Decide the access model. The likely shape is one base with **interface-only**
-      collaborators - a base collaborator can open the data whatever the interface shows, so
-      only interface-only access actually restricts anyone. **Check this against the Airtable
-      plan RIAC is on before designing around it.**
-- [ ] **[Decide]** How much the conflict check may reveal across regions. It currently writes
-      matched people's names, dates of birth, country of birth and attached cases onto the new
-      intake - so a Region 2 paralegal already reads facts about Region 4's people. A narrower
-      version ("possible conflict, contact Region 4", no names) is buildable and costs the
-      ability to judge whether a match is real
-- [ ] **[Claude]** Once decided: per-center filtered pages keyed on the case's RIAC
+- [ ] **[Dan]** ⚠️ **Check whether RIAC's Airtable plan includes Sync.** Everything below
+      depends on it. This is the first question and it blocks the rest
+- [ ] **[Claude]** Design the reference base: Courts, Counties, RIACs, Agencies, NY Penal Law,
+      NY VTL, IDP Chart Entry, Email Templates - synced one-way and read-only into all six.
+      Linked-record fields work against synced tables, so the `Court` link and the charge
+      picker survive unchanged
+- [ ] **[Decide]** Which base is the template, and how a change made in one reaches the other
+      five
+- [ ] **[Decide]** **Statewide reporting.** Six bases means no single place to count cases
+      across all centers. Nobody has said this is required - it is raised because finding out
+      late would be expensive. Likely answer if it is: a summary synced *back*, counts only,
+      no client detail
 - ⚠️ Do **not** add a region picker to the intake form. `RIAC (Routing)` already derives the
       center from the court's county, and a picker would be a second source of truth for one
       fact
+- ⚠️ Once siloed, a conflict referral between centers is a **re-entry by hand** - the two bases
+      cannot see each other
+
+## Cases opened without an intake  **[Dan]**
+
+Built 13 Aug 2026: `Case Origin` (`fldWA9t94mcTny5Us`) on the case table, three options -
+intake form, opened from attorney enquiry, conflict record. Reasoning in `AIRTABLE.md` →
+"Cases that never had an intake".
+
+- [ ] **[Dan]** Put `Case Origin` on the Case Viewer, and ideally on Find a Case, so a conflict
+      record is never mistaken for a live case
+- [ ] **[Dan]** A conflict record must never be set to *Intake Sent / Awaiting Contact* - that
+      status is what puts a case on the chase list, and it would email an attorney about a case
+      RIAC is not on. No formula prevents this; the label is the safeguard
+- [ ] **[Decide]** Whether a stub case should get a conflict check run by hand once real client
+      details arrive. There is no name to check when it is opened, so the check is deferred
+      rather than skipped - but nothing currently reminds anyone to come back to it
 
 ## Conflict alerts on a person  **[Claude]**
 
