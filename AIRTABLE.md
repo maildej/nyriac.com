@@ -2055,26 +2055,43 @@ obvious gap. They fall into three groups:
   all: *The Bronx Defenders*, *Brooklyn Defender Services*, *New York County Defender
   Services*, *Neighborhood Defender Service of Harlem*, *Center for Family Representation*.
 
-**A seventh option, `Appellate / Assigned`, was added by Dan on 13 August 2026** and applied to
-the three appellate institutional providers — *Appellate Advocates*, *Center for Appellate
-Litigation*, *Office of the Appellate Defender*. **10 records remain blank.**
+**A seventh option, `Appellate / Assigned`, was added by Dan on 13 August 2026.** It went to the
+three appellate institutional providers — *Appellate Advocates*, *Center for Appellate
+Litigation*, *Office of the Appellate Defender* — and then to the two **Appellate Division**
+assigned-counsel plans, First and Second Department, which had been classified as
+`Assigned Counsel / 18-B` before the category existed.
+
+✅ **All 134 records are now classified**, Dan having filled the remaining ten by hand the same
+day. Verified by filtering for an empty `Provider Type`: zero rows.
+
+**On it not being one of ILS's five categories — Dan's position, 13 Aug 2026:** the database
+will be approved by ILS before going live, and a finer breakdown is the kind of thing a funder
+adopts rather than rejects. So the extra category is not a problem to be mapped away; if ILS
+keeps its five, `Appellate / Assigned` rolls into *Assigned Counsel* when the form is filled.
 
 Adding a select option is safe and additive; nothing reads this field yet. Two things follow
 from it, though:
 
-- ⚠️ **It is not one of ILS's five categories**, so the annual report needs a rule for where it
-  lands — *Assigned Counsel* is the natural home, since these are court-assigned appellate
-  providers, but that is not yet decided. Same situation as `Federal Defender / CJA Panel`.
-- ⚠️ **It overlaps with two records already classified as Assigned Counsel** — *Assigned Counsel
-  Plan - Appellate Division, First Department* and *... Second Department*. Those are literally
-  appellate assigned-counsel plans, so they arguably belong in the new category. Left as they
-  are pending a decision, because moving them changes counts that the other classification
-  already assumes.
+- ✅ **The two Appellate Division plans were moved into it** on Dan's instruction — *Assigned
+  Counsel Plan - Appellate Division, First Department* and *... Second Department*.
 
 **A note on how it was added:** the Airtable API cannot add a choice to an existing select
 through `update_field`, but writing a new value with `typecast: true` creates the option as a
 side effect. That is a useful escape hatch and also a hazard — it means a typo in a write can
 silently invent a select option. Use it deliberately, never as a default.
+
+### ⚠️ New fields do not appear in a view that already hides fields
+
+Worth knowing, because it cost a round of confusion on 13 August. The case table's Grid view has
+**46 hidden fields**, and a field created through the API lands in that view **hidden**. So
+`ILS Report Category`, `County (Reporting)`, `County (No Court On File)` and
+`Out-Of-Region Reason` all existed and were computing correctly while being invisible.
+
+To see them: open **State Case Info & RIAC Progress** → Grid view → click the **hidden fields**
+button in the toolbar → search the field name → switch it on.
+
+**"I cannot find the field" is therefore not evidence it was not created.** Check by filtering
+or by the hidden-fields panel before assuming a build failed.
 
 ### Reporting cases sent OUT for conflict
 

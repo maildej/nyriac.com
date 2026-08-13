@@ -1294,25 +1294,17 @@ in `AIRTABLE.md` → "Checked against a real ILS annual report".
 - [x] ~~**Q6: classify all 134 Agencies**~~ - **121 done 13 Aug 2026** (`fldAgfjArnPJUoIgE`):
       44 Public Defender, 45 Assigned Counsel / 18-B, 11 Conflict Defender, 11 Legal Aid,
       10 Federal Defender / CJA Panel
-- [ ] **[Dan]** **Classify the 10 still blank.** Filter Agencies for an empty `Provider Type`.
-      Left blank on purpose: a wrong value that looks decided is worse than an obvious gap.
-      Two carry two roles in one name (*Ontario - Conflict Defender & Assigned Counsel Plan*,
-      *Sullivan - Conflict Legal Aid*); three have names no rule can read (*Chemung - Public
-      Advocate*, *Erie - Aid to Indigent Prisoners Society*, *Albany - Alternate Public
-      Defender*, where "Public Defender" would mislead because alternate defenders do conflict
-      work); and five are NYC institutional providers that do not map onto ILS's county-shaped
-      categories
+- [x] ~~Classify the agencies left blank~~ - **done by Dan, 13 Aug 2026. All 134 now carry a
+      `Provider Type`**, verified by filtering for empties: zero rows
 - [x] ~~The three appellate providers~~ - resolved 13 Aug 2026 by Dan's new
       **`Appellate / Assigned`** option, applied to Appellate Advocates, Center for Appellate
       Litigation and Office of the Appellate Defender
-- [ ] **[Decide]** **Where does `Appellate / Assigned` land on the ILS form?** It is not one of
-      ILS's five categories. *Assigned Counsel* is the natural home - these are court-assigned
-      appellate providers - but it is undecided. Same open question as `Federal Defender /
-      CJA Panel`
-- [ ] **[Decide]** **Do the two Appellate Division plans move?** *Assigned Counsel Plan -
-      Appellate Division, First Department* and *... Second Department* are currently
-      `Assigned Counsel / 18-B` and are literally appellate assigned-counsel plans. Left as they
-      are because moving them changes counts
+- [x] ~~Where does `Appellate / Assigned` land on the ILS form?~~ - **not a problem.** Dan,
+      13 Aug 2026: ILS approves the database before go-live and is likely to adopt a better
+      breakdown rather than reject it. If the five categories stand, it rolls into
+      *Assigned Counsel* at form-filling time
+- [x] ~~Do the two Appellate Division plans move?~~ - **yes, moved 13 Aug 2026** on Dan's
+      instruction
 - [x] ~~Delete `ZZ DELETE ME - created in error` on Attorneys & Requestors~~ - done by Dan,
       13 Aug 2026
 - [x] ~~**Q3: add a reason field to the case table**~~ - done, `Out-Of-Region Reason`
