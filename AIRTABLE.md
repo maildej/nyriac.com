@@ -2244,6 +2244,62 @@ if it is counting **cases** - and nobody has yet said which.
 the autonumber plus 5999, with the client and attorney parts each wrapped in their own `IF`. A
 case with no client still numbers itself and still reads sensibly in a list.
 
+## One route in, whatever route it arrived by (13 August 2026)
+
+**The PDF intake forms cannot be retired**, and Dan's reasons are requirements rather than
+preferences:
+
+1. Some attorneys **handwrite them and post them in**.
+2. Some complete them **at a jail with no cell service**, where a fillable PDF works and a web
+   form cannot.
+
+**His resolution, and it closes the gap completely:** leave the attorney's options open, and
+make the **center's** route single. However an intake reaches a center — online, posted,
+emailed — **the center only ever enters a new case through the Airtable intake form.** A paper
+intake is therefore keyed in, and the conflict check runs on it like any other.
+
+That works because it puts the constraint on the people RIAC controls rather than on the
+attorneys it does not.
+
+### The two fields that make it checkable rather than merely stated
+
+| Field | |
+|---|---|
+| `Conflict Check Status` (`fldeaLAlIN42h7ATv`) | Formula. Reads **⚠ NEVER CONFLICT-CHECKED** when `Possible Conflict Matches` is completely empty |
+| `How This Intake Arrived` (`fldhSKwa5tzk1kgzG`) | Online by the attorney / keyed from paper / keyed from an emailed PDF / keyed from a call or enquiry |
+
+`Conflict Check Status` works because the automation writes its heading **whether or not it
+finds anyone**, so a completely empty box means one thing only: the automation never ran. Put
+it on Needs Review, or keep a view filtered to the warning — anything appearing there was made
+by hand or by the API and needs re-entering through the form.
+
+⚠️ **The oldest pilot intakes will flag.** Several pre-date the automation. That is the field
+working.
+
+**`How This Intake Arrived` is a staff field, not a form question** — an attorney submitting
+online should never see it. Without it the paper route is invisible and nobody can say how much
+re-keying the centers are actually doing. Worth counting once a year: if most intakes turn out
+to be re-keyed, that argues for effort on the paper-to-form step; if almost none are, it argues
+for leaving it alone.
+
+**Interface-only access would make this structural.** Staff with no route to the Data tab
+cannot create an intake by hand at all, so the six-base plan turns Dan's working rule into a
+mechanism. Until then, `Conflict Check Status` is the check.
+
+### `intake.html`, rebuilt the same day
+
+The page now leads with **Submit a new case online**, linking to the Airtable form, and keeps
+the two fillable PDFs below it under *"If you cannot submit online"* — with a prompt to
+download before setting off somewhere without a connection.
+
+⚠️ **Do not replace that link with a form hosted on nyriac.com.** The conflict check is bound to
+the Airtable form by internal ID and silently stops running on anything else. There is a comment
+saying so in the page's source, at the link.
+
+**After the six-base split this becomes six links, one per region** — and it must stay possible
+to pick a region *directly* rather than only by county, because an attorney conflicted out of
+their own center needs to reach a different one.
+
 ## Forms: two places, one confusing overlap
 
 This cost two rounds of confusion, so it is worth writing down carefully — including the
