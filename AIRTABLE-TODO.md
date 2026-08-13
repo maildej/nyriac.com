@@ -1279,6 +1279,49 @@ automatically** - what connects them is somebody having recorded the co-defendan
 - [ ] **[Decide]** Whether to ask the attorney about known co-defendants on the intake form
       itself, which would catch them at the one moment somebody is definitely paying attention
 
+## ILS ANNUAL REPORT - the gaps found 13 Aug 2026  **[Both]**
+
+Checked field by field against RIAC-2's completed **2025 Annual Report**. That document is the
+real reporting obligation, so these are requirements rather than nice-to-haves. Full analysis
+in `AIRTABLE.md` → "Checked against a real ILS annual report".
+
+✅ Region 2's counties in the base match ILS's list exactly - all 16, none missing or extra.
+
+### Blocking - the report cannot be produced without these
+
+- [ ] **[Dan]** **Define "consultation"** (Q1). The base counts cases. Is a consultation a
+      case, an advisal, or every contact? Every other number has to reconcile with it
+- [ ] **[Claude]** **Q6: classify all 134 Agencies** by `Provider Type` (`fldBTrHMPXKWuMfqH`,
+      added 13 Aug, **currently empty on every record**). Most can be read from the name; the
+      irregular ones - *Attica Legal Aid Bureau, Inc.*, the institutional providers, the ten
+      federal records - need Dan's eye. Propose a pass, then have Dan check the exceptions
+- [ ] **[Claude]** **Q3: add a reason field to the case table** for why an out-of-region case
+      was accepted. `Conflict Referral - Details` sits on the **intake**, and there is no link
+      from case back to intake, so the reason is not where the report gets written from. ILS
+      asks for it explicitly, naming "a conflict of interest at another Center"
+- [ ] **[Decide]** **Q4: "Non-Criminal Case" is not "Family Court".** ILS wants Family Court as
+      its own column; ours also covers matrimonial and other non-criminal work. Either split
+      the option in two, or accept that this column is approximate and say so to ILS
+- [ ] **[Decide]** **Q4: what does ILS's Total column mean?** `Case Type` is a multi-select, so
+      a case ticked Criminal *and* Appeal lands in two columns and the columns will not sum to
+      the number of requests. Requests, or ticks? Settle before sending a number
+- [ ] **[Dan]** **Q7: add a "Provider meeting" option to `Training Type`** so meetings with
+      providers can be logged alongside trainings. ⚠️ Claude cannot do this - the API's
+      `update_field` accepts only name, description and formula, so choices cannot be added to
+      an existing select. Data tab → the field header → Edit field → add the choice
+
+### Not blocking, but it will bite
+
+- [ ] **[Decide]** **Q2: cases with no court have no county** and drop out of every county
+      count with nothing marking them missing. Immigration-related and USCIS matters may have
+      no NY court; so does a case opened from a vague attorney enquiry. County totals will
+      quietly fail to reconcile with Q1. Options: a "county not applicable" bucket, or letting
+      county be recorded independently of the court
+- [x] ~~Q8: topics and collaborators~~ - **done 13 Aug 2026.** `Topics Covered`
+      (`fld0v0okJdm56sxyF`) and `Collaborators` (`fldFNN6RMVeqYrrDE`) added to
+      `Trainings & Presentations`. Both are named columns on the ILS form and had been folded
+      into `Notes` on the mistaken view that the funder wanted counts only
+
 ## Trainings & Presentations - built 13 Aug 2026  **[Dan]**
 
 `Trainings & Presentations` (`tblIe2KxbV3cr4M2c`). Standalone log for the funder's annual

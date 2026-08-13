@@ -1913,6 +1913,79 @@ referred to another center, so the two are not distinguished. If the referral la
 the record makes the situation obvious and it can be referred then - at which point the label
 becomes literally accurate. It never misleads anyone into doing something wrong in the interim.
 
+## Checked against a real ILS annual report (13 August 2026)
+
+RIAC-2's completed **2025 Annual Report** was read field by field against the base. It is the
+authoritative statement of what the funder asks for, and it is worth keeping that in mind: the
+eight questions below are the actual reporting obligation, not a guess at one.
+
+**One clean pass:** the base's counties for Region 2 match ILS's list **exactly** — all 16,
+Broome through Tompkins, none missing and none extra.
+
+### What the report asks, and whether the base can answer it
+
+| ILS question | Status |
+|---|---|
+| **1.** Total consultations offered | ⚠️ Definition missing, not data |
+| **2.** Requests by county | ⚠️ Works, but silently drops cases with no court |
+| **3.** Out-of-region requests: county, number, **reasons** | ❌ Reasons not held on the case |
+| **4.** Requests by county **by type** | ❌ No Family Court category; Total column ambiguous |
+| **5.** Out-of-region requests by type | ❌ Inherits 3 and 4 |
+| **6.** Requests by county **by provider type** | ❌ Was unanswerable — field now built, empty |
+| **7.** Meetings with providers: name, date, topic | ❌ Nothing records these |
+| **8.** Trainings: topics, attendees, collaborators | ⚠️ Two columns were missing, now added |
+
+### The gaps in detail
+
+**Q1 — "consultations" is undefined.** The base counts *cases*. Whether a consultation is a
+case, an advisal, or every contact is a question only RIAC can answer, and every other number
+on the form has to reconcile with it.
+
+**Q2 — county comes from the court, so a case with no court has no county.** That is fine for
+criminal and family matters and wrong for the rest: an immigration-related or USCIS matter may
+have no NY court at all, and a case opened from a vague attorney enquiry has nothing yet.
+Those cases **vanish from every county count without appearing anywhere as missing**, so the
+county totals will quietly fail to reconcile with Q1.
+
+**Q3 — the reason an out-of-region case was accepted is not on the case.** The
+`Conflict Referral - Details` box built on 12 August lives on the **Pending Intake**, and the
+link from case back to intake was deliberately removed. So at reporting time the reason is not
+where the report is written from. ILS asks for it in terms, giving "a conflict of interest at
+another Center" as its own example.
+
+**Q4 — two separate problems.**
+- **"Non-Criminal Case" is not "Family Court".** Ours covers family, matrimonial *and other*
+  non-criminal work; ILS wants Family Court specifically. A non-criminal case that is not
+  family court has no honest column.
+- **`Case Type` is a multi-select and ILS's table has a Total column.** A case ticked both
+  Criminal and Appeal — expressly allowed, and expected — appears in two columns, so the
+  columns will not sum to the number of requests. **Whether ILS's Total means requests or
+  ticks has to be settled before a number is sent.** The 12 August rule only stops the two
+  *outside* options being ticked together; it does not touch this.
+
+**Q6 — this was the largest gap.** Nothing in the base could break requests down by provider
+type. The type was only ever implicit in the agency's **name**, and the names are not
+consistent enough to read it off: *Assigned Counsel Office*, *Assigned Counsel Plan* and
+*18-b Assigned Counsel Program* all appear, and *Attica Legal Aid Bureau, Inc.* carries no
+word a rule could key on. `Provider Type` (`fldBTrHMPXKWuMfqH`) has been added to Agencies with
+ILS's own categories — **empty on all 134 records until they are classified.**
+
+> The intake's `Type Of Office` does **not** substitute for it. That question deliberately
+> merges public defender, legal aid, conflict defender and assigned counsel into one option,
+> because its job is routing the form. Provider type is a fact about the office, so it belongs
+> on the office — classified once, rather than restated by every attorney on every intake.
+
+**Q7 — provider meetings are not recorded anywhere.** `Trainings & Presentations` covers
+trainings; ILS asks separately for meetings with providers, by name, date and topic. The
+shapes are close enough that one table can hold both, which needs a **"Provider meeting"**
+option adding to `Training Type`. ⚠️ **The API cannot add a choice to an existing select** —
+`update_field` accepts only name, description and formula — so that is hand-work.
+
+**Q8 — `Topics Covered` and `Collaborators` were missing and are now added.** Both are named
+columns on the form. They had been folded into `Notes` on the reasoning that the funder wanted
+counts only, which the actual form disproves. `Audience Type`, added the same day on a guess,
+turns out to answer ILS's "groups served" directly.
+
 ## Trainings & Presentations (13 August 2026)
 
 `Trainings & Presentations` (`tblIe2KxbV3cr4M2c`) logs every training RIAC delivers, for the
