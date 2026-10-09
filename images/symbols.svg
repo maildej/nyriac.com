@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- RIAC symbols. Each <symbol> is shown on a page with
+       <svg><use href="images/symbols.svg#i-NAME"/></svg>.
+       Navy follows the text colour. The cream "paper" and the orange accent come from
+       the icon-fill and icon-accent custom properties that .symbol sets in css/style.css.
+       Drawn on a 48-unit square. -->
+  
+
+  <!-- Steps you must take if your client was not born in the U.S.: the world, and a tick -->
+  <symbol id="i-steps" viewBox="0 0 48 48">
+    <g>
+      <circle style="fill: currentColor" cx="21" cy="21" r="17"/>
+      <g style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="2.4">
+        <ellipse cx="21" cy="21" rx="7" ry="17"/>
+        <path d="M21 4v34M5.6 14.5h30.8M5.6 27.5h30.8"/>
+      </g>
+      <circle style="fill: var(--icon-accent, #ef7c28); stroke: var(--icon-fill, #fff)" cx="35.5" cy="35.5" r="11" stroke-width="3"/>
+      <path style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="3.4" d="M30.5 35.8l3.4 3.4 6.4-6.6"/>
+    </g>
+  </symbol>
+
+  <!-- ACDs: a calendar with one date marked, the day the case is dismissed -->
+  <symbol id="i-acd" viewBox="0 0 48 48">
+    <g>
+      <rect style="fill: currentColor" x="4" y="8" width="40" height="36" rx="5"/>
+      <rect style="fill: var(--icon-fill, #fff)" x="8.5" y="18" width="31" height="21.5" rx="2"/>
+      <rect style="fill: currentColor; stroke: var(--icon-fill, #fff)" x="12" y="3" width="5.5" height="11" rx="2.75" stroke-width="2"/>
+      <rect style="fill: currentColor; stroke: var(--icon-fill, #fff)" x="30.5" y="3" width="5.5" height="11" rx="2.75" stroke-width="2"/>
+      <g style="fill: currentColor">
+        <rect x="12" y="21.5" width="6.5" height="6" rx="1"/>
+        <rect x="20.75" y="21.5" width="6.5" height="6" rx="1"/>
+        <rect x="29.5" y="21.5" width="6.5" height="6" rx="1"/>
+        <rect x="12" y="30" width="6.5" height="6" rx="1"/>
+        <rect x="20.75" y="30" width="6.5" height="6" rx="1"/>
+      </g>
+      <rect style="fill: var(--icon-accent, #ef7c28)" x="29.5" y="30" width="6.5" height="6" rx="1"/>
+    </g>
+  </symbol>
+
+  <!-- Court interpreters: two languages, one speech bubble each -->
+  <symbol id="i-interpreter" viewBox="0 0 48 48">
+    <g>
+      <path style="fill: currentColor" d="M7 4h20a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4H15l-7 6.5V25H7a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z"/>
+      <path style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="2.8" d="M11 20.5l6-12.5 6 12.5M13.2 16.2h7.6"/>
+      <path style="fill: var(--icon-accent, #ef7c28); stroke: var(--icon-fill, #fff)" stroke-width="3" d="M22 17h19a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4h-1v7l-7.5-7H22a4 4 0 0 1-4-4V21a4 4 0 0 1 4-4z"/>
+      <path style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="2.4" d="M31.5 20.5v2.6M25 23.6h13M26.8 24c1.4 4.4 4.6 7.6 9.4 8.6M36.2 24c-1.4 4.4-4.6 7.6-9.4 8.6"/>
+    </g>
+  </symbol>
+
+  <!-- Orders of protection: a shield over a home -->
+  <symbol id="i-protection" viewBox="0 0 48 48">
+    <g>
+      <path style="fill: currentColor" d="M24 2.5l18 6.4v12.6c0 11.6-7.6 19.8-18 24.5C13.6 41.3 6 33.1 6 21.5V8.9z"/>
+      <path style="fill: var(--icon-fill, #fff)" d="M13.5 25.2L24 15.8l10.5 9.4h-3.2V36H16.7V25.2z"/>
+      <rect style="fill: var(--icon-accent, #ef7c28)" x="21.2" y="27.5" width="5.6" height="8.5" rx="1"/>
+    </g>
+  </symbol>
+
+  <!-- Mandatory detention: a person behind bars -->
+  <symbol id="i-detention" viewBox="0 0 48 48">
+    <g>
+      <rect style="fill: currentColor" x="4" y="4" width="40" height="40" rx="4"/>
+      <circle style="fill: var(--icon-accent, #ef7c28)" cx="24" cy="19" r="6.5"/>
+      <path style="fill: var(--icon-accent, #ef7c28)" d="M10.5 44v-3.5c0-7.4 6-12 13.5-12s13.5 4.6 13.5 12V44z"/>
+      <g style="fill: var(--icon-fill, #fff)">
+        <rect x="10.4" y="4" width="3.4" height="40"/>
+        <rect x="18.2" y="4" width="3.4" height="40"/>
+        <rect x="26.4" y="4" width="3.4" height="40"/>
+        <rect x="34.2" y="4" width="3.4" height="40"/>
+      </g>
+    </g>
+  </symbol>
+
+  <!-- No diversion or up-front pleas: stop, a raised hand -->
+  <symbol id="i-stop" viewBox="0 0 48 48">
+    <g>
+      <path style="fill: var(--icon-accent, #ef7c28)" d="M15.6 2.5h16.8l13.1 13.1v16.8L32.4 45.5H15.6L2.5 32.4V15.6z"/>
+      <g style="fill: var(--icon-fill, #fff)">
+        <rect x="16.4" y="13.5" width="4.2" height="15" rx="2.1"/>
+        <rect x="21" y="10.5" width="4.2" height="18" rx="2.1"/>
+        <rect x="25.6" y="11.5" width="4.2" height="17" rx="2.1"/>
+        <rect x="30.2" y="15" width="4.2" height="13.5" rx="2.1"/>
+        <path d="M16.4 25h18v5.5c0 5.3-3.8 9-9 9s-9-3.7-9-9z"/>
+        <rect x="12.6" y="22.8" width="4.2" height="13" rx="2.1" transform="rotate(-36 14.7 29.3)"/>
+      </g>
+    </g>
+  </symbol>
+
+  <!-- Factual basis of pleas: a handshake, the bargained-for plea. Navy hand from the left, its
+       fingers wrapped over the orange hand; the orange thumb across the top, its fingertips
+       curled under at the bottom left. -->
+  <symbol id="i-plea" viewBox="0 0 48 48">
+    <g>
+    <!-- sleeves -->
+    <path style="fill: currentColor" d="M1 13.4l9.8 2.2-6.2 11.8L1 25.8z"/>
+    <path style="fill: var(--icon-accent, #ef7c28)" d="M47 13.4l-9.8 2.2 6.2 11.8 3.6-1.6z"/>
+    <!-- the orange hand behind -->
+    <path style="fill: var(--icon-accent, #ef7c28); stroke: var(--icon-fill, #fff); stroke-width: 1.2; stroke-linejoin: round; paint-order: stroke" d="M22.6 13.8l8-.2 6.6 2 6.2 11.8-3.8 2.8c-3 2.4-6.6 3.8-10.4 4.4L27 30l-.2-12.4z"/>
+    <!-- the navy hand: back of the hand and the four fingers in one shape -->
+    <path style="fill: currentColor; stroke: var(--icon-fill, #fff); stroke-width: 1.2; stroke-linejoin: round; paint-order: stroke" d="M10.8 15.6l4.4 1 6-2.2 4.8-1.2c1.1-.2 2.2.2 3 1l7.6 8.4c.9 1 .9 2.5-.1 3.4-.6.5-1.3.7-2 .6.6.9.5 2.1-.3 2.9-.6.6-1.5.8-2.3.6.5.9.3 2-.5 2.7-.8.7-1.9.8-2.8.3-.1.8-.6 1.5-1.4 1.8-1 .4-2.1.1-2.8-.6L22 33.2l-8.2-2.7-9.2-3.1z"/>
+    <!-- fine lines between the navy fingers -->
+    <path style="fill: none; stroke: var(--icon-fill, #fff); stroke-width: 1.1; stroke-linecap: round" d="M28.63 20.11L34.40 26.49M26.43 24.06L31.80 29.99M23.67 27.65L28.50 32.99"/>
+    <!-- the orange thumb, slim, lying across the top of the navy hand -->
+    <path style="fill: var(--icon-accent, #ef7c28); stroke: var(--icon-fill, #fff); stroke-width: 1.2; stroke-linejoin: round; paint-order: stroke" d="M33 14.5C30 14.2 26.6 15 23.6 16.7l-3.2 1.9c-.8.5-1 1.6-.5 2.4.5.8 1.5 1 2.3.6l3.2-1.8c2.2-1.2 4.8-2 7.6-2.2z"/>
+    <!-- no line where the thumb leaves the orange hand: this covers the outline there -->
+    <path style="fill: var(--icon-accent, #ef7c28)" d="M31 13.75L34 14.65V19l-.8-.8-.9-1L31 15.5z"/>
+    <!-- the orange fingertips, curled round under the navy hand -->
+    <g style="fill: var(--icon-accent, #ef7c28); stroke: var(--icon-fill, #fff); stroke-width: 1.2; stroke-linejoin: round; paint-order: stroke">
+      <ellipse cx="13.09" cy="30.74" rx="2.25" ry="1.90" transform="rotate(18 13.09 30.74)"/>
+      <ellipse cx="15.89" cy="31.66" rx="2.25" ry="1.90" transform="rotate(18 15.89 31.66)"/>
+      <ellipse cx="18.69" cy="32.59" rx="2.25" ry="1.90" transform="rotate(18 18.69 32.59)"/>
+      <ellipse cx="21.50" cy="33.51" rx="2.15" ry="1.80" transform="rotate(18 21.50 33.51)"/>
+    </g>
+    </g>
+  </symbol>
+
+  <!-- U.S. citizenship: a passport, checked under a magnifying glass -->
+  <symbol id="i-citizenship" viewBox="0 0 48 48">
+    <g>
+      <rect style="fill: currentColor" x="5" y="3" width="27" height="37" rx="3"/>
+      <g style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="2.3">
+        <circle cx="18.5" cy="16" r="7"/>
+        <ellipse cx="18.5" cy="16" rx="2.8" ry="7"/>
+        <path d="M11.5 16h14M12 31.5h13"/>
+      </g>
+      <circle style="fill: var(--icon-fill, #fff)" cx="33" cy="32" r="11.5"/>
+      <circle style="fill: none; stroke: var(--icon-accent, #ef7c28); stroke-linecap: round; stroke-linejoin: round" cx="33" cy="32" r="7.5" stroke-width="4.4"/>
+      <path style="fill: none; stroke: var(--icon-accent, #ef7c28); stroke-linecap: round; stroke-linejoin: round" stroke-width="5.2" d="M38.8 37.8l5.2 5.2"/>
+    </g>
+  </symbol>
+
+  <!-- A judge asks about status: a gavel, and a question -->
+  <symbol id="i-judge" viewBox="0 0 48 48">
+    <g>
+      <g style="fill: currentColor" transform="rotate(-45 17 21)">
+        <rect x="5" y="11" width="24" height="11" rx="3"/>
+        <rect x="14.5" y="21" width="5" height="21" rx="2.5"/>
+      </g>
+      <g style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="2" transform="rotate(-45 17 21)">
+        <path d="M10 11.5v10M24 11.5v10"/>
+      </g>
+      <rect style="fill: currentColor" x="3" y="40" width="25" height="5.5" rx="2"/>
+      <path style="fill: var(--icon-accent, #ef7c28)" d="M30 2h13a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3h-4l-5.5 5v-5H30a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z"/>
+      <path style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="2.6" d="M33.2 8.2c.3-1.8 1.7-2.8 3.4-2.8 1.9 0 3.3 1.3 3.3 3 0 2.4-3.3 2.6-3.3 4.8"/>
+      <circle style="fill: var(--icon-fill, #fff)" cx="36.6" cy="16.3" r="1.6"/>
+    </g>
+  </symbol>
+
+  <!-- Intake: criminal cases, a fingerprint (the RAP sheet every criminal intake needs): a loop
+       pattern, generated as contour lines, so edit it as a whole rather than ridge by ridge. -->
+  <symbol id="i-criminal" viewBox="0 0 48 48">
+    <g>
+      <path style="fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round" stroke-width="1" d="M25.8 18.2L25.0 18.8 22.9 21.8 16.8 29.8 14.4 33.4 11.6 38.1M14.0 41.0L17.7 34.0 19.6 30.8 21.7 27.6 27.2 19.8 27.3 19.0 27.0 18.4 26.4 18.1 25.8 18.2M26.0 16.2L25.0 16.5 24.0 17.2 22.3 19.6M21.5 20.6L13.9 30.0 12.0 32.6 10.2 35.4M16.1 42.6L17.6 39.8 20.6 33.6 22.1 30.8M22.8 29.7L28.8 20.8 29.2 19.8 29.3 19.0 29.2 18.2 28.6 17.1 28.0 16.6 27.4 16.3 26.0 16.2M25.2 14.4L23.6 15.1 22.4 16.2 19.5 20.4 11.7 29.2 8.8 33.0M18.4 43.8L19.8 41.1 21.3 37.8M21.8 36.7L23.3 33.4 24.7 30.6 26.9 27.0 30.6 21.6 31.0 20.8 31.2 19.8 31.2 18.4 31.1 17.4 30.6 16.4 29.8 15.4 28.8 14.7 27.6 14.3 26.4 14.2 25.2 14.4M25.2 12.4L24.0 12.7 23.0 13.2 22.1 13.8 21.2 14.6 20.4 15.6 17.3 20.2 8.2 30.0M20.8 44.6L22.6 41.0 25.4 34.4 26.8 31.4 29.0 27.6 32.5 22.2 32.9 21.2 33.2 20.2 33.2 18.2 32.9 16.8 32.3 15.4 31.3 14.2 30.0 13.2 28.4 12.5 26.8 12.3 25.2 12.4M23.5 44.8L25.3 41.2 28.0 34.4 29.5 31.2 31.2 28.0 34.2 23.4 34.7 22.4 35.0 21.4 35.2 20.2 35.1 18.0 35.0 17.0M34.6 15.8L33.9 14.4 32.8 13.0 31.4 11.9 29.8 11.0 28.2 10.5 26.4 10.3 24.6 10.5 23.0 11.0 21.3 12.0 19.8 13.2 18.9 14.4 17.0 17.4 15.1 20.0 7.9 27.2M26.2 45.0L28.1 41.0 31.2 33.0 32.9 29.6M33.6 28.4L35.4 25.4M36.1 24.4L36.6 23.4 37.0 22.2 37.2 20.0 37.1 17.8 36.9 16.6 36.4 15.2 35.7 13.8 34.8 12.6 33.9 11.6 32.8 10.6 31.6 9.8 30.4 9.2 29.0 8.7 27.8 8.5 26.4 8.4 24.4 8.6 22.4 9.2 20.6 10.1 19.0 11.2 17.4 13.0 15.0 16.8 12.8 19.8 7.8 24.6M29.2 44.8L30.8 41.2 33.4 34.4 34.6 31.6 36.2 28.4 38.4 24.8 38.9 23.4 39.2 22.0M39.2 20.8L39.0 17.8 38.8 16.5M37.8 13.8L36.6 11.9 35.1 10.2 33.4 8.8 31.6 7.7 29.8 6.9 27.8 6.5 25.8 6.5 23.6 6.8M22.2 7.2L20.6 7.8 19.2 8.6 18.0 9.4 16.8 10.4 15.5 12.0 13.1 16.0 10.8 19.2 7.6 22.3M33.0 42.8L34.5 39.2M34.9 38.0L37.3 31.8 38.8 28.6 40.2 26.5 40.9 24.4M20.8 5.6L19.0 6.4 17.4 7.3 16.0 8.3 14.8 9.4M14.0 10.4L10.3 16.4 8.2 19.2 7.4 20.0M37.9 38.0L39.3 33.8 40.5 30.8M13.0 8.2L11.8 9.8 8.0 16.0"/>
+    </g>
+  </symbol>
+
+  <!-- Intake: non-criminal cases — a family -->
+  <symbol id="i-family" viewBox="0 0 48 48">
+    <g>
+      <circle style="fill: currentColor" cx="14" cy="10" r="5.5"/>
+      <circle style="fill: currentColor" cx="34" cy="10" r="5.5"/>
+      <path style="fill: currentColor" d="M6 44V25a8 8 0 0 1 16 0v19z"/>
+      <path style="fill: currentColor" d="M26 44V25a8 8 0 0 1 16 0v19z"/>
+      <circle style="fill: var(--icon-accent, #ef7c28); stroke: var(--icon-fill, #fff)" cx="24" cy="25" r="4.6" stroke-width="2.4"/>
+      <path style="fill: var(--icon-accent, #ef7c28); stroke: var(--icon-fill, #fff)" stroke-width="2.4" d="M17.5 46V38a6.5 6.5 0 0 1 13 0v8z"/>
+    </g>
+  </symbol>
+
+  <!-- Home, what we do: case consultations — two people talking it through -->
+  <symbol id="i-consult" viewBox="0 0 48 48">
+    <g>
+      <circle style="fill: currentColor" cx="13" cy="21" r="6"/>
+      <path style="fill: currentColor" d="M3 46v-6a10 10 0 0 1 20 0v6z"/>
+      <circle style="fill: currentColor" cx="35" cy="21" r="6"/>
+      <path style="fill: currentColor" d="M25 46v-6a10 10 0 0 1 20 0v6z"/>
+      <path style="fill: var(--icon-accent, #ef7c28)" d="M17 2h14a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-4.5L24 17l-2.5-3H17a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z"/>
+      <g style="fill: var(--icon-fill, #fff)"><circle cx="19.5" cy="8" r="1.5"/><circle cx="24" cy="8" r="1.5"/><circle cx="28.5" cy="8" r="1.5"/></g>
+    </g>
+  </symbol>
+
+  <!-- Home, what we do: practice advisories — a document -->
+  <symbol id="i-advisory" viewBox="0 0 48 48">
+    <g>
+      <path style="fill: currentColor" d="M11 3h18l12 12v28a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+      <path style="fill: var(--icon-accent, #ef7c28)" d="M29 3v10a2 2 0 0 0 2 2h10z"/>
+      <path style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="2.8" d="M15 21h18M15 27.5h18M15 34h11"/>
+    </g>
+  </symbol>
+
+  <!-- Home, what we do: training and support, a presenter at a board of notes -->
+  <symbol id="i-training" viewBox="0 0 48 48">
+    <g>
+      <rect style="fill: currentColor" x="14" y="4" width="31" height="23" rx="2.5"/>
+      <path style="fill: none; stroke: var(--icon-accent, #ef7c28); stroke-linecap: round; stroke-linejoin: round" stroke-width="3" d="M19.5 10.5h13"/>
+      <path style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="2.6" d="M19.5 16h20M19.5 21.5h15"/>
+      <circle style="fill: currentColor" cx="8" cy="23" r="5"/>
+      <path style="fill: currentColor" d="M1 46V37a7 7 0 0 1 14 0v9z"/>
+      <path style="fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round" stroke-width="3" d="M12.5 32l7-6.5"/>
+    </g>
+  </symbol>
+
+
+  <!-- Home, who we serve: a client, who speaks to their attorney -->
+  <symbol id="i-individual" viewBox="0 0 48 48">
+    <g>
+      <circle style="fill: currentColor" cx="17" cy="20" r="7.5"/>
+      <path style="fill: currentColor" d="M3 46v-4c0-8 6.3-13 14-13s14 5 14 13v4z"/>
+      <path style="fill: var(--icon-accent, #ef7c28)" d="M29 3h14a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-3.5L34 23v-5h-5a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z"/>
+      <g style="fill: var(--icon-fill, #fff)"><circle cx="31.5" cy="10.5" r="1.6"/><circle cx="36" cy="10.5" r="1.6"/><circle cx="40.5" cy="10.5" r="1.6"/></g>
+    </g>
+  </symbol>
+
+  <!-- Home, who we serve: privately retained counsel, a briefcase -->
+  <symbol id="i-retained" viewBox="0 0 48 48">
+    <g>
+      <path style="fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round" stroke-width="3.4" d="M17.5 13V9.5a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3V13"/>
+      <rect style="fill: currentColor" x="4" y="13" width="40" height="29" rx="4"/>
+      <path style="fill: none; stroke: var(--icon-fill, #fff); stroke-linecap: round; stroke-linejoin: round" stroke-width="2.4" d="M4.5 25.5h39"/>
+      <rect style="fill: var(--icon-accent, #ef7c28); stroke: var(--icon-fill, #fff)" x="20" y="21" width="8" height="9" rx="1.6" stroke-width="2"/>
+    </g>
+  </symbol>
+</svg>

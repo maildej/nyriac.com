@@ -13,6 +13,7 @@
   if (!list) return;
 
   var MIN_CARD = 300; // px: minimum card width before the grid adds a column
+  var cols = 1;       // how many cards fit side by side, set by layoutCards()
 
   function visibleItems() {
     var v = [];
@@ -27,12 +28,14 @@
     var width = list.clientWidth;
     if (!width) return;
     var gap = parseFloat(getComputedStyle(list).columnGap) || 0;
-    var cols = Math.max(1, Math.floor((width + gap) / (MIN_CARD + gap)));
+    cols = Math.max(1, Math.floor((width + gap) / (MIN_CARD + gap)));
     var cardW = Math.floor((width - (cols - 1) * gap) / cols);
     items.forEach(function (it) { it.style.flex = '0 0 ' + cardW + 'px'; });
   }
 
-  // Measure the tallest visible title bar and set them all to it.
+  // Measure the tallest visible title and set them all to it. In a single
+  // column (a phone) there is nothing beside a card to line up with, so
+  // each title keeps its own height.
   function equalizeTitles() {
     var titles = [];
     visibleItems().forEach(function (it) {
@@ -41,6 +44,7 @@
     });
     if (!titles.length) return;
     titles.forEach(function (h3) { h3.style.height = 'auto'; });
+    if (cols === 1) return;
     var max = 0;
     titles.forEach(function (h3) {
       if (h3.offsetHeight > max) max = h3.offsetHeight;

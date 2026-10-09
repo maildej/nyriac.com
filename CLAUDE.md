@@ -8,6 +8,12 @@ The owner of this project is not a developer and knows little about web design o
 - Make edits for them rather than telling them how to code.
 - Keep the site simple — resist adding frameworks, build tools, or JavaScript unless truly needed.
 - When something requires action outside this folder (GitHub, Wix), give exact click-by-click steps.
+- **Show a mockup before building anything visible**, with the options side by side and a
+  recommendation, and offer improvements as suggestions. Build only once the owner has chosen;
+  publishing to `main` then waits for a separate yes. A proposal copy of the site outside the
+  repository, served on its own local port beside the current site, works well.
+- When the owner follows a session from their phone (Remote Control), local preview links do not
+  reach them: send screenshots into the chat, at phone width and full size.
 
 ## What this site is
 
@@ -30,7 +36,7 @@ Audience: attorneys (public defenders, assigned counsel, mandated providers) —
 
 ## Technical setup
 
-- **Plain static HTML/CSS.** No build step, no JavaScript, no frameworks, no Jekyll (`.nojekyll` disables it). One external dependency: Google Fonts (Source Serif 4 + Inter) loaded via a `<link>` in each page's `<head>`.
+- **Plain static HTML/CSS.** No build step, no frameworks, no Jekyll (`.nojekyll` disables it). JavaScript is limited to a few small plain scripts in `js/` (the advisory search, the map tooltips, the download-request form). One external dependency: Google Fonts (Source Serif 4 + Inter) loaded via a `<link>` in each page's `<head>`.
 - **Hosting:** GitHub Pages, deployed from the `main` branch of a GitHub repo.
 - **Domain:** `nyriac.com`, registered at **Wix**. Wix does not allow domain transfers or nameserver changes, so DNS is managed inside Wix: A records point the apex domain to GitHub Pages' IPs, and a CNAME points `www` to the GitHub Pages address. The `CNAME` file in this folder tells GitHub Pages the custom domain. See `SETUP.md` for the exact records.
 
@@ -43,9 +49,8 @@ Audience: attorneys (public defenders, assigned counsel, mandated providers) —
 | `contact.html` | Six region cards (`#region-1` … `#region-6`) with counties served and each center's contacts — the map links here |
 | `intake.html` | Intake forms landing page: download the criminal or non-criminal PDF intake form. **Deliberately still PDF-only** — the online route is being tested at the unlisted address below first |
 | `p9vt3xk6qz1md7bw/` | **Unlisted test pages** for the online intake route (`nyriac.com/p9vt3xk6qz1md7bw/`). All `noindex` and linked from nowhere. `index.html` is the front door (two cards: start a new case / add to an existing case); `new-case.html` embeds the **Airtable form** in the page; `new-case-handoff.html` is the same page but sends the attorney to airtable.com — the two exist to be compared, then one is deleted; `supplemental.html` is a placeholder until that form is published. Currently points at **Region 2's** form only. **Never replace the Airtable form with a form hosted here** — the conflict check is bound to the Airtable form and silently stops running on anything else. Embedding it is fine; re-implementing it is not. When testing is done this content moves into `intake.html` and the folder is deleted |
-| `chief-defender-survey.html` | **Unlisted** survey for NY chief defenders (see "Chief Defender survey" below). `noindex`; not linked from any nav or footer — reachable only by direct URL |
-| `js/chief-defender-survey.js` | Submits the survey to Formspree via `fetch` and shows an inline thank-you |
-| `css/style.css` | All styling, shared by every page (brand + region colors at top in `:root`) |
+| `css/style.css` | All styling, shared by every page. At the top in `:root`: the brand and region colors, and the type scale (`--fs-*`) — see "Design rules" below |
+| `images/symbols.svg` | The symbols on the advisory, intake and home-page cards, one `<symbol id="i-…">` each — see "Design rules" below |
 | `images/riac-mark.svg` | Colored map mark used as the header logo on every page |
 | `images/favicon.svg` | Browser tab icon (navy square + map) |
 | `advisories/` | Drop advisory PDFs here; link them from `advisories.html`. `advisories/source/` holds internal Word (.docx) copies for editing — not linked publicly, kept out of search engines via `robots.txt` |
@@ -59,10 +64,10 @@ Audience: attorneys (public defenders, assigned counsel, mandated providers) —
 
 ## Unlisted pages, and what "unlisted" is actually worth
 
-Two pages are deliberately not linked from anywhere: `chief-defender-survey.html` and the
-intake test folder. Both carry `noindex, nofollow`.
+The intake test folder is deliberately not linked from anywhere, and its pages carry
+`noindex, nofollow`.
 
-⚠️ **Neither is secret, and nothing should be built assuming otherwise.** This repository is
+⚠️ **It is not secret, and nothing should be built assuming otherwise.** This repository is
 **public** — GitHub Pages requires it on a free plan — so **every path in it is discoverable by
 browsing the file tree on github.com.** A hard-to-guess folder name does not change that.
 
@@ -82,12 +87,11 @@ repository with paid Pages hosting, or somewhere other than this site.
 
 ## Forms (Formspree)
 
-Two forms email their submissions through **Formspree** (formspree.io) — a free service that turns a plain HTML form into an email, so the static site needs no backend. Each form posts to a Formspree endpoint; the recipient email and reply settings live in the Formspree account, not in the site code. Submissions are sent in the background with a small `fetch` script so the visitor stays on the page and sees an inline confirmation.
+One form emails its submissions through **Formspree** (formspree.io) — a free service that turns a plain HTML form into an email, so the static site needs no backend. The form posts to a Formspree endpoint; the recipient email and reply settings live in the Formspree account, not in the site code. Submissions are sent in the background with a small `fetch` script so the visitor stays on the page and sees an inline confirmation.
 
 | Form | Endpoint | Emails to | Subject | Handler |
 |---|---|---|---|---|
 | Advisory download request (`request.html`) | `formspree.io/f/mjgnrzpp` | (set in Formspree) | New RIAC advisory download request | `js/document-request.js` |
-| Chief Defender survey (`chief-defender-survey.html`) | `formspree.io/f/mdaqzrpq` | RIAC2@ocbaacp.org | Chief Defender Referral Survey | `js/chief-defender-survey.js` |
 
 Notes:
 - The subject line and honeypot spam trap are set with hidden fields (`_subject`, `_gotcha`) in the form's HTML.
@@ -102,10 +106,6 @@ An unlisted, `noindex` admin page at `admin/index.html` running **Decap CMS** (l
 - Because GitHub Pages can't run server-side code, GitHub OAuth login is proxied through a **free Netlify site created only for this purpose** (Netlify doesn't host the actual site — nyriac.com stays on GitHub Pages). See `SETUP.md` for the one-time setup the owner needs to complete (registering a GitHub OAuth App, connecting Netlify, and adding `nyriac.com` as a domain on that Netlify site so its OAuth login recognizes requests from it), which fills in `site_domain` in `admin/config.yml`.
 - Uploads land in `advisories/` (PDF) and `advisories/source/` (Word doc) and create a small metadata entry under `cms/advisories/` that Decap uses for its list/search — this metadata isn't read by the public site. **Uploading a file here does not automatically add it as a card on `advisories.html`** — that step (title, summary, card styling) is still a manual edit, same as any other advisories.html change.
 - Only people with push access to the GitHub repo (or added as OAuth-approved users) can log in — that's the real access boundary, not the page's URL being unlisted.
-
-### Chief Defender survey
-
-An **unlisted** page (`chief-defender-survey.html`) sent to NY chief defenders, asking how their office identifies and refers non-U.S.-born clients to their RIAC. It is deliberately not linked anywhere on the site and carries `noindex, nofollow` — it's shared by direct link only. Question 1 is a searchable office picker whose ~130 options were generated from the NYSDA "Public Defense Services" Chief Defender list; if that list changes, update the `<datalist id="offices">` options in the page.
 
 ### Email signatures
 
@@ -177,9 +177,44 @@ The point of the command is that a chat can be closed at any moment without losi
 
 ## Conventions
 
-- Navigation (header) and footer are copied into each page — when editing them, update **all three pages** (`index.html`, `advisories.html`, `contact.html`) plus `404.html`'s header.
-- Pages use relative links (`advisories.html`); only `404.html` uses absolute links (`/advisories.html`) because GitHub serves it from any URL.
+- Navigation (header) and footer are copied into each page — when editing them, update **every
+  page that carries them**: `index.html`, `advisories.html`, `intake.html`, `contact.html`,
+  `request.html`, `thanks.html` and `404.html`, plus the test pages in `p9vt3xk6qz1md7bw/`.
+- Pages use relative links (`advisories.html`); only `404.html` and the test pages use absolute links (`/advisories.html`) because they are served from other addresses.
 - To publish changes: commit and push to `main` (or upload the changed files via github.com); GitHub Pages redeploys automatically in ~1 minute.
+
+### Design rules
+
+The look of the site takes its cues from the RIAC database's own pages (in the private
+repository), without sharing any of their code.
+
+- **Type.** Source Serif 4 for headings, Inter for everything else. **Every font size is one of
+  the `--fs-*` variables** at the top of `css/style.css` (display, title, section, card, lede,
+  text, small, label); do not add a size of its own to a rule. Capitals are for short labels
+  only (the menu, "Region 1", "Counties served"), never for a sentence or a title. The logo
+  lettering and the funder ribbon keep their own sizes.
+- **Paragraphs.** Reading paragraphs (`.section-intro`) are **justified** on a computer, held to
+  about 75 letters a line, with no first-line indent; on a phone they are left-aligned, because
+  a short line cannot be justified without wide gaps between words. Card text is centred.
+- **Cards.** A card has a two-tone header: the title in a navy bar (orange on a featured card),
+  with the card's symbol as a cream badge on the bar's lower edge. The advisory, intake and
+  home-page cards all use it. Title bars side by side are always the same height: on the home
+  page the stylesheet does it (each card is a two-row CSS subgrid); on the advisories page
+  `js/advisory-search.js` measures and matches them, except on a phone, where the cards are in
+  one column and each keeps its own height.
+- **Buttons and pills in a group are the same width and height**, unless there is a reason not
+  to — the rule the database pages follow. On a phone the four menu buttons are a two-by-two
+  grid of equal buttons, and the home page's two buttons stack, full width. The one exception:
+  on a computer the menu's "Practice Advisories" is wider than the other three, because four
+  items that wide would push the menu onto a second row.
+- **Symbols** (`images/symbols.svg`) are drawn for this site: solid navy shapes with one orange
+  detail, on a 48-unit square. The navy follows the text colour; the cream and orange come from
+  `--icon-fill` and `--icon-accent`, which `.symbol` sets. A page shows one with
+  `<span class="symbol" aria-hidden="true"><svg><use href="images/symbols.svg#i-NAME"/></svg></span>`
+  inside the card's `<h3>`. ⚠️ Never put two hyphens in a row inside a comment in that file: it
+  is XML, a double hyphen in a comment is an error, and the browser then draws **none** of the
+  symbols. Do not use stock or clip-art pictures, or images from the training slides: most are
+  not licensed for a public website.
 
 ## Working across two computers
 
@@ -240,6 +275,13 @@ reasoning, is rule 10 of `CLAUDE.md` in `maildej/RIAC-Airtable`.
 - **[Owner] Update the OneDrive signature file's Region 2 number** to **(315) 898-2593** in every
   signature block it holds. An online session cannot reach OneDrive, and the individual staff
   blocks exist only in that file.
+- **[Owner, optional] Delete the Chief Defender survey's form in Formspree** (`mdaqzrpq`,
+  "Chief Defender Referral Survey"). The survey page is gone from the site, so nothing posts to
+  it; deleting it frees the slot. The responses already emailed to RIAC2@ocbaacp.org are not
+  affected.
+- **[Owner, decide] The Region 2 and Region 3 cards on `contact.html` name no host office**; the
+  other four do (e.g. "Legal Aid Bureau of Buffalo"). Suggested, not yet answered: send the names
+  as they should appear if they are to be added.
 
 **Traps that have already cost time:**
 
